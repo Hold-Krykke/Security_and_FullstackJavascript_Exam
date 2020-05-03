@@ -9,7 +9,6 @@
 ### Overordnet projekt ide:
 Vores grundlag for projektet er at vi gerne vil lave en *__sikker__* React native mobil application. 
 
-#### Ide
 * __Find your Friends__
   * Lokation spores ved tilgang af forside - vises på kort (uden login)
     * Login for at chatte/poste beskeder
