@@ -4,7 +4,7 @@
 [Google Security](https://developers.google.com/identity/sign-in/web/backend-auth) https://developers.google.com/identity/protocols/oauth2/web-server#creatingcred
 
 Flow is schema/schema.graphql and resolverMap.ts goes into schema.ts
-schema.ts goes into new Apolloserver in server.ts that is then hosted via httpserver + express
+schema.ts goes into new Apolloserver in server.ts that is then hosted via express
 
 ## Make sure to make a .env file with the following contents:
 
