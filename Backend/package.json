@@ -35,5 +35,9 @@
     "nodemon": "^2.0.3",
     "ts-node": "^8.10.1",
     "typescript": "^3.9.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Hold-Krykke/Security_and_FullstackJavascript_Exam"
   }
 }
