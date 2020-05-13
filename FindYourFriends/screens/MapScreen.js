@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import { Dimensions, StyleSheet, View, Text, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import Card from '../components/Card';
 import colors from '../constants/colors';
 import Input from '../components/Input';
@@ -12,10 +12,11 @@ const MapScreen = props => {
             <View style={styles.screen}>
                 <Card style={styles.container}>
                     <Text style={styles.title}>This is MapScreen</Text>
-                    <Input style={styles.input}
-                        placeholder='Placeholder'
-                    />
                 </Card>
+                <Card style={styles.container}>
+                    <Text style={styles.text}>This should be a map</Text>
+                </Card>
+
             </View>
         </TouchableWithoutFeedback>)
 };
@@ -28,10 +29,17 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start'
     },
     title: {
-        color: colors.secondary,
+        color: colors.primary,
         fontSize: 22,
         fontWeight: "bold",
         marginVertical: 10
+
+    },
+    text: {
+        color: colors.secondary,
+        fontSize: 14,
+        fontWeight: "bold",
+        marginBottom: 20
 
     },
     container: {
@@ -39,9 +47,9 @@ const styles = StyleSheet.create({
         maxWidth: '80%',
         alignItems: 'center'
     },
-    input: {
-        width: 100,
-        textAlign: 'center'
+    mapStyle: {
+        width: Dimensions.get('window').width,
+        height: Dimensions.get('window').height,
     }
 });
 

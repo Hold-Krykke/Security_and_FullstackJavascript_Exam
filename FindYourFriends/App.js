@@ -9,7 +9,7 @@ import ChatScreen from './screens/ChatScreen';
 export default function App() {
 
     // USE SCREENS LIKE THIS
-    const [test, setTest] = useState(false);
+    const [test, setTest] = useState(true);
 
     let content = <HomeScreen setTest={setTest} />;
     if (test) {
