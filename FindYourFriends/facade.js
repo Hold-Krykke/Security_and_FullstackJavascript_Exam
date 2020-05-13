@@ -1,4 +1,4 @@
-import { SERVER_URL } from '../constants/settings';
+import { SERVER_URL } from './constants/settings';
 
 facade = () => {
 
@@ -9,7 +9,7 @@ facade = () => {
 
 
     return {
-        fetchGameArea
+        fetchSomething
     }
 }
 
