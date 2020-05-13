@@ -26,7 +26,5 @@ server.applyMiddleware({ app, path: "/graphql" }); // Mount Apollo middleware he
 const httpServer = createServer(app);
 
 httpServer.listen({ port: 3000 }, (): void =>
-  console.log(
-    `\n🚀      GraphQL is now running on http://localhost:3000/graphql`
-  )
+  console.log(`\n\nGraphQL is now running on http://localhost:3000/graphql\n`)
 );
