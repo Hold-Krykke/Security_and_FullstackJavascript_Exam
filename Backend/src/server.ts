@@ -1,7 +1,6 @@
 import express from "express";
 import { ApolloServer } from "apollo-server-express";
 import depthLimit from "graphql-depth-limit"; // https://www.npmjs.com/package/graphql-depth-limit
-import { createServer } from "http";
 // Gzip compressing can greatly decrease the size of the response body and hence increase the speed of a web app.
 // https://expressjs.com/en/advanced/best-practice-performance.html
 import compression from "compression";
@@ -23,8 +22,6 @@ app.use(compression()); // see import
 
 server.applyMiddleware({ app, path: "/graphql" }); // Mount Apollo middleware here. If no path is specified, it defaults to `/graphql`.
 
-const httpServer = createServer(app);
-
-httpServer.listen({ port: 3000 }, (): void =>
+app.listen({ port: 3000 }, (): void =>
   console.log(`\n\nGraphQL is now running on http://localhost:3000/graphql\n`)
 );

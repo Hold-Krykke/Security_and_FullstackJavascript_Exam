@@ -19,7 +19,6 @@
     "express": "^4.17.1",
     "google-auth-library": "^6.0.0",
     "graphql": "^15.0.0",
-    "http": "0.0.1-security",
     "ncp": "^2.0.0",
     "dotenv": "^8.2.0"
   },
