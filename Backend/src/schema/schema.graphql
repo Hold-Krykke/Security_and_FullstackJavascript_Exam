@@ -1,4 +1,11 @@
+'''
+Multiline docstring
+Description for the type
+'''
 type Query {
+  '''
+  Description for the field
+  '''
   helloWorld: String!
 }
 # You can comment like this here.
