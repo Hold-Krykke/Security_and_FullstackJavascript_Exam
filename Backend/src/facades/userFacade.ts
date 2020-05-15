@@ -6,7 +6,6 @@ const bcrypt = require('bcryptjs');
 import setup from '../config/setupDB'
 
 
-
 let userCollection: mongo.Collection;
 
 export default class UserFacade {

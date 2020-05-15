@@ -1,11 +1,6 @@
 import { IResolvers } from "graphql-tools";
-
 const path = require('path')
 require('dotenv').config({ path: path.join(process.cwd(), '.env') })
-//require('dotenv').config();
-import * as mongo from 'mongodb'
-import IUser from './interfaces/IUser';
-const bcrypt = require('bcryptjs');
 import setup from './config/setupDB'
 import UserFacade from './facades/userFacade'
 
@@ -20,12 +15,10 @@ type Query {
 */
 
 (async function setupDB() {
-    console.log(path.join(process.cwd(), '.env'))
-    let testuser: IUser = { userName: 'hest', password: 'hat' }
     const client = await setup()
     UserFacade.setDatabase(client)
-    console.log(UserFacade.addUser(testuser))
-
+    // let testuser: IUser = { userName: 'hat4', password: 'hat' }
+    // console.log(UserFacade.addUser(testuser))
 })()
 
 const resolverMap: IResolvers = {
