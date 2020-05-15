@@ -38,8 +38,37 @@ export default class UserFacade {
             await userCollection.insertOne(newUser);
             return true;
         } catch (err) {
+            // Errorhandling needed
             console.log(err.errmsg)
             return false;
         }
+    }
+
+    static async getUser(userName: string, proj?: object): Promise<IUser> {
+        const user = await userCollection.findOne(
+            { userName },
+            proj
+        )
+        if (!user) {
+            // Errorhandling needed
+            console.log('User not found')
+        }
+        return user;
+    }
+
+    static async deleteUser(userName: string): Promise<string> {
+        const status = await userCollection.deleteOne({ userName })
+        if (status.deletedCount === 1) {
+            return "User was deleted";
+        } // Errorhandling needed
+        else return 'Requested delete could not be performed'
+    }
+
+    static async getAllUsers(proj?: object): Promise<Array<any>> {
+        const all = userCollection.find(
+            {},
+            { projection: proj }
+        )
+        return all.toArray();
     }
 }
