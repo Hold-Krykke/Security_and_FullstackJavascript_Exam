@@ -14,8 +14,16 @@ passport.use(
       clientSecret: process.env.CLIENT_SECRET,
       callbackURL: "http://127.0.0.1:3000/auth/github/callback",
     },
-    function (accessToken, refreshToken, profile, done) {
-      User.findOrCreate({ githubId: profile.id }, function (err, user) {
+    function (
+      accessToken: any,
+      refreshToken: any,
+      profile: { id: any },
+      done: (arg0: any, arg1: any) => any
+    ) {
+      User.findOrCreate({ githubId: profile.id }, function (
+        err: any,
+        user: any
+      ) {
         return done(err, user);
       });
     }
