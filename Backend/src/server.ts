@@ -6,6 +6,7 @@ import depthLimit from "graphql-depth-limit"; // https://www.npmjs.com/package/g
 import compression from "compression";
 import cors from "cors";
 import schema from "./schema";
+import bodyParser from "body-parser";
 
 const app = express();
 
@@ -15,6 +16,11 @@ const server = new ApolloServer({
 });
 
 // Additional middleware can be mounted at this point to run before Apollo.
+// Body-parser https://www.npmjs.com/package/body-parser
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }));
+// parse application/json
+app.use(bodyParser.json());
 // CORS MIDDLEWARE
 app.use("*", cors());
 // COMPRESSION MIDDLEWARE
