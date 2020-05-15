@@ -1,21 +1,21 @@
 import passport from "passport";
-const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const path = require("path");
 require("dotenv").config({ path: path.join(process.cwd(), ".env") });
 
+/*
+The GitHub authentication strategy authenticates users using a GitHub account and OAuth 2.0 tokens. 
+The strategy requires a verify callback, which accepts these credentials and calls done providing a user, 
+as well as options specifying a client ID, client secret, and callback URL.
+*/
 passport.use(
-  new GoogleStrategy(
+  new GitHubStrategy(
     {
-      clientId: process.env.GOOGLE_CLIENT_ID, // "<GOOGLE_CLIENT_ID>", // e.g. asdfghjkljhgfdsghjk.apps.googleusercontent.com
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET, //"<GOOGLE_CLIENT_SECRET>", // e.g. _ASDFA%DFASDFASDFASD#FAD-
-      // redirect: "https://your-website.com/google-auth", // this must match your google api settings
-      callbackURL: "http://www.example.com/auth/google/callback",
+      clientID: process.env.CLIENT_ID,
+      clientSecret: process.env.CLIENT_SECRET,
+      callbackURL: "http://127.0.0.1:3000/auth/github/callback",
     },
-    function (accessToken: any, refreshToken: any, profile: any, done: any) {
-      User.findOrCreate({ googleId: profile.id }, function (
-        err: any,
-        user: any
-      ) {
+    function (accessToken, refreshToken, profile, done) {
+      User.findOrCreate({ githubId: profile.id }, function (err, user) {
         return done(err, user);
       });
     }
