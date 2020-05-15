@@ -13,6 +13,7 @@
   "author": "Camilla, Runi, Asger, Malte",
   "license": "ISC",
   "dependencies": {
+    "@types/passport": "^1.0.3",
     "apollo-server-express": "^2.13.1",
     "body-parser": "^1.19.0",
     "compression": "^1.7.4",
