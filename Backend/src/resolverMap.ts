@@ -18,8 +18,6 @@ type Query {
 (async function setupDB() {
     const client = await setup()
     UserFacade.setDatabase(client)
-    // let testuser: IUser = { userName: 'hat4', password: 'hat' }
-    // console.log(UserFacade.addUser(testuser))
 })()
 
 const resolverMap: IResolvers = {
@@ -28,7 +26,6 @@ const resolverMap: IResolvers = {
             return `Hello world!`;
         },
     },
-    // VIRKER IKKE
     Mutation: {
         addUser: (_, { input }) => {
             const userName: string = input.userName;
@@ -38,12 +35,6 @@ const resolverMap: IResolvers = {
             return added;
         },
     },
-    // Mutation: {
-    //     addUser: (root, { input }) => {
-    //         const user: IUser = { input.userName, input.password }
-    //         UserFacade.addUser(user)
-    //     });
-    // }
 };
 
 export default resolverMap;
