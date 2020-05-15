@@ -30,7 +30,9 @@ const resolverMap: IResolvers = {
     },
     // VIRKER IKKE
     Mutation: {
-        addUser: (_, { userName, password }) => {
+        addUser: (_, { input }) => {
+            const userName: string = input.userName;
+            const password: string = input.password;
             const user: IUser = { userName, password }
             const added = UserFacade.addUser(user);
             return added;

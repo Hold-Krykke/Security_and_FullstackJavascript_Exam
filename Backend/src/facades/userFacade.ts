@@ -23,7 +23,7 @@ export default class UserFacade {
     }
 
     static async addUser(user: IUser): Promise<boolean> {
-        const hash: String = await new Promise((resolve, reject) => {
+        const hash: string = await new Promise((resolve, reject) => {
             bcrypt.hash(user.password, 10, (err: Error, hash: string) => {
                 if (err) {
                     reject(err);
@@ -32,7 +32,8 @@ export default class UserFacade {
             });
         });
 
-        let newUser = { ...user, password: hash }
+        let newUser: IUser = { userName: user.userName, password: hash }
+        console.log(newUser);
         try {
             await userCollection.insertOne(newUser);
             return true;
