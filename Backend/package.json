@@ -20,7 +20,8 @@
     "express": "^4.17.1",
     "google-auth-library": "^6.0.0",
     "graphql": "^14.0.0",
-    "ncp": "^2.0.0"
+    "ncp": "^2.0.0",
+    "passport": "^0.4.1"
   },
   "devDependencies": {
     "@types/compression": "^1.7.0",
