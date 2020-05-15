@@ -1,0 +1,43 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "Backend for Security and JavaScript Project",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ./dist/server.js",
+    "build": "tsc -p . && ncp src/schema dist/schema",
+    "start:dev": "npm run build:dev",
+    "build:dev": "nodemon ./src/server.ts --exec ts-node src/server.ts -e ts,graphql"
+  },
+  "keywords": [],
+  "author": "Camilla, Runi, Asger, Malte",
+  "license": "ISC",
+  "dependencies": {
+    "apollo-server-express": "^2.13.1",
+    "compression": "^1.7.4",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "google-auth-library": "^6.0.0",
+    "graphql": "^14.0.0",
+    "ncp": "^2.0.0"
+  },
+  "devDependencies": {
+    "@types/compression": "^1.7.0",
+    "@types/express": "^4.17.6",
+    "@types/graphql": "^14.5.0",
+    "@types/graphql-depth-limit": "^1.1.2",
+    "@types/node": "^14.0.1",
+    "@types/cors": "^2.8.6",
+    "graphql-depth-limit": "^1.1.0",
+    "graphql-import": "^1.0.2",
+    "graphql-import-node": "0.0.4",
+    "nodemon": "^2.0.3",
+    "ts-node": "^8.10.1",
+    "typescript": "^3.9.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Hold-Krykke/Security_and_FullstackJavascript_Exam"
+  }
+}
