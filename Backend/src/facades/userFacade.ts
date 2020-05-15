@@ -45,6 +45,7 @@ export default class UserFacade {
     }
 
     static async getUser(userName: string, proj?: object): Promise<IUser> {
+        console.log(userName)
         const user = await userCollection.findOne(
             { userName },
             proj

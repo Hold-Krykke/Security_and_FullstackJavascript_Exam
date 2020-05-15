@@ -25,6 +25,12 @@ const resolverMap: IResolvers = {
         helloWorld(_: void, args: void): string {
             return `Hello world!`;
         },
+        allUsers(_: void, args: void): any {
+            return UserFacade.getAllUsers();
+        },
+        getUser(_: void, args): any {
+            return UserFacade.getUser(args.userName);
+        },
     },
     Mutation: {
         addUser: (_, { input }) => {
