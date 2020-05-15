@@ -3,7 +3,6 @@ require('dotenv').config({ path: path.join(process.cwd(), '.env') })
 import * as mongo from 'mongodb'
 import IUser from '../interfaces/IUser';
 const bcrypt = require('bcryptjs');
-import setup from '../config/setupDB'
 
 
 let userCollection: mongo.Collection;

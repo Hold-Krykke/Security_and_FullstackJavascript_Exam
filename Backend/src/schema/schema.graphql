@@ -7,5 +7,8 @@ type Query {
   """
   helloWorld: String!
 }
+type Mutation {
+    addUser: Boolean!
+}
 # You can comment like this here.
 # https://github.com/apollographql/graphql-tag#importing-graphql-files

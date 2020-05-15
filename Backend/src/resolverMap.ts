@@ -3,6 +3,7 @@ const path = require('path')
 require('dotenv').config({ path: path.join(process.cwd(), '.env') })
 import setup from './config/setupDB'
 import UserFacade from './facades/userFacade'
+import IUser from './interfaces/IUser';
 
 // Resolvers
 // Used in Schema to make a GraphQL schema
@@ -27,6 +28,20 @@ const resolverMap: IResolvers = {
             return `Hello world!`;
         },
     },
+    // VIRKER IKKE
+    Mutation: {
+        addUser: (_, { userName, password }) => {
+            const user: IUser = { userName, password }
+            const added = UserFacade.addUser(user);
+            return added;
+        },
+    },
+    // Mutation: {
+    //     addUser: (root, { input }) => {
+    //         const user: IUser = { input.userName, input.password }
+    //         UserFacade.addUser(user)
+    //     });
+    // }
 };
 
 export default resolverMap;
