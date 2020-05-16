@@ -14,42 +14,75 @@ import Input from "../components/Input";
 import facade from "../facade";
 import * as Google from "expo-google-app-auth";
 
+/**
+ * Google Login SSO
+ * Documentation for Google Login https://docs.expo.io/versions/latest/sdk/google/
+ * When we want to add backend, read here: https://docs.expo.io/versions/latest/sdk/google/#server-side-apis
+ */
+
 const ClientID =
-  "848374281346-g9rmruc01l44mj46q2ftgtvm0e5ol7t1.apps.googleusercontent.com";
+  "848374281346-g9rmruc01l44mj46q2ftgtvm0e5ol7t1.apps.googleUsercontent.com";
 
 const LoginScreen = (props) => {
   const [signedIn, setSignedIn] = useState(false);
-  const [user, setUser] = useState({});
+  const [googleUser, setgoogleUser] = useState({
+    id: "",
+    name: "",
+    givenName: "",
+    familyName: "",
+    photoUrl: "",
+    email: "",
+  });
+  const [loginResult, setLoginResult] = useState({
+    type: "cancel",
+    accessToken: "",
+    idToken: "",
+    refreshToken: "",
+    googleUser: {
+      id: "",
+      name: "",
+      givenName: "",
+      familyName: "",
+      photoUrl: "",
+      email: "",
+    },
+  });
 
   const signIn = async () => {
     try {
       const config = {
         clientId: ClientID,
         scopes: ["profile", "email"],
+        // redirectUrl: string | undefined	// Defaults to ${AppAuth.OAuthRedirect}:/oauth2redirect/google. Optionally you can define your own redirect URL, just make sure to see the note below.
+        // Note on redirectUrl: If you choose to provide your own redirectUrl, it should start with the value returned by AppAuth.OAuthRedirect. This way, the method will function correctly and consistently whether you are testing in the Expo Client or as a standalone app.
       };
       // First- obtain access token from Expo's Google API
-      const result = await Google.logInAsync(config);
-      const { type, accessToken, user } = result;
+      const loginResult = await Google.logInAsync(config); // Returns Promise<LogInResult>
+      const { type, accessToken, idToken, refreshToken, user } = loginResult;
 
       if (type === "success") {
         // Then you can use the Google REST API
-        let userInfoResponse = await fetch(
-          "https://www.googleapis.com/userinfo/v2/me",
+        let googleUserInfoResponse = await fetch(
+          "https://www.googleapis.com/googleUserinfo/v2/me",
           {
             headers: { Authorization: `Bearer ${accessToken}` },
           }
         );
-        console.log("User Info Response: ", userInfoResponse);
-        console.log();
-        console.log("User: ", user);
-        console.log();
-
-        setSignedIn(true);
-        setUser({
+        console.log(
+          "\n\nGOOGLEUSER INFO RESPONSE:\n\n",
+          JSON.stringify(googleUserInfoResponse),
+          "\n\nGOOGLEUSER:\n\n",
+          JSON.stringify(user),
+          "\n\nLOGINRESULT:\n\n",
+          JSON.stringify(loginResult)
+        );
+        setgoogleUser({
           ...user,
         });
+        setLoginResult(loginResult);
+        setSignedIn(true);
       } else {
-        console.log("cancelled");
+        console.log("User cancelled login");
       }
     } catch (e) {
       console.log("error", e);
@@ -65,7 +98,10 @@ const LoginScreen = (props) => {
       <View style={styles.screen}>
         <Card style={styles.container}>
           {signedIn ? (
-            <LoggedInPage name={user.name} photoUrl={user.photoUrl} />
+            <LoggedInPage
+              name={googleUser.name}
+              photoUrl={googleUser.photoUrl}
+            />
           ) : (
             <LoginPage signIn={signIn} />
           )}
