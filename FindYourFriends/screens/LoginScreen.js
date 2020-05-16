@@ -12,27 +12,41 @@ import Card from "../components/Card";
 import colors from "../constants/colors";
 import Input from "../components/Input";
 import facade from "../facade";
-import Expo from "expo";
+import * as Google from "expo-google-app-auth";
 
 const ClientID =
   "848374281346-g9rmruc01l44mj46q2ftgtvm0e5ol7t1.apps.googleusercontent.com";
 
 const LoginScreen = (props) => {
-  const [user, setUser] = useState({ signedIn: false, name: "", photoUrl: "" });
+  const [signedIn, setSignedIn] = useState(false);
+  const [user, setUser] = useState({});
 
   const signIn = async () => {
     try {
-      const result = await Expo.Google.logInAsync({
-        androidClientId: ClientID,
-        //iosClientId: YOUR_CLIENT_ID_HERE,  <-- if you use iOS
+      const config = {
+        clientId: ClientID,
         scopes: ["profile", "email"],
-      });
+      };
+      // First- obtain access token from Expo's Google API
+      const result = await Google.logInAsync(config);
+      const { type, accessToken, user } = result;
 
-      if (result.type === "success") {
+      if (type === "success") {
+        // Then you can use the Google REST API
+        let userInfoResponse = await fetch(
+          "https://www.googleapis.com/userinfo/v2/me",
+          {
+            headers: { Authorization: `Bearer ${accessToken}` },
+          }
+        );
+        console.log("User Info Response: ", userInfoResponse);
+        console.log();
+        console.log("User: ", user);
+        console.log();
+
+        setSignedIn(true);
         setUser({
-          signedIn: true,
-          name: result.user.name,
-          photoUrl: result.user.photoUrl,
+          ...user,
         });
       } else {
         console.log("cancelled");
@@ -50,13 +64,11 @@ const LoginScreen = (props) => {
     >
       <View style={styles.screen}>
         <Card style={styles.container}>
-          {user.signedIn ? (
+          {signedIn ? (
             <LoggedInPage name={user.name} photoUrl={user.photoUrl} />
           ) : (
             <LoginPage signIn={signIn} />
           )}
-          <Text style={styles.title}>This is LoginScreen</Text>
-          <Input style={styles.input} placeholder="Placeholder" />
         </Card>
       </View>
     </TouchableWithoutFeedback>
@@ -67,7 +79,7 @@ const LoginPage = (props) => {
   return (
     <View>
       <Text style={styles.title}>Sign In With Google</Text>
-      <Button title="Sign in with Google" onPress={() => props.signIn()} />
+      <Button title="Sign in with Google" onPress={props.signIn} />
     </View>
   );
 };
