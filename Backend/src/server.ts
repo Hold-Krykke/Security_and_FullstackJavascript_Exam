@@ -10,20 +10,26 @@ import session from "express-session";
 import uuid from "uuid/v4";
 import passport from "passport";
 import User from "./dummyUser";
+
 const SESSION_SECRECT = "bad secret";
 
-const app = express();
-
-const server = new ApolloServer({
-  schema,
-  validationRules: [depthLimit(7)], // see import
+passport.serializeUser((user: any, done) => {
+  done(null, user.id);
 });
 
-// Additional middleware can be mounted at this point to run before Apollo.
-// CORS MIDDLEWARE
-app.use("*", cors());
-// COMPRESSION MIDDLEWARE
-app.use(compression()); // see import
+passport.deserializeUser((id, done) => {
+  const users = User.getUsers();
+  const matchingUser = users.find((user) => user.id === id);
+  done(null, matchingUser);
+});
+
+const app = express();
+/**
+ * After setting the express-session middleware
+ * we initialize passport by calling passport.initialize().
+ * Afterward we connect Passport and express-session by adding the
+ * passport.session() middleware.
+ */
 app.use(
   session({
     genid: (req) => uuid(),
@@ -32,7 +38,19 @@ app.use(
     saveUninitialized: false,
   })
 );
+app.use(passport.initialize());
+app.use(passport.session());
 
+// Additional middleware can be mounted at this point to run before Apollo.
+// CORS MIDDLEWARE
+app.use("*", cors());
+// COMPRESSION MIDDLEWARE
+app.use(compression()); // see import
+
+const server = new ApolloServer({
+  schema,
+  validationRules: [depthLimit(7)], // see import
+});
 server.applyMiddleware({ app, path: "/graphql" }); // Mount Apollo middleware here. If no path is specified, it defaults to `/graphql`.
 
 const PORT = 3000;
