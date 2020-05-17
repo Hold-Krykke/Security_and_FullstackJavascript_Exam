@@ -50,6 +50,10 @@ app.use(compression()); // see import
 const server = new ApolloServer({
   schema,
   validationRules: [depthLimit(7)], // see import
+  context: ({ req, res }) => ({
+    getUser: () => req.user,
+    logout: () => req.logout(),
+  }),
 });
 server.applyMiddleware({ app, path: "/graphql" }); // Mount Apollo middleware here. If no path is specified, it defaults to `/graphql`.
 
