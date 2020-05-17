@@ -1,5 +1,5 @@
 import express from "express";
-import { ApolloServer } from "apollo-server-express";
+import { ApolloServer, AuthenticationError } from "apollo-server-express";
 import depthLimit from "graphql-depth-limit"; // https://www.npmjs.com/package/graphql-depth-limit
 // Gzip compressing can greatly decrease the size of the response body and hence increase the speed of a web app.
 // https://expressjs.com/en/advanced/best-practice-performance.html
@@ -9,7 +9,7 @@ import schema from "./schema";
 import session from "express-session";
 import uuid from "uuid/v4";
 import passport from "passport";
-import User from "./dummyUser";
+import User from "./passport_test/dummyUser";
 
 const SESSION_SECRECT = "bad secret";
 
@@ -51,8 +51,9 @@ const server = new ApolloServer({
   schema,
   validationRules: [depthLimit(7)], // see import
   context: ({ req, res }) => ({
+    // Could use this to build the context https://github.com/jkettmann/graphql-passport
     getUser: () => req.user,
-    logout: () => req.logout(),
+    logout: () => req.logout(), // Passed down through context, by passport
   }),
 });
 server.applyMiddleware({ app, path: "/graphql" }); // Mount Apollo middleware here. If no path is specified, it defaults to `/graphql`.

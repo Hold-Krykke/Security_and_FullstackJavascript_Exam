@@ -11,7 +11,7 @@ type Query {
 */
 const resolverMap: IResolvers = {
   Query: {
-    helloWorld(_: void, args: void): string {
+    helloWorld(parent: void, args: void, context: any): string {
       return `Hello world!`;
     },
   },
