@@ -15,7 +15,10 @@ import facade from "../facade";
 import * as Google from "expo-google-app-auth";
 
 /**
- * Google Login SSO
+ * Google Login SSO - IMPLICIT FLOW
+ *
+ * What we want to eventually implement is a SERVER FLOW. https://developers.google.com/identity/protocols/oauth2/openid-connect
+ *
  * Documentation for Google Login https://docs.expo.io/versions/latest/sdk/google/
  * When we want to add backend, read here: https://docs.expo.io/versions/latest/sdk/google/#server-side-apis
  */
