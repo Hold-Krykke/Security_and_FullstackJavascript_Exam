@@ -7,12 +7,13 @@ import compression from "compression";
 import cors from "cors";
 import schema from "./schema";
 import session from "express-session";
-import uuid from "uuid/v4";
+import { v4 as uuid } from "uuid";
 import passport from "passport";
 import User from "./passport_test/dummyUser";
-import { GraphQLLocalStrategy, buildContext } from "graphql-passport";
 import typeDefs from "./passport_test/typeDefs";
 import resolvers from "./passport_test/resolvers";
+import cookieParser from "cookie-parser";
+import bodyParser from "body-parser";
 
 const SESSION_SECRECT = "bad secret";
 
@@ -40,6 +41,15 @@ passport.use(
   })
 );
 const app = express();
+// CORS MIDDLEWARE
+//app.use("*", cors());
+// const corsOptions = {
+//   origin: ["http://localhost:3000"],
+//   credentials: true,
+// };
+// app.use(cors(corsOptions));
+app.use(cookieParser());
+app.use(bodyParser());
 /**
  * After setting the express-session middleware
  * we initialize passport by calling passport.initialize().
@@ -51,27 +61,30 @@ app.use(
     //https://github.com/expressjs/session
     genid: (req) => uuid(),
     secret: SESSION_SECRECT,
-    resave: false,
+    resave: true,
     saveUninitialized: false,
   })
 );
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Additional middleware can be mounted at this point to run before Apollo.
-// CORS MIDDLEWARE
-app.use("*", cors());
 // COMPRESSION MIDDLEWARE
-app.use(compression()); // see import
+//app.use(compression()); // see import
 
 const server = new ApolloServer({
   typeDefs,
   resolvers,
   //schema,
   validationRules: [depthLimit(7)], // see import
-  context: ({ req, res }) => buildContext({ req, res }), // buildContext copies a couple of Passport related fields like its authenticate and login functions from the request into the context and makes them usable from the resolvers.
+  // buildContext will add all additional fields you pass to it to the context.
+  context: ({ req, res }) => buildContext({ req, res, User }), // buildContext copies a couple of Passport related fields like its authenticate and login functions from the request into the context and makes them usable from the resolvers.
+  playground: {
+    settings: {
+      "request.credentials": "same-origin",
+    },
+  },
 });
-server.applyMiddleware({ app, path: "/graphql" }); // Mount Apollo middleware here. If no path is specified, it defaults to `/graphql`.
+server.applyMiddleware({ app, cors: false, path: "/graphql" }); // Mount Apollo middleware here. If no path is specified, it defaults to `/graphql`.
 
 const PORT = 3000;
 app.listen({ port: PORT }, (): void =>
