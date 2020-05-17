@@ -8,6 +8,8 @@ import cors from "cors";
 import schema from "./schema";
 import session from "express-session";
 import uuid from "uuid/v4";
+import passport from "passport";
+import User from "./dummyUser";
 const SESSION_SECRECT = "bad secret";
 
 const app = express();

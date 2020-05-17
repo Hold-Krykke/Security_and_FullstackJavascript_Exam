@@ -14,6 +14,7 @@
   "license": "ISC",
   "dependencies": {
     "@types/express-session": "^1.17.0",
+    "@types/passport": "^1.0.3",
     "@types/uuid": "^7.0.3",
     "apollo-server-express": "^2.13.1",
     "compression": "^1.7.4",
