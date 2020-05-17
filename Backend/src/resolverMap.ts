@@ -8,12 +8,6 @@ import IUser from './interfaces/IUser';
 // Resolvers
 // Used in Schema to make a GraphQL schema
 // Schema is used to make Apollo Server
-// This matches with the schema.graphql, like so:
-/* ./schema/schema.graphql
-type Query {
-  helloWorld: String!
-}
-*/
 
 (async function setupDB() {
     const client = await setup()

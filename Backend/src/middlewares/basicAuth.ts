@@ -1,6 +1,4 @@
-//const http = require('http')
 const auth = require('basic-auth')
-//const compare = require('tsscmp')
 import { Response } from "express"
 import UserFacade from '../facades/userFacade';
 
