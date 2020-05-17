@@ -7,6 +7,7 @@ import compression from 'compression';
 import cors from 'cors';
 import schema from './schema';
 import { ApiError } from './customErrors/apiError';
+import authMiddleware from "./middlewares/basicAuth";
 
 const app = express();
 
@@ -16,10 +17,10 @@ const server = new ApolloServer({
 });
 
 // Additional middleware can be mounted at this point to run before Apollo.
-// CORS MIDDLEWARE
 app.use("*", cors());
-// COMPRESSION MIDDLEWARE
 app.use(compression()); // see import
+
+app.use(authMiddleware)
 
 server.applyMiddleware({ app, path: '/graphql' }); // Mount Apollo middleware here. If no path is specified, it defaults to `/graphql`.
 

@@ -68,4 +68,22 @@ export default class UserFacade {
         )
         return all.toArray();
     }
+
+    static async checkUser(userName: string, plainTextPassword: string): Promise<boolean> {
+        let result = false;
+        const user = await UserFacade.getUser(userName);
+        if (!user) throw new ApiError(`User ${userName} not found`, 404);
+
+        await new Promise((resolve, reject) => {
+            bcrypt.compare(plainTextPassword, user.password, (err: Error, res: boolean) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    result = res;
+                    resolve(res);
+                }
+            });
+        })
+        return result;
+    }
 }
