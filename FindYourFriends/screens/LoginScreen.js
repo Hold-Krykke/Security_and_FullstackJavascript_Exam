@@ -69,11 +69,15 @@ const LoginScreen = (props) => {
           }
         );
         console.log(
-          JSON.stringify({
-            googleUserInfoResponse,
-            "Google User": user,
-            loginResult,
-          })
+          JSON.stringify(
+            {
+              googleUserInfoResponse,
+              "Google User": user,
+              loginResult,
+            },
+            null,
+            4
+          )
         );
         setgoogleUser({
           ...user,
