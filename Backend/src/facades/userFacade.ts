@@ -32,7 +32,7 @@ export default class UserFacade {
             });
         });
 
-        let newUser: IUser = { userName: user.userName, password: hash }
+        let newUser: IUser = { userName: user.userName, password: hash, name: user.name }
         console.log(newUser);
         try {
             await userCollection.insertOne(newUser);

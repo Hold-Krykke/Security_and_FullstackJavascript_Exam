@@ -13,11 +13,13 @@ type Query {
 type User {
   userName: String!
   password: String!
+  name: String!
 }
 
 input UserInput {
   userName: String!
   password: String!
+  name: String!
 }
 
 type Mutation {

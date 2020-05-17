@@ -36,7 +36,8 @@ const resolverMap: IResolvers = {
         addUser: (_, { input }) => {
             const userName: string = input.userName;
             const password: string = input.password;
-            const user: IUser = { userName, password }
+            const name: string = input.name;
+            const user: IUser = { userName, password, name };
             const added = UserFacade.addUser(user);
             return added;
         },
