@@ -59,22 +59,13 @@ const LoginScreen = (props) => {
         // redirectUrl: string | undefined	// Defaults to ${AppAuth.OAuthRedirect}:/oauth2redirect/google. Optionally you can define your own redirect URL, just make sure to see the note below.
         // Note on redirectUrl: If you choose to provide your own redirectUrl, it should start with the value returned by AppAuth.OAuthRedirect. This way, the method will function correctly and consistently whether you are testing in the Expo Client or as a standalone app.
       };
-      // First- obtain access token from Expo's Google API
       const loginResult = await Google.logInAsync(config); // Returns Promise<LogInResult>
       const { type, accessToken, idToken, refreshToken, user } = loginResult;
 
       if (type === "success") {
-        // Then you can use the Google REST API
-        let googleUserInfoResponse = await fetch(
-          "https://www.googleapis.com/googleUserinfo/v2/me",
-          {
-            headers: { Authorization: `Bearer ${accessToken}` },
-          }
-        );
         console.log(
           JSON.stringify(
             {
-              googleUserInfoResponse,
               "Google User": user,
               loginResult,
             },
