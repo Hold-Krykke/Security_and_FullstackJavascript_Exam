@@ -1,4 +1,4 @@
-import { IResolvers } from "graphql-tools";
+import { IResolvers } from 'graphql-tools';
 const path = require('path')
 require('dotenv').config({ path: path.join(process.cwd(), '.env') })
 import setup from './config/setupDB'
@@ -22,9 +22,6 @@ type Query {
 
 const resolverMap: IResolvers = {
     Query: {
-        helloWorld(_: void, args: void): string {
-            return `Hello world!`;
-        },
         allUsers(_: void, args: void): any {
             return UserFacade.getAllUsers();
         },

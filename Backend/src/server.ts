@@ -1,12 +1,12 @@
-import express from "express";
-import { ApolloServer } from "apollo-server-express";
-import depthLimit from "graphql-depth-limit"; // https://www.npmjs.com/package/graphql-depth-limit
+import express from 'express';
+import { ApolloServer } from 'apollo-server-express';
+import depthLimit from 'graphql-depth-limit'; // https://www.npmjs.com/package/graphql-depth-limit
 // Gzip compressing can greatly decrease the size of the response body and hence increase the speed of a web app.
 // https://expressjs.com/en/advanced/best-practice-performance.html
-import compression from "compression";
-import cors from "cors";
-import schema from "./schema";
-import { ApiError } from "./customErrors/apiError";
+import compression from 'compression';
+import cors from 'cors';
+import schema from './schema';
+import { ApiError } from './customErrors/apiError';
 
 const app = express();
 
@@ -21,7 +21,7 @@ app.use("*", cors());
 // COMPRESSION MIDDLEWARE
 app.use(compression()); // see import
 
-server.applyMiddleware({ app, path: "/graphql" }); // Mount Apollo middleware here. If no path is specified, it defaults to `/graphql`.
+server.applyMiddleware({ app, path: '/graphql' }); // Mount Apollo middleware here. If no path is specified, it defaults to `/graphql`.
 
 app.use(function (err: any, req: any, res: any, next: Function) {
     if (err instanceof (ApiError)) {

@@ -3,7 +3,7 @@ require('dotenv').config({ path: path.join(process.cwd(), '.env') })
 import * as mongo from 'mongodb'
 import IUser from '../interfaces/IUser';
 const bcrypt = require('bcryptjs');
-import { ApiError } from "../customErrors/apiError"
+import { ApiError } from '../customErrors/apiError'
 
 let userCollection: mongo.Collection;
 
@@ -13,13 +13,13 @@ export default class UserFacade {
             if (!client.isConnected()) {
                 await client.connect();
             }
-            userCollection = client.db().collection("users");
+            userCollection = client.db().collection('users');
             await userCollection.createIndex({ userName: 1 }, { unique: true })
             await userCollection.createIndex({ name: 1 }, { unique: true })
             return client.db();
 
         } catch (err) {
-            console.error("Could not create connect\n", err)
+            console.error('\nCould not create connect\n', err)
         }
     }
 
@@ -34,7 +34,6 @@ export default class UserFacade {
         });
 
         let newUser: IUser = { userName: user.userName, password: hash, name: user.name }
-        console.log(newUser);
         try {
             await userCollection.insertOne(newUser);
             return true;
@@ -44,7 +43,6 @@ export default class UserFacade {
     }
 
     static async getUser(userName: string, proj?: object): Promise<IUser> {
-        console.log(userName)
         const user = await userCollection.findOne(
             { userName },
             proj
@@ -56,10 +54,9 @@ export default class UserFacade {
     }
 
     static async deleteUser(userName: string): Promise<string> {
-        console.log(userName)
         const status = await userCollection.deleteOne({ userName })
         if (status.deletedCount === 1) {
-            return "User was deleted";
+            return `${userName} was removed`;
         }
         else throw new ApiError(`Requested user ${userName} could not be removed`, 400)
     }
