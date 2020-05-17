@@ -10,6 +10,7 @@ import session from "express-session";
 import uuid from "uuid/v4";
 import passport from "passport";
 import User from "./passport_test/dummyUser";
+import { GraphQLLocalStrategy, buildContext } from "graphql-passport";
 
 const SESSION_SECRECT = "bad secret";
 
@@ -22,7 +23,20 @@ passport.deserializeUser((id, done) => {
   const matchingUser = users.find((user) => user.id === id);
   done(null, matchingUser);
 });
-
+passport.use(
+  new GraphQLLocalStrategy((email: any, password: any, done: any): any => {
+    /*
+    If we find a match we pass the user to the done callback. 
+    Otherwise, we create an error and pass it to done.
+    */
+    const users = User.getUsers();
+    const matchingUser = users.find(
+      (user) => email === user.email && password === user.password
+    );
+    const error = matchingUser ? null : new Error("no matching user");
+    done(error, matchingUser);
+  })
+);
 const app = express();
 /**
  * After setting the express-session middleware
@@ -32,6 +46,7 @@ const app = express();
  */
 app.use(
   session({
+    //https://github.com/expressjs/session
     genid: (req) => uuid(),
     secret: SESSION_SECRECT,
     resave: false,
@@ -50,11 +65,7 @@ app.use(compression()); // see import
 const server = new ApolloServer({
   schema,
   validationRules: [depthLimit(7)], // see import
-  context: ({ req, res }) => ({
-    // Could use this to build the context https://github.com/jkettmann/graphql-passport
-    getUser: () => req.user,
-    logout: () => req.logout(), // Passed down through context, by passport
-  }),
+  context: ({ req, res }) => buildContext({ req, res }), // buildContext copies a couple of Passport related fields like its authenticate and login functions from the request into the context and makes them usable from the resolvers.
 });
 server.applyMiddleware({ app, path: "/graphql" }); // Mount Apollo middleware here. If no path is specified, it defaults to `/graphql`.
 

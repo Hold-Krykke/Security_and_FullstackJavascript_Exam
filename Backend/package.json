@@ -21,6 +21,7 @@
     "express-session": "^1.17.1",
     "google-auth-library": "^6.0.0",
     "graphql": "^14.0.0",
+    "graphql-passport": "^0.6.3",
     "ncp": "^2.0.0",
     "passport": "^0.4.1",
     "uuid": "^8.0.0"
