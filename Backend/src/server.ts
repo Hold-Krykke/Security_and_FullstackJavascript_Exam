@@ -11,6 +11,8 @@ import uuid from "uuid/v4";
 import passport from "passport";
 import User from "./passport_test/dummyUser";
 import { GraphQLLocalStrategy, buildContext } from "graphql-passport";
+import typeDefs from "./passport_test/typeDefs";
+import resolvers from "./passport_test/resolvers";
 
 const SESSION_SECRECT = "bad secret";
 
@@ -63,7 +65,9 @@ app.use("*", cors());
 app.use(compression()); // see import
 
 const server = new ApolloServer({
-  schema,
+  typeDefs,
+  resolvers,
+  //schema,
   validationRules: [depthLimit(7)], // see import
   context: ({ req, res }) => buildContext({ req, res }), // buildContext copies a couple of Passport related fields like its authenticate and login functions from the request into the context and makes them usable from the resolvers.
 });
