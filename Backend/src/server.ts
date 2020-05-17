@@ -6,6 +6,8 @@ import depthLimit from "graphql-depth-limit"; // https://www.npmjs.com/package/g
 import compression from "compression";
 import cors from "cors";
 import schema from "./schema";
+import session from "express-session";
+import uuid from "uuid/v4";
 
 const app = express();
 
