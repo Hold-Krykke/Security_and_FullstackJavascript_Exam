@@ -105,10 +105,12 @@ const server = new ApolloServer({
   resolvers,
   //schema,
   validationRules: [depthLimit(7)], // see import
-  context: ({ req }) => ({
-    session: req.session,
-    user: req.user,
-  }), // buildContext copies a couple of Passport related fields like its authenticate and login functions from the request into the context and makes them usable from the resolvers.
+  context: ({ req }) => {
+    return {
+      session: req.session,
+      user: req.user,
+    };
+  }, // buildContext copies a couple of Passport related fields like its authenticate and login functions from the request into the context and makes them usable from the resolvers.
   playground: {
     settings: {
       "request.credentials": "include",
