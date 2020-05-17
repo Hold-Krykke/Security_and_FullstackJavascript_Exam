@@ -24,7 +24,6 @@
     "graphql": "^14.0.0",
     "jsonwebtoken": "^8.5.1",
     "mongodb": "^3.5.7",
-    "mongoose": "^5.9.14",
     "ncp": "^2.0.0",
     "passport": "^0.4.1",
     "passport-google-token": "^0.1.2"

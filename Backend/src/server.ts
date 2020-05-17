@@ -12,6 +12,8 @@ const app = express();
 const server = new ApolloServer({
   schema,
   validationRules: [depthLimit(7)], // see import
+  // add request and response to graphQL context
+  context: ({ req, res }) => ({ req, res }),
 });
 
 // Additional middleware can be mounted at this point to run before Apollo.
