@@ -22,6 +22,9 @@ app.use(compression()); // see import
 
 server.applyMiddleware({ app, path: "/graphql" }); // Mount Apollo middleware here. If no path is specified, it defaults to `/graphql`.
 
-app.listen({ port: 3000 }, (): void =>
-  console.log(`\n\nGraphQL is now running on http://localhost:3000/graphql\n`)
+const PORT = 3000;
+app.listen({ port: PORT }, (): void =>
+  console.log(
+    `\n\nGraphQL is now running on http://localhost:${PORT}/graphql\n`
+  )
 );
