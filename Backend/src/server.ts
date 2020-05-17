@@ -79,7 +79,7 @@ const sessionOptions = {
   resave: false,
   saveUninitialized: false,
   cookie: {
-    maxAge: 40000,
+    maxAge: 40000000,
     sameSite: true,
     secure: process.env.NODE_ENV === "production",
   },
@@ -106,6 +106,9 @@ const server = new ApolloServer({
   //schema,
   validationRules: [depthLimit(7)], // see import
   context: ({ req }) => {
+    console.log(req);
+    const token = req.headers.authorization || "";
+    if (token) console.log(jwt.verify(token, JWT_SECRET));
     return {
       session: req.session,
       user: req.user,
