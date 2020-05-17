@@ -28,7 +28,7 @@ const resolverMap: IResolvers = {
         allUsers(_: void, args: void): any {
             return UserFacade.getAllUsers();
         },
-        getUser(_: void, args): any {
+        getUser(_: void, args: any): any {
             return UserFacade.getUser(args.userName);
         },
     },
@@ -39,6 +39,11 @@ const resolverMap: IResolvers = {
             const user: IUser = { userName, password }
             const added = UserFacade.addUser(user);
             return added;
+        },
+        deleteUser: (_, args: any) => {
+            const userName: string = args.userName;
+            const msg = UserFacade.deleteUser(userName);
+            return msg;
         },
     },
 };

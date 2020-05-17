@@ -58,6 +58,7 @@ export default class UserFacade {
     }
 
     static async deleteUser(userName: string): Promise<string> {
+        console.log(userName)
         const status = await userCollection.deleteOne({ userName })
         if (status.deletedCount === 1) {
             return "User was deleted";

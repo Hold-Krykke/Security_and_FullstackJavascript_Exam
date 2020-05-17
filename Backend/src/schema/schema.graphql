@@ -7,7 +7,7 @@ type Query {
   """
   helloWorld: String!
   allUsers: [User]
-  getUser(userName: String): User
+  getUser(userName: String!): User
 }
 
 type User {
@@ -22,6 +22,7 @@ input UserInput {
 
 type Mutation {
     addUser(input: UserInput!): Boolean
+    deleteUser(userName: String!): String
 }
 # You can comment like this here.
 # https://github.com/apollographql/graphql-tag#importing-graphql-files
