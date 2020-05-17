@@ -3,7 +3,7 @@ require('dotenv').config({ path: path.join(process.cwd(), '.env') })
 import * as mongo from 'mongodb'
 import IUser from '../interfaces/IUser';
 const bcrypt = require('bcryptjs');
-
+import { ApiError } from "../customErrors/apiError"
 
 let userCollection: mongo.Collection;
 
@@ -15,10 +15,11 @@ export default class UserFacade {
             }
             userCollection = client.db().collection("users");
             await userCollection.createIndex({ userName: 1 }, { unique: true })
+            await userCollection.createIndex({ name: 1 }, { unique: true })
             return client.db();
 
         } catch (err) {
-            console.error("Could not create connect", err)
+            console.error("Could not create connect\n", err)
         }
     }
 
@@ -38,9 +39,7 @@ export default class UserFacade {
             await userCollection.insertOne(newUser);
             return true;
         } catch (err) {
-            // Errorhandling needed
-            console.log(err.errmsg)
-            return false;
+            throw new ApiError(`User could not be added, username (${user.userName}) and name (${user.name}) must be unique`, 400)
         }
     }
 
@@ -51,8 +50,7 @@ export default class UserFacade {
             proj
         )
         if (!user) {
-            // Errorhandling needed
-            console.log('User not found')
+            throw new ApiError(`User with username: ${userName} was not found`, 404)
         }
         return user;
     }
@@ -62,8 +60,8 @@ export default class UserFacade {
         const status = await userCollection.deleteOne({ userName })
         if (status.deletedCount === 1) {
             return "User was deleted";
-        } // Errorhandling needed
-        else return 'Requested delete could not be performed'
+        }
+        else throw new ApiError(`Requested user ${userName} could not be removed`, 400)
     }
 
     static async getAllUsers(proj?: object): Promise<Array<any>> {
