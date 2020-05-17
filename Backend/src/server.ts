@@ -8,6 +8,7 @@ import cors from "cors";
 import schema from "./schema";
 import session from "express-session";
 import uuid from "uuid/v4";
+const SESSION_SECRECT = "bad secret";
 
 const app = express();
 
@@ -21,6 +22,14 @@ const server = new ApolloServer({
 app.use("*", cors());
 // COMPRESSION MIDDLEWARE
 app.use(compression()); // see import
+app.use(
+  session({
+    genid: (req) => uuid(),
+    secret: SESSION_SECRECT,
+    resave: false,
+    saveUninitialized: false,
+  })
+);
 
 server.applyMiddleware({ app, path: "/graphql" }); // Mount Apollo middleware here. If no path is specified, it defaults to `/graphql`.
 
