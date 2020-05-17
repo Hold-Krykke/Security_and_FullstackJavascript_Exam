@@ -1,4 +1,5 @@
 import { v4 as uuid } from "uuid";
+import User from "./dummyUser";
 
 const resolvers = {
   Query: {
@@ -8,11 +9,8 @@ const resolvers = {
     logout: (parent: any, args: any, context: any) => context.logout(),
 
     login: async (parent: any, { email, password }: any, context: any) => {
-      const { user } = await context.authenticate("graphql-local", {
-        email,
-        password,
-      });
-      await context.login(user);
+      const user = await User.getByEmail(email, password);
+      console.log(context);
       return { user };
     },
     /**

@@ -14,79 +14,109 @@ import typeDefs from "./passport_test/typeDefs";
 import resolvers from "./passport_test/resolvers";
 import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
+import passportJWT from "passport-jwt";
+import jwt from "jsonwebtoken";
 
 const SESSION_SECRECT = "bad secret";
+const { Strategy, ExtractJwt } = passportJWT;
 
+// const { GRAPHQL_PORT, JWT_SECRET } = process.env
+const PORT = 3000;
+const JWT_SECRET = "bad secret";
+
+// generate a jwt token for testing purposes
+console.log(jwt.sign(User.getUsers()[0], JWT_SECRET));
+
+const params = {
+  secretOrKey: JWT_SECRET,
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+};
+const strategy = new Strategy(params, (payload, done) => {
+  const user = User.getUser(payload.id);
+  return done(null, user);
+});
+passport.use(strategy);
 passport.serializeUser((user: any, done) => {
   done(null, user.id);
 });
 
 passport.deserializeUser((id, done) => {
-  const users = User.getUsers();
-  const matchingUser = users.find((user) => user.id === id);
-  done(null, matchingUser);
+  done(null, User.getUser(id));
 });
-passport.use(
-  new GraphQLLocalStrategy((email: any, password: any, done: any): any => {
-    /*
-    If we find a match we pass the user to the done callback. 
-    Otherwise, we create an error and pass it to done.
-    */
-    const users = User.getUsers();
-    const matchingUser = users.find(
-      (user) => email === user.email && password === user.password
-    );
-    const error = matchingUser ? null : new Error("no matching user");
-    done(error, matchingUser);
-  })
-);
+
 const app = express();
+
 // CORS MIDDLEWARE
 //app.use("*", cors());
-// const corsOptions = {
-//   origin: ["http://localhost:3000"],
-//   credentials: true,
-// };
-// app.use(cors(corsOptions));
+const corsOptions = {
+  origin: [`http://localhost:${PORT}`],
+  credentials: true,
+};
+app.use(cors(corsOptions));
+app.use(express.urlencoded({ extended: true }));
+app.use(passport.initialize());
 app.use(cookieParser());
 app.use(bodyParser());
+app.use("/graphql", (req, res, next) => {
+  passport.authenticate("jwt", { session: false }, (err, user, info) => {
+    if (user) {
+      req.user = user;
+    }
+
+    next();
+  })(req, res, next);
+});
+
 /**
  * After setting the express-session middleware
  * we initialize passport by calling passport.initialize().
  * Afterward we connect Passport and express-session by adding the
  * passport.session() middleware.
  */
-app.use(
-  session({
-    //https://github.com/expressjs/session
-    genid: (req) => uuid(),
-    secret: SESSION_SECRECT,
-    resave: true,
-    saveUninitialized: false,
-  })
-);
-app.use(passport.initialize());
+const sessionOptions = {
+  name: "Hold Krykke",
+  secret: SESSION_SECRECT,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    maxAge: 40000,
+    sameSite: true,
+    secure: process.env.NODE_ENV === "production",
+  },
+};
+app.use(session(sessionOptions));
+// app.use(
+//   // session({
+//   //   //https://github.com/expressjs/session
+//   //   genid: (req) => uuid(),
+//   //   secret: SESSION_SECRECT,
+//   //   resave: true,
+//   //   saveUninitialized: false,
+//   // })
+
+// );
 app.use(passport.session());
 
 // COMPRESSION MIDDLEWARE
-//app.use(compression()); // see import
+app.use(compression()); // see import
 
 const server = new ApolloServer({
   typeDefs,
   resolvers,
   //schema,
   validationRules: [depthLimit(7)], // see import
-  // buildContext will add all additional fields you pass to it to the context.
-  context: ({ req, res }) => buildContext({ req, res, User }), // buildContext copies a couple of Passport related fields like its authenticate and login functions from the request into the context and makes them usable from the resolvers.
+  context: ({ req }) => ({
+    session: req.session,
+    user: req.user,
+  }), // buildContext copies a couple of Passport related fields like its authenticate and login functions from the request into the context and makes them usable from the resolvers.
   playground: {
     settings: {
-      "request.credentials": "same-origin",
+      "request.credentials": "include",
     },
   },
 });
 server.applyMiddleware({ app, cors: false, path: "/graphql" }); // Mount Apollo middleware here. If no path is specified, it defaults to `/graphql`.
 
-const PORT = 3000;
 app.listen({ port: PORT }, (): void =>
   console.log(
     `\n\nGraphQL is now running on http://localhost:${PORT}/graphql\n`
