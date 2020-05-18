@@ -16,7 +16,9 @@ const app = express();
 
 app.use(passport.initialize());
 
-app.get('/auth/google', passport.authenticate('google', { scope: 'openid email', prompt: 'select_account' }));
+const params = { scope: 'openid email', accessType: 'offline', prompt: 'consent' }
+
+app.get('/auth/google', passport.authenticate('google', params));
 
 app.get('/auth/google/callback',
     passport.authenticate('google', { failureRedirect: '/login' }),

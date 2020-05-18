@@ -25,7 +25,6 @@ const initPassport = () => {
         clientID: '848374281346-dsdvalpdbid45inil3kvu438ico0ssjr.apps.googleusercontent.com',
         clientSecret: '6iNQ8mwdBjJwUe-TRL-aKHq9',
         callbackURL: 'http://localhost:3000/auth/google/callback',
-        authorizationParams: { access_type: 'offline', approval_prompt: 'force' }
     }, GoogleTokenStrategyCallback));
 
     passport.deserializeUser((user, done) => {
