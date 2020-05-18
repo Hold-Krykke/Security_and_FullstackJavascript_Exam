@@ -66,11 +66,8 @@ const server = new ApolloServer({
   validationRules: [depthLimit(7)], // see import
   context: ({ req }) => {
     // console.log(req); // Currently its getting one every 2-3 seconds, even though nothing is happening
-    const token = req.headers.authorization || "";
-    if (token) console.log(jwt.verify(token, JWT_SECRET));
     return {
-      session: req.session,
-      user: req.user,
+      // Add to context here
     };
   }, // buildContext copies a couple of Passport related fields like its authenticate and login functions from the request into the context and makes them usable from the resolvers.
   playground: {
