@@ -7,13 +7,13 @@ type Query {
   """
   allUsers: [User]
   getUser(userName: String!): User
-  login(email: String!, password: String!)
+  login(email: String!, password: String!): AuthData!
 }
 
 type AuthData {
   userId: ID!
   token: String!
-  
+  tokenExpiration: Int!
 }
 
 type User {
@@ -29,8 +29,8 @@ input UserInput {
 }
 
 type Mutation {
-    addUser(input: UserInput!): Boolean
-    deleteUser(userName: String!): String
+  addUser(input: UserInput!): Boolean
+  deleteUser(userName: String!): String
 }
 # You can comment like this here.
 # https://github.com/apollographql/graphql-tag#importing-graphql-files
