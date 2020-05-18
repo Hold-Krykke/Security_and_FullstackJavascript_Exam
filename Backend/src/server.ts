@@ -125,7 +125,9 @@ const server = new ApolloServer({
     },
   },
 });
-app.use(authMiddleware);
+
+// Disabling this while testing on branch
+//app.use(authMiddleware);
 
 app.use(function (err: any, req: any, res: any, next: Function) {
   if (err instanceof ApiError) {
