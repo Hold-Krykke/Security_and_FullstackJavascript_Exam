@@ -65,7 +65,7 @@ const server = new ApolloServer({
   schema,
   validationRules: [depthLimit(7)], // see import
   context: ({ req }) => {
-    console.log(req);
+    // console.log(req); // Currently its getting one every 2-3 seconds, even though nothing is happening
     const token = req.headers.authorization || "";
     if (token) console.log(jwt.verify(token, JWT_SECRET));
     return {

@@ -17,10 +17,10 @@ import jwt from "jsonwebtoken";
 
 const resolverMap: IResolvers = {
   Query: {
-    allUsers(_: void, args: void): any {
+    allUsers(parent: void, args: void): any {
       return UserFacade.getAllUsers();
     },
-    getUser(_: void, args: any): any {
+    getUser(parent: void, args: any, context: any): any {
       return UserFacade.getUser(args.userName);
     },
     login: async (
