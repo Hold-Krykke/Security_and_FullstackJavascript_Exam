@@ -10,7 +10,7 @@ import User from "./passport_test/dummyUser";
 import typeDefs from "./passport_test/typeDefs";
 import resolvers from "./passport_test/resolvers";
 import cookieParser from "cookie-parser";
-import bodyParser from "body-parser";
+import bodyParser from "body-parser"; // However, I want to point out that express-graphql can parse request's body according to its content-type, so the body parser is unnecessary. With that gone, you can send application/graphql request using postman, and copy & paste the query/mutation directly from graphiql.
 import passportJWT from "passport-jwt";
 import jwt from "jsonwebtoken";
 import compression from "compression";
