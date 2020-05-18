@@ -8,8 +8,22 @@ import cors from 'cors';
 import schema from './schema';
 import { ApiError } from './customErrors/apiError';
 import authMiddleware from "./middlewares/basicAuth";
+import initPassport from './middlewares/passportOauth';
+import passport from 'passport';
 
+initPassport();
 const app = express();
+
+app.use(passport.initialize());
+
+app.get('/auth/google', passport.authenticate('google', { scope: 'openid email', prompt: 'select_account' }));
+
+app.get('/auth/google/callback',
+    passport.authenticate('google', { failureRedirect: '/login' }),
+    function (req, res) {
+        res.redirect('/');
+    });
+
 
 const server = new ApolloServer({
     schema,
@@ -20,7 +34,7 @@ const server = new ApolloServer({
 app.use("*", cors());
 app.use(compression()); // see import
 
-//app.use(authMiddleware)
+//app.use(authMiddleware) Needs fixing
 
 server.applyMiddleware({ app, path: '/graphql' }); // Mount Apollo middleware here. If no path is specified, it defaults to `/graphql`.
 
