@@ -4,6 +4,7 @@ require("dotenv").config({ path: path.join(process.cwd(), ".env") });
 import setup from "./config/setupDB";
 import UserFacade from "./facades/userFacade";
 import IUser from "./interfaces/IUser";
+import jwt from "jsonwebtoken";
 
 // Resolvers
 // Used in Schema to make a GraphQL schema
@@ -38,6 +39,24 @@ const resolverMap: IResolvers = {
         throw new Error("Password is incorrect!"); // Maybe we shouldn't do this. Don't want to give the Hacker any hints! #Security
         // But giving the "hint" is good for debugging. But in production it should just be "User credentials are invalid!" in both Errors.
       }
+      // Making token to hand to user
+      const tokenExpiration = 1;
+      const tokenConfig = {
+        expiresIn: `${tokenExpiration}h`,
+      };
+      const token = jwt.sign(
+        { userName: user.userName },
+        process.env.JWT_SECRET,
+        tokenConfig
+      );
+      /*
+      type AuthData {
+            userName: String!
+            token: String!
+            tokenExpiration: Int!
+        }
+      */
+      return { userName: user.userName, token, tokenExpiration };
     },
   },
   Mutation: {

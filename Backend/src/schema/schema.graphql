@@ -11,7 +11,7 @@ type Query {
 }
 
 type AuthData {
-  userId: ID!
+  userName: String!
   token: String!
   tokenExpiration: Int!
 }

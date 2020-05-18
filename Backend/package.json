@@ -25,9 +25,10 @@
     "express-session": "^1.17.1",
     "google-auth-library": "^6.0.0",
     "graphql": "^14.0.0",
+    "graphql-tools": "^5.0.0",
+    "jsonwebtoken": "^8.5.1",
     "mongodb": "^3.5.7",
     "ncp": "^2.0.0",
-    "jsonwebtoken": "^8.5.1",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
     "uuid": "^8.0.0"

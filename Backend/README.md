@@ -15,5 +15,7 @@ Find them [here](https://console.developers.google.com/apis/credentials/oauthcli
 
 ### Replace the nonsense with your own ID and SECRET
 
+JWT_SECRET=holdkrykkesupersecretkey
+
 GOOGLE_CLIENT_ID=asdfghjkljhgfdsghjk.apps.googleusercontent.com
 GOOGLE_CLIENT_SECRET=\_ASDFA%DFASDFASDFASD#FAD-
