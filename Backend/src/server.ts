@@ -20,7 +20,7 @@ const server = new ApolloServer({
 app.use("*", cors());
 app.use(compression()); // see import
 
-app.use(authMiddleware)
+//app.use(authMiddleware)
 
 server.applyMiddleware({ app, path: '/graphql' }); // Mount Apollo middleware here. If no path is specified, it defaults to `/graphql`.
 
