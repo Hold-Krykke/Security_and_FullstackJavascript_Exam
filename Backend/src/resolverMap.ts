@@ -22,7 +22,12 @@ const resolverMap: IResolvers = {
     getUser(_: void, args: any): any {
       return UserFacade.getUser(args.userName);
     },
-    login: async (parent: void, { userName, password }, context: any) => {
+    login: async (
+      parent: void,
+      args: { userName: string; password: string },
+      context: any
+    ) => {
+      const { userName, password } = args;
       const user = await UserFacade.getUser(userName);
       if (!user) {
         throw new Error("User does not exist!");
