@@ -8,19 +8,34 @@ import cors from 'cors';
 import schema from './schema';
 import { ApiError } from './customErrors/apiError';
 import authMiddleware from "./middlewares/basicAuth";
+import initPassport from './middlewares/passportOauth';
+import passport from 'passport';
 
+initPassport();
 const app = express();
+
+app.use(passport.initialize());
+
+// Keept out because typeScript is angry
+const params = { scope: 'openid email', accessType: 'offline', prompt: 'consent' }
+
+app.get('/auth/google', passport.authenticate('google', params));
+
+app.get('/auth/google/callback',
+    passport.authenticate('google', { failureRedirect: '/login' }),
+    function (req, res) {
+        res.redirect('/graphql');
+    });
 
 const server = new ApolloServer({
     schema,
     validationRules: [depthLimit(7)], // see import
 });
 
-// Additional middleware can be mounted at this point to run before Apollo.
 app.use("*", cors());
 app.use(compression()); // see import
 
-app.use(authMiddleware)
+//app.use(authMiddleware) ***** Needs fixing *****
 
 server.applyMiddleware({ app, path: '/graphql' }); // Mount Apollo middleware here. If no path is specified, it defaults to `/graphql`.
 
