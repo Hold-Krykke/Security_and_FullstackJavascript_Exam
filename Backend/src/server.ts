@@ -27,7 +27,9 @@ const PORT = 3000;
 const JWT_SECRET = "bad secret";
 
 // generate a jwt token for testing purposes
-console.log(jwt.sign(User.getUsers()[0], JWT_SECRET));
+// Where do we use this?
+const test_jwt = jwt.sign(User.getUsers()[0], JWT_SECRET);
+console.log(test_jwt);
 
 const params = {
   secretOrKey: JWT_SECRET,
