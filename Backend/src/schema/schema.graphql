@@ -7,7 +7,7 @@ type Query {
   """
   allUsers: [User]
   getUser(userName: String!): User
-  login(email: String!, password: String!): AuthData!
+  login(userName: String!, password: String!): AuthData!
 }
 
 type AuthData {
