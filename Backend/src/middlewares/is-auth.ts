@@ -3,6 +3,7 @@ const path = require("path");
 require("dotenv").config({ path: path.join(process.cwd(), ".env") });
 
 // Middleware for auth
+// Reached here in the video tutorial: https://youtu.be/uk9YHJsOjVo?t=1291
 const ass = async ({ req, res, next }: { req: any; res: any; next: any }) => {
   const authHeader = req.headers.authorization || "";
   if (!authHeader) {
