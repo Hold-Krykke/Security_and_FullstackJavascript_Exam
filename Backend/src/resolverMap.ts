@@ -44,11 +44,8 @@ const resolverMap: IResolvers = {
       const tokenConfig = {
         expiresIn: `${tokenExpiration}h`,
       };
-      const token = jwt.sign(
-        { userName: user.userName },
-        process.env.JWT_SECRET,
-        tokenConfig
-      );
+      const secret = "holdkrykkesupersecretkey"; //process.env.JWT_SECRET;
+      const token = jwt.sign({ userName: user.userName }, secret, tokenConfig);
       /*
       type AuthData {
             userName: String!
