@@ -62,6 +62,7 @@ app.use(passport.initialize());
 app.use(cookieParser());
 app.use(bodyParser());
 app.use("/graphql", (req, res, next) => {
+  // https://dev.to/hasusozam/passport-jwt-with-graphql-3gdj
   passport.authenticate("jwt", { session: false }, (err, user, info) => {
     if (user) {
       req.user = user;
@@ -80,7 +81,7 @@ app.use("/graphql", (req, res, next) => {
 const sessionOptions = {
   name: "Hold Krykke",
   secret: SESSION_SECRECT,
-  resave: false,
+  resave: false, // What are these settings?
   saveUninitialized: false,
   cookie: {
     maxAge: 40000000,
