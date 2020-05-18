@@ -16,6 +16,11 @@ import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
 import passportJWT from "passport-jwt";
 import jwt from "jsonwebtoken";
+import compression from 'compression';
+import cors from 'cors';
+import schema from './schema';
+import { ApiError } from './customErrors/apiError';
+import authMiddleware from "./middlewares/basicAuth";
 
 const SESSION_SECRECT = "bad secret";
 const { Strategy, ExtractJwt } = passportJWT;
@@ -121,9 +126,22 @@ const server = new ApolloServer({
   },
 });
 server.applyMiddleware({ app, cors: false, path: "/graphql" }); // Mount Apollo middleware here. If no path is specified, it defaults to `/graphql`.
+app.use(authMiddleware)
 
 app.listen({ port: PORT }, (): void =>
   console.log(
     `\n\nGraphQL is now running on http://localhost:${PORT}/graphql\n`
   )
+server.applyMiddleware({ app, path: '/graphql' }); // Mount Apollo middleware here. If no path is specified, it defaults to `/graphql`.
+
+app.use(function (err: any, req: any, res: any, next: Function) {
+    if (err instanceof (ApiError)) {
+        const e = <ApiError>err;
+        return res.status(e.errorCode).send({ code: e.errorCode, message: e.message })
+    }
+    next(err)
+})
+
+app.listen({ port: 3000 }, (): void =>
+    console.log(`\n\nGraphQL is now running on http://localhost:3000/graphql\n`)
 );
