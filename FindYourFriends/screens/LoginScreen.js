@@ -12,7 +12,7 @@ import Card from "../components/Card";
 import colors from "../constants/colors";
 import Input from "../components/Input";
 import facade from "../facade";
-import * as Linking from "expo-linking";
+import { Linking } from "expo";
 import * as WebBrowser from "expo-web-browser";
 
 const backendURL = "https://87a26532.ngrok.io";
@@ -44,7 +44,8 @@ const LoginScreen = (props) => {
   const handleGoogleLogin = async () => {
     try {
       let result = await WebBrowser.openAuthSessionAsync(
-        `${backendURL}/auth/google` //?authToken=${Linking.makeUrl("/")
+        `${backendURL}/auth/google`, //?authToken=${Linking.makeUrl("/")
+        "exp://192.168.1.10:19000"
       );
       if (result.url) {
         const redirectData_ = Linking.parse(result.url);
@@ -96,6 +97,10 @@ const LoggedInPage = (props) => {
     <View style={styles.container}>
       {/* <Text style={styles.title}>Welcome:{props.name}</Text>
       <Image style={styles.image} source={{ uri: props.photoUrl }} /> */}
+      <Image
+        style={styles.image}
+        source={{ uri: "https://i.imgur.com/x9XtMsh.jpg" }}
+      />
       <Text>data: {JSON.stringify(props.data, null, 4)}</Text>
       <Text>Result: {JSON.stringify(props.result, null, 4)}</Text>
     </View>
