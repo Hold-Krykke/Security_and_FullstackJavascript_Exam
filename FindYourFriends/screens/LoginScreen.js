@@ -14,7 +14,7 @@ import Input from "../components/Input";
 import facade from "../facade";
 import * as Linking from "expo-linking";
 
-const backendURL = "http://85270f5f.ngrok.io";
+const backendURL = "https://87a26532.ngrok.io";
 /**
  * Google Login SSO - IMPLICIT FLOW
  *
@@ -56,6 +56,8 @@ const LoginScreen = (props) => {
     </TouchableWithoutFeedback>
   );
 };
+
+const login = () => {};
 
 const LoginPage = (props) => {
   return (
