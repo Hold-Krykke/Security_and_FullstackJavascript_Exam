@@ -38,7 +38,6 @@ const LoginScreen = (props) => {
     photoUrl: "",
     email: "",
   });
-  const [redirectData, setRedirectData] = useState();
   const [result, setResult] = useState();
 
   const handleGoogleLogin = async () => {
@@ -47,11 +46,7 @@ const LoginScreen = (props) => {
         `${backendURL}/auth/google`, //?authToken=${Linking.makeUrl("/")
         "exp://192.168.1.10:19000"
       );
-      if (result.url) {
-        const redirectData_ = Linking.parse(result.url);
-        setRedirectData({ redirectData_ });
-      }
-      console.log({ result, redirectData });
+      //console.log({ result, redirectData });
       setResult({ result });
       setSignedIn(true);
     } catch (error) {
@@ -71,7 +66,6 @@ const LoginScreen = (props) => {
             <LoggedInPage
               name={user.name}
               photoUrl={user.photoUrl}
-              data={redirectData}
               result={result}
             />
           ) : (
@@ -101,7 +95,6 @@ const LoggedInPage = (props) => {
         style={styles.image}
         source={{ uri: "https://i.imgur.com/x9XtMsh.jpg" }}
       />
-      <Text>data: {JSON.stringify(props.data, null, 4)}</Text>
       <Text>Result: {JSON.stringify(props.result, null, 4)}</Text>
     </View>
   );
