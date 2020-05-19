@@ -8,17 +8,51 @@ import cors from 'cors';
 import schema from './schema';
 import { ApiError } from './customErrors/apiError';
 import authMiddleware from "./middlewares/basicAuth";
-import initPassport from './middlewares/passportOauth';
+import initPassport from './middlewares/passportSetup';
 import passport from 'passport';
+const jwt = require('jsonwebtoken');
+const bodyParser = require('body-parser')
+const app = express();
+const path = require('path')
+require('dotenv').config({ path: path.join(process.cwd(), '.env') })
 
 initPassport();
-const app = express();
+
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 app.use(passport.initialize());
 
-// Keept out because typeScript is angry
-const params = { scope: 'openid email', accessType: 'offline', prompt: 'consent' }
+app.post('/auth/jwt', (req, res) => {
+    passport.authenticate(
+        'local',
+        { session: false },
+        (error: Error, user: any) => {
+            if (error || !user) {
+                res.status(400).json({ error });
+                return
+            }
 
+            const payload = {
+                username: user.userName,
+                expires: Date.now() + 3600000,
+            };
+
+            req.login(payload, { session: false }, (error) => {
+                if (error) {
+                    res.status(400).send({ error });
+                }
+
+                const token = jwt.sign(JSON.stringify(payload), process.env.SECRET);
+                res.cookie('jwt', jwt, { httpOnly: true, secure: true });
+                res.status(200).send({ username: user.userName, jwt: token });
+            });
+        },
+    )(req, res);
+});
+
+// Kept out because typeScript is angry
+const params = { scope: 'openid email', accessType: 'offline', prompt: 'consent' }
 app.get('/auth/google', passport.authenticate('google', params));
 
 app.get('/auth/google/callback',
@@ -35,7 +69,7 @@ const server = new ApolloServer({
 app.use("*", cors());
 app.use(compression()); // see import
 
-//app.use(authMiddleware) ***** Needs fixing *****
+//app.use(authMiddleware) //***** Needs fixing *****
 
 server.applyMiddleware({ app, path: '/graphql' }); // Mount Apollo middleware here. If no path is specified, it defaults to `/graphql`.
 

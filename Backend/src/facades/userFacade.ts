@@ -77,8 +77,10 @@ export default class UserFacade {
         await new Promise((resolve, reject) => {
             bcrypt.compare(plainTextPassword, user.password, (err: Error, res: boolean) => {
                 if (err) {
+                    console.log('ERROR')
                     reject(err);
                 } else {
+                    console.log('SUCCES')
                     result = res;
                     resolve(res);
                 }
