@@ -14,7 +14,11 @@ import Input from "../components/Input";
 import facade from "../facade";
 import { Linking } from "expo";
 import * as WebBrowser from "expo-web-browser";
-import jwt_decode from "jwt-decode";
+import jwt_decode from "jwt-decode"; // https://www.npmjs.com/package/jwt-decode
+/*
+  We dont verify token here. 
+  We have to verify it on the backend on every request. 
+*/
 
 const backendURL = "https://87a26532.ngrok.io";
 /**
