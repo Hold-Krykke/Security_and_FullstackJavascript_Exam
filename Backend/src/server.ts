@@ -10,11 +10,15 @@ import { ApiError } from './customErrors/apiError';
 import authMiddleware from "./middlewares/basicAuth";
 import initPassport from './middlewares/passportOauth';
 import passport from 'passport';
+import { requestLogger, errorLogger } from './middlewares/logger'
 
 initPassport();
 const app = express();
 
 app.use(passport.initialize());
+
+//The regular logger needs to be before the router
+app.use(requestLogger)
 
 // Keept out because typeScript is angry
 const params = { scope: 'openid email', accessType: 'offline', prompt: 'consent' }
@@ -26,6 +30,9 @@ app.get('/auth/google/callback',
     function (req, res) {
         res.redirect('/graphql');
     });
+
+//The errorlogger needs to be added AFTER the express router and BEFORE any custom error handlers.
+app.use(errorLogger)
 
 const server = new ApolloServer({
     schema,
