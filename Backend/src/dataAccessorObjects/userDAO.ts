@@ -21,7 +21,7 @@ export default class UserDataAccessorObject {
 
   // Does not work
   // /**
-  //  * Used to create new connection pool. It is NOT necessarry to call this method when instantiating class.
+  //  * Used to create new connection pool. It is NOT necessary to call this method when instantiating class.
   //  * > Returns true if pool was created or false if it failed to create a pool.
   //  */
   // createConnectionPool(): Promise<boolean> {
@@ -69,9 +69,10 @@ export default class UserDataAccessorObject {
 
   /**
    * Used to get a user from database based on given username.
+   * Returns promise with null as value if no user was found
    * @param username username of user
    */
-  getUserByUsername(username: string): Promise<IUser> {
+  getUserByUsername(username: string): Promise<IUser> | Promise<any> {
     return new Promise((resolve, reject) => {
       this._pool.getConnection((err, connection) => {
         if (err) {
@@ -86,6 +87,12 @@ export default class UserDataAccessorObject {
                 reject(error);
               }
               const data = result[0];
+              console.log(typeof(data));
+              if (typeof(data) == "undefined") {
+                resolve(null);
+                // return statement necessary to end method
+                return;
+              } 
               //I couldn't find a better way to destructure this data
               const { username, password, email, isOAuth, refreshToken } = data;
               const user: IUser = {
@@ -98,7 +105,7 @@ export default class UserDataAccessorObject {
               resolve(user);
             });
           } catch (error) {
-            console.log("Failed to get user by email");
+            console.log("Failed to get user by username");
             reject(error);
           } finally {
             //console.log("Releasing connection back to the pool");
@@ -111,10 +118,11 @@ export default class UserDataAccessorObject {
 
   /**
    * Used to create user in database. 
+   * Can be used to add both OAuth users and normal users
    * Will return promise with success message if user was persisted.
    * Will return rejected promise with specific message if a duplicate error occurs.
    * username and email (if provided) must be unique
-   * @param user User containing at least username, password (hashed) and isOAuth
+   * @param user 
    */
   addUser(user: IUser): Promise<any> {
     return new Promise((resolve, reject) => {
@@ -196,10 +204,15 @@ export default class UserDataAccessorObject {
         else {
           try {
             connection.query('DELETE FROM `exam`.`users` WHERE (`username` = ?);',
-            [username], function(error){
+            [username], function(error, result){
+              console.log(result);
               if (error) {
                 console.log("An error occurred when trying to delete user");
                 reject(error);
+              }
+              if (result.affectedRows == 0) {
+                // Should promise be resolved instead (a bit less aggressive strategy)
+                reject({"message": `User ${username} does not exist`})
               }
               resolve({"message": `User ${username} succesfully deleted`});
             })
@@ -216,6 +229,7 @@ export default class UserDataAccessorObject {
 
   /**
    * Used to check if the user provided correct credentials.
+   * Perhaps this method should be removed?
    * @param username username of user
    * @param password password of use
    */
@@ -235,13 +249,81 @@ export default class UserDataAccessorObject {
                 reject(false);
               }
               if (result[0].password == password) resolve(true);
-              else reject(false);
+              else resolve(false);
             });
           } catch (error) {
             console.log("Failed to check user");
             reject(false);
           } finally {
-            //console.log("Releasing connection back to the pool");
+            connection.release();
+          }
+        }
+      });
+    })
+  }
+
+  /**
+   * Used to check if a specific user is an OAuth type user.
+   * @param username username of user
+   */
+  isOAuthUser(username: string): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this._pool.getConnection((err, connection) => {
+        if (err) {
+          console.log("Failed to get connection from pool");
+          reject(err);
+        }
+        else {
+          try {
+            connection.query('SELECT `username`, `isOAuth` FROM `exam`.`users` WHERE (`username` = ?);',
+             [username], function (error, result) {
+              if (error) {
+                console.log("An error occurred when trying to check user status (OAuth)");
+                reject(false);
+              }
+              if (result[0].isOAuth) resolve(true);
+              else resolve(false);
+            });
+          } catch (error) {
+            console.log("Failed to check user status (OAuth)");
+            reject(false);
+          } finally {
+            connection.release();
+          }
+        }
+      });
+    })
+  }
+
+  /**
+   * Used to get refresh token of specific user.
+   * @param username username of user
+   */
+  getRefreshToken(username: string): Promise<string> | Promise<any> {
+    return new Promise((resolve, reject) => {
+      this._pool.getConnection((err, connection) => {
+        if (err) {
+          console.log("Failed to get connection from pool");
+          reject(err);
+        }
+        else {
+          try {
+            connection.query('SELECT `refreshToken` FROM `exam`.`users` WHERE (`username` = ?);',
+             [username], function (error, result) {
+              if (error) {
+                console.log("An error occurred when trying to get refresh token");
+                reject(false);
+              }
+              if (result[0].refreshToken) {
+                resolve(result[0].refreshToken);
+                return;
+              }
+              else resolve(null);
+            });
+          } catch (error) {
+            console.log("Failed to refresh token");
+            reject(false);
+          } finally {
             connection.release();
           }
         }
@@ -253,18 +335,19 @@ export default class UserDataAccessorObject {
 
 // const dao: UserDataAccessorObject = new UserDataAccessorObject();
 // async function getUser() {
-//   const user: IUser = await dao.getUserByEmail("Johnny");
+//   const user: IUser = await dao.getUserByUsername("ass");
 //   console.log(user);
 // }
 // getUser();
 
 // const newUser: IUser = {username: "ass", password: "xyzhash", isOAuth: false, email: "bitch@mail.com", refreshToken: null};
+// const newOAuthUser: IUser = {username: "Neko Chan", password: null, email: null, isOAuth: true, refreshToken: "Meow meow"}
 
 // async function addUser(newUser: IUser){
 //   let success = await dao.addUser(newUser);
 //   console.log(success);
 // }
-// addUser(newUser);
+// addUser(newOAuthUser);
 
 // async function updateUserRefreshToken(username: string, token: string){
 //   let success = await dao.updateUserRefreshToken(username, token);
@@ -282,7 +365,19 @@ export default class UserDataAccessorObject {
 //   let success = await dao.checkUser(username, password);
 //   console.log(success);
 // }
-// checkUser("Jenny", "sickhash");
+// checkUser("Jenny", "badhash");
+
+// async function isOAuthUser(username: string){
+//   let success = await dao.isOAuthUser(username);
+//   console.log(success);
+// }
+// isOAuthUser("Jenny");
+
+// async function getRefreshToken(username: string){
+//   let success = await dao.getRefreshToken(username);
+//   console.log(success);
+// }
+// getRefreshToken("Johnny");
 
 
 // setTimeout(() => {

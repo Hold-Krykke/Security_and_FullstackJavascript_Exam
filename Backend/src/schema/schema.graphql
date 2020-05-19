@@ -5,25 +5,23 @@ type Query {
   Docstrings show up in the documentation panel inside GraphQL playground and GraphiQL.
   Description for the field
   """
-  allUsers: [User]
-  getUser(userName: String!): User
+  getUser(username: String!): User
 }
 
 type User {
-  userName: String!
-  password: String!
-  name: String!
+  username: String!
+  email: String!
 }
 
 input UserInput {
-  userName: String!
+  username: String!
   password: String!
-  name: String!
+  email: String!
 }
 
 type Mutation {
     addUser(input: UserInput!): Boolean
-    deleteUser(userName: String!): String
+    deleteUser(username: String!): String
 }
 # You can comment like this here.
 # https://github.com/apollographql/graphql-tag#importing-graphql-files
