@@ -5,102 +5,204 @@ import mysql from "mysql";
 import { SSLAccessor } from "../ssl.js";
 import IUser from "../interfaces/IUser.js";
 
+const host = process.env.DATABASE_IP;
+const username = process.env.DATABASE_USER_USERNAME;
+const password = process.env.DATABASE_USER_PASSWORD;
+const schema = process.env.DATABASE_SCHEMA;
+const port = 3306
 
-// Default max amount of connections is 10 which is enough for us
-var pool = createConnectionPool();
+export default class UserDataAccessorObject {
 
-function createConnectionPool() {
-  let host = process.env.DATABASE_IP;
-  let username = process.env.DATABASE_USER_USERNAME;
-  let password = process.env.DATABASE_USER_PASSWORD;
-  let schema = process.env.DATABASE_SCHEMA;
-  let port = 3306
+  private _pool: mysql.Pool;
 
-  return mysql.createPool({
-    host,
-    port,
-    user: username,
-    password,
-    database: schema,
-    ssl: getSSLConfiguration(),
-  });
-}
-
-function getSSLConfiguration() {
-  if (!SSLAccessor) {
-    throw new Error("Cannot access SSL information. Please provide SSL CA, CERT and KEY.");
+  constructor() {
+    this._pool = this._createConnectionPool();
   }
-  return {
-    ca: SSLAccessor.get_SSL_CA(),
-    key: SSLAccessor.get_SSL_KEY(),
-    cert: SSLAccessor.get_SSL_CERT()
+
+  // /**
+  //  * Used to create new connection pool. It is NOT necessarry to call this method when instantiating class.
+  //  * > Returns true if pool was created or false if it failed to create a pool.
+  //  */
+  // createConnectionPool(): Promise<boolean> {
+  //   return new Promise((resolve, reject) => {
+  //     try {
+  //       this._pool = this._createConnectionPool()
+  //       resolve(true);
+  //     } catch (err) {
+  //       console.log(err);
+  //       reject(false);
+  //     }
+  //   })
+  // }
+
+  private _createConnectionPool(): mysql.Pool {
+    return mysql.createPool({
+      host,
+      port,
+      user: username,
+      password,
+      database: schema,
+      ssl: this._getSSLConfiguration(),
+    });
   }
-}
 
-function testConnection() {
-  pool.getConnection((err, connection) => {
-    if (err) {
-      console.log("Failed to test connection using pool");
-      throw err;
+  private _getSSLConfiguration() {
+    if (!SSLAccessor) {
+      throw new Error("Cannot access SSL information. Please provide SSL CA, CERT and KEY.");
     }
-    try {
-      connection.query('SELECT * FROM test', function (error, results, fields) {
-        if (error) throw error;
-        console.log('The data is: ', results[0].data);
-      });
-    } catch (error) {
-      throw error;
-    } finally {
-      console.log("Releasing connection back to the pool");
-      connection.release();
+    return {
+      ca: SSLAccessor.get_SSL_CA(),
+      key: SSLAccessor.get_SSL_KEY(),
+      cert: SSLAccessor.get_SSL_CERT()
     }
-  });
-}
+  }
 
-function getUserByEmail(email: string, callback: Function) {
-  // let user: IUser = {username: "", password: "", email: null, isOAuth: false, refreshToken: null};
-  pool.getConnection((err, connection) => {
-    if (err) {
-      console.log("Failed to get connection from pool");
-      //throw err;
-    }
-    try {
-      connection.query('SELECT * FROM users WHERE email = ?', [email], function (error, result) {
-        if (error) {
-          console.log("An error occurred when trying to fetch user");
-          // throw error;
+  /**
+   * Used to terminate the connection pool within instance of class.
+   */
+  terminateConnectionPool() {
+    this._pool.end();
+  }
+
+  /**
+   * Used to get a user from database based on given email.
+   * @param email Email address of the user
+   */
+  getUserByEmail(username: string): Promise<IUser> {
+    return new Promise((resolve, reject) => {
+      this._pool.getConnection((err, connection) => {
+        if (err) {
+          console.log("Failed to get connection from pool");
+          reject(err);
         }
-        const data = result[0];
-        //I couldn't find a better way to destructure this data
-        const {username, password, email, isOAuth, refreshToken} = data;
-        const user: IUser = {
-          username,
-          password,
-          email,
-          isOAuth,
-          refreshToken
+        else {
+          try {
+            connection.query('SELECT * FROM users WHERE username = ?', [username], function (error, result) {
+              if (error) {
+                console.log("An error occurred when trying to fetch user");
+                reject(error);
+              }
+              const data = result[0];
+              //I couldn't find a better way to destructure this data
+              const { username, password, email, isOAuth, refreshToken } = data;
+              const user: IUser = {
+                username,
+                password,
+                email,
+                isOAuth,
+                refreshToken
+              }
+              resolve(user);
+            });
+          } catch (error) {
+            console.log("Failed to get user by email");
+            reject(error);
+          } finally {
+            //console.log("Releasing connection back to the pool");
+            connection.release();
+          }
         }
-        return callback(user);
       });
-    } catch (error) {
-      console.log("Failed to get user by email");
-      // throw error;
-    } finally {
-      console.log("Releasing connection back to the pool");
-      connection.release();
-    }
-  });
+    })
+  }
+
+  /**
+   * Used to create user in database. 
+   * Will return promise with success message if user was persisted.
+   * Will return rejected promise with specific message if a duplicate error occurs.
+   * username and email (if provided) must be unique
+   * @param user User contain at least username, password (hashed) and isOAuth
+   */
+  addUser(user: IUser): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this._pool.getConnection((err, connection) => {
+        if (err) {
+          console.log("Failed to get connection from pool");
+          reject(err);
+        }
+        else {
+          try {
+            connection.query('INSERT INTO `exam`.`users` (`username`, `password`, `email`, `isOAuth`, `refreshToken`) VALUES ( ?, ?, ?, ?, ?);',
+            [user.username, user.password, user.email, user.isOAuth, user.refreshToken], function(error){
+              if (error) {
+                console.log("An error occurred when trying to insert user in database");
+                if (error.message.includes("ER_DUP_ENTRY: Duplicate entry")) {
+                  reject({"message": "Username or email already exists"});
+                }
+                reject(error);
+              }
+              resolve({"message": `User ${user.username} was succesfully created`});
+            })
+          } catch (err) {
+            console.log("Failed to create user");
+            reject(err);
+          } finally {
+            connection.release();
+          }
+        }
+      });
+    })
+  }
+
+  /**
+   * Used to update the refresh token of a user.
+   * Returns promise with success message if token was updated
+   * @param username username of user
+   * @param token new refresh token
+   */
+  updateUserRefreshToken(username: string, token: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this._pool.getConnection((err, connection) => {
+        if (err) {
+          console.log("Failed to get connection from pool");
+          reject(err);
+        }
+        else {
+          try {
+            connection.query('UPDATE `exam`.`users` SET `refreshToken` = ? WHERE (`username` = ?);',
+            [token, username], function(error){
+              if (error) {
+                console.log("An error occurred when trying to update user refresh token");
+                reject(error);
+              }
+              resolve({"message": `User ${username}'s refresh token was succesfully updated`});
+            })
+          } catch (err) {
+            console.log("Failed to update token");
+            reject(err);
+          } finally {
+            connection.release();
+          }
+        }
+      });
+    })
+  }
+
 }
 
-let johnny = {}
-getUserByEmail("johnny@ringo.com", (data: IUser) => {
-  johnny = data;
-  console.log("Data:",data);
-});
+const dao: UserDataAccessorObject = new UserDataAccessorObject();
+// async function getUser() {
+//   const user: IUser = await dao.getUserByEmail("Johnny");
+//   console.log(user);
+// }
+// getUser();
 
-console.log("Johnny:\n", johnny);
+// const newUser: IUser = {username: "ass", password: "xyzhash", isOAuth: false, email: "bitch@mail.com", refreshToken: null};
+
+// async function addUser(newUser: IUser){
+//   let succes = await dao.addUser(newUser);
+//   console.log(succes);
+// }
+// addUser(newUser);
+
+async function updateUserRefreshToken(username: string, token: string){
+  let succes = await dao.updateUserRefreshToken(username, token);
+  console.log(succes);
+}
+updateUserRefreshToken("Jenny", "megatoken");
+
 
 setTimeout(() => {
   console.log("Ending pool");
-  pool.end();
+  dao.terminateConnectionPool();
 }, 6000);
