@@ -19,6 +19,7 @@ export default class UserDataAccessorObject {
     this._pool = this._createConnectionPool();
   }
 
+  // Does not work
   // /**
   //  * Used to create new connection pool. It is NOT necessarry to call this method when instantiating class.
   //  * > Returns true if pool was created or false if it failed to create a pool.
@@ -59,16 +60,18 @@ export default class UserDataAccessorObject {
 
   /**
    * Used to terminate the connection pool within instance of class.
+   * Do not use this method unless you are absolutely sure you're not going 
+   * to use the instance anymore
    */
   terminateConnectionPool() {
     this._pool.end();
   }
 
   /**
-   * Used to get a user from database based on given email.
-   * @param email Email address of the user
+   * Used to get a user from database based on given username.
+   * @param username username of user
    */
-  getUserByEmail(username: string): Promise<IUser> {
+  getUserByUsername(username: string): Promise<IUser> {
     return new Promise((resolve, reject) => {
       this._pool.getConnection((err, connection) => {
         if (err) {
@@ -111,7 +114,7 @@ export default class UserDataAccessorObject {
    * Will return promise with success message if user was persisted.
    * Will return rejected promise with specific message if a duplicate error occurs.
    * username and email (if provided) must be unique
-   * @param user User contain at least username, password (hashed) and isOAuth
+   * @param user User containing at least username, password (hashed) and isOAuth
    */
   addUser(user: IUser): Promise<any> {
     return new Promise((resolve, reject) => {
@@ -178,9 +181,77 @@ export default class UserDataAccessorObject {
     })
   }
 
+  /**
+   * Used to remove specific user from database.
+   * Will return promise with success message if user was deleted
+   * @param username username of user
+   */
+  deleteUser(username: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this._pool.getConnection((err, connection) => {
+        if (err) {
+          console.log("Failed to get connection from pool");
+          reject(err);
+        }
+        else {
+          try {
+            connection.query('DELETE FROM `exam`.`users` WHERE (`username` = ?);',
+            [username], function(error){
+              if (error) {
+                console.log("An error occurred when trying to delete user");
+                reject(error);
+              }
+              resolve({"message": `User ${username} succesfully deleted`});
+            })
+          } catch (err) {
+            console.log("Failed to delete user");
+            reject(err);
+          } finally {
+            connection.release();
+          }
+        }
+      });
+    })
+  }
+
+  /**
+   * Used to check if the user provided correct credentials.
+   * @param username username of user
+   * @param password password of use
+   */
+  checkUser(username: string, password: string): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this._pool.getConnection((err, connection) => {
+        if (err) {
+          console.log("Failed to get connection from pool");
+          reject(err);
+        }
+        else {
+          try {
+            connection.query('SELECT `username`, `password` FROM `exam`.`users` WHERE (`username` = ?);',
+             [username], function (error, result) {
+              if (error) {
+                console.log("An error occurred when trying to check user");
+                reject(false);
+              }
+              if (result[0].password == password) resolve(true);
+              else reject(false);
+            });
+          } catch (error) {
+            console.log("Failed to check user");
+            reject(false);
+          } finally {
+            //console.log("Releasing connection back to the pool");
+            connection.release();
+          }
+        }
+      });
+    })
+  }
+
 }
 
-const dao: UserDataAccessorObject = new UserDataAccessorObject();
+// const dao: UserDataAccessorObject = new UserDataAccessorObject();
 // async function getUser() {
 //   const user: IUser = await dao.getUserByEmail("Johnny");
 //   console.log(user);
@@ -190,19 +261,31 @@ const dao: UserDataAccessorObject = new UserDataAccessorObject();
 // const newUser: IUser = {username: "ass", password: "xyzhash", isOAuth: false, email: "bitch@mail.com", refreshToken: null};
 
 // async function addUser(newUser: IUser){
-//   let succes = await dao.addUser(newUser);
-//   console.log(succes);
+//   let success = await dao.addUser(newUser);
+//   console.log(success);
 // }
 // addUser(newUser);
 
-async function updateUserRefreshToken(username: string, token: string){
-  let succes = await dao.updateUserRefreshToken(username, token);
-  console.log(succes);
-}
-updateUserRefreshToken("Jenny", "megatoken");
+// async function updateUserRefreshToken(username: string, token: string){
+//   let success = await dao.updateUserRefreshToken(username, token);
+//   console.log(success);
+// }
+// updateUserRefreshToken("Jenny", "megatoken");
+
+// async function deleteUser(username: string){
+//   let success = await dao.deleteUser(username);
+//   console.log(success);
+// }
+// deleteUser("TestBoi");
+
+// async function checkUser(username: string, password: string){
+//   let success = await dao.checkUser(username, password);
+//   console.log(success);
+// }
+// checkUser("Jenny", "sickhash");
 
 
-setTimeout(() => {
-  console.log("Ending pool");
-  dao.terminateConnectionPool();
-}, 6000);
+// setTimeout(() => {
+//   console.log("Ending pool");
+//   dao.terminateConnectionPool();
+// }, 6000);
