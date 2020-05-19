@@ -13,6 +13,7 @@ import colors from "../constants/colors";
 import Input from "../components/Input";
 import facade from "../facade";
 import * as Linking from "expo-linking";
+import * as WebBrowser from "expo-web-browser";
 
 const backendURL = "https://87a26532.ngrok.io";
 /**
@@ -37,6 +38,25 @@ const LoginScreen = (props) => {
     photoUrl: "",
     email: "",
   });
+  const [redirectData, setRedirectData] = useState();
+  const [result, setResult] = useState();
+
+  const handleGoogleLogin = async () => {
+    try {
+      let result = await WebBrowser.openAuthSessionAsync(
+        `${backendURL}/auth/google` //?authToken=${Linking.makeUrl("/")
+      );
+      if (result.url) {
+        const redirectData_ = Linking.parse(result.url);
+        setRedirectData({ redirectData_ });
+      }
+      console.log({ result, redirectData });
+      setResult({ result });
+      setSignedIn(true);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <TouchableWithoutFeedback
@@ -47,9 +67,14 @@ const LoginScreen = (props) => {
       <View style={styles.screen}>
         <Card style={styles.container}>
           {signedIn ? (
-            <LoggedInPage name={user.name} photoUrl={user.photoUrl} />
+            <LoggedInPage
+              name={user.name}
+              photoUrl={user.photoUrl}
+              data={redirectData}
+              result={result}
+            />
           ) : (
-            <LoginPage />
+            <LoginPage googleLoginHandler={handleGoogleLogin} />
           )}
         </Card>
       </View>
@@ -57,18 +82,11 @@ const LoginScreen = (props) => {
   );
 };
 
-const login = () => {};
-
 const LoginPage = (props) => {
   return (
     <View>
       <Text style={styles.title}>Sign In With Google</Text>
-      <Button
-        title="Sign in with Google"
-        onPress={() => {
-          Linking.openURL(`${backendURL}/auth/google`);
-        }}
-      />
+      <Button title="Sign in with Google" onPress={props.googleLoginHandler} />
     </View>
   );
 };
@@ -76,8 +94,10 @@ const LoginPage = (props) => {
 const LoggedInPage = (props) => {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Welcome:{props.name}</Text>
-      <Image style={styles.image} source={{ uri: props.photoUrl }} />
+      {/* <Text style={styles.title}>Welcome:{props.name}</Text>
+      <Image style={styles.image} source={{ uri: props.photoUrl }} /> */}
+      <Text>data: {JSON.stringify(props.data, null, 4)}</Text>
+      <Text>Result: {JSON.stringify(props.result, null, 4)}</Text>
     </View>
   );
 };
