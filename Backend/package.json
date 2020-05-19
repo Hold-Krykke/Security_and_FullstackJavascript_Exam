@@ -13,6 +13,7 @@
   "author": "Camilla, Runi, Asger, Malte",
   "license": "ISC",
   "dependencies": {
+    "@types/jsonwebtoken": "^8.5.0",
     "@types/mongodb": "^3.5.17",
     "@types/passport": "^1.0.3",
     "apollo-server-express": "^2.13.1",

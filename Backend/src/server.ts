@@ -10,6 +10,7 @@ import { ApiError } from "./customErrors/apiError";
 import authMiddleware from "./middlewares/basicAuth";
 import initPassport from "./middlewares/passportOauth";
 import passport from "passport";
+import token from "./util/makeTestJWT";
 
 initPassport();
 const app = express();
@@ -29,8 +30,8 @@ app.get(
   "/auth/google/callback",
   passport.authenticate("google", { failureRedirect: "/login" }),
   function (req, res) {
-    const authToken = "testauthtoken123123x123";
-    res.redirect(`exp://192.168.1.10:19000/?authToken=${authToken}`); // This should point to the Mobile App. Should include info like /?authToken=23xbdbb21b3
+    const authToken = token;
+    res.redirect(`exp://192.168.1.10:19000/?token=${authToken}`); // This should point to the Mobile App. Should include info like /?authToken=23xbdbb21b3
   }
 );
 

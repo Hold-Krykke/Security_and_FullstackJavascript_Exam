@@ -14,6 +14,7 @@ import Input from "../components/Input";
 import facade from "../facade";
 import { Linking } from "expo";
 import * as WebBrowser from "expo-web-browser";
+import jwt_decode from "jwt-decode";
 
 const backendURL = "https://87a26532.ngrok.io";
 /**
@@ -38,17 +39,27 @@ const LoginScreen = (props) => {
     photoUrl: "",
     email: "",
   });
-  const [result, setResult] = useState();
 
   const handleGoogleLogin = async () => {
     try {
       let result = await WebBrowser.openAuthSessionAsync(
-        `${backendURL}/auth/google`, //?authToken=${Linking.makeUrl("/")
+        `${backendURL}/auth/google`,
         "exp://192.168.1.10:19000"
       );
-      //console.log({ result, redirectData });
-      setResult({ result });
-      setSignedIn(true);
+      if ((result.type = "success")) {
+        const url = result.url;
+        const decoded = jwt_decode(url.split("token=")[1]);
+        console.log(decoded);
+        setUser({
+          ...user,
+          name: decoded.name,
+          photoUrl: decoded.photoUrl,
+          email: decoded.email,
+        });
+        setSignedIn(true);
+      } else {
+        console.log("User Cancelled.");
+      }
     } catch (error) {
       console.log(error);
     }
@@ -63,11 +74,7 @@ const LoginScreen = (props) => {
       <View style={styles.screen}>
         <Card style={styles.container}>
           {signedIn ? (
-            <LoggedInPage
-              name={user.name}
-              photoUrl={user.photoUrl}
-              result={result}
-            />
+            <LoggedInPage name={user.name} photoUrl={user.photoUrl} />
           ) : (
             <LoginPage googleLoginHandler={handleGoogleLogin} />
           )}
@@ -89,13 +96,8 @@ const LoginPage = (props) => {
 const LoggedInPage = (props) => {
   return (
     <View style={styles.container}>
-      {/* <Text style={styles.title}>Welcome:{props.name}</Text>
-      <Image style={styles.image} source={{ uri: props.photoUrl }} /> */}
-      <Image
-        style={styles.image}
-        source={{ uri: "https://i.imgur.com/x9XtMsh.jpg" }}
-      />
-      <Text>Result: {JSON.stringify(props.result, null, 4)}</Text>
+      <Text style={styles.title}>Welcome:{props.name}</Text>
+      <Image style={styles.image} source={{ uri: props.photoUrl }} />
     </View>
   );
 };
