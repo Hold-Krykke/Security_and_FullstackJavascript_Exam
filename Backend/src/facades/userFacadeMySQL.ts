@@ -1,6 +1,7 @@
 var path = require('path')
 require('dotenv').config({ path: path.join(process.cwd(), '.env') })
 import mysql from "mysql";
+// import that let's us access secret SSL information needed to make secure connection
 import { SSLAccessor } from "../ssl.js";
 
 const host = process.env.DATABASE_IP;
@@ -31,9 +32,6 @@ function getSSLConfiguration() {
     throw new Error("Cannot access SSL information. Please provide SSL CA, CERT and KEY.");
   }
   return {
-    // This is an important step into making the keys work. When loaded into
-    // the environment the \n characters will not be actual new-line characters.
-    // so the .replace() calls fixes that.
     ca: SSLAccessor.get_SSL_CA(),
     key: SSLAccessor.get_SSL_KEY(),
     cert: SSLAccessor.get_SSL_CERT()
