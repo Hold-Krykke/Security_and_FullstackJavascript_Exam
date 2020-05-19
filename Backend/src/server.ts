@@ -29,7 +29,8 @@ app.get(
   "/auth/google/callback",
   passport.authenticate("google", { failureRedirect: "/login" }),
   function (req, res) {
-    res.redirect("exp://192.168.1.10:19000/?authToken=testauthtoken123123x123"); // This should point to the Mobile App. Should include info like /?authToken=23xbdbb21b3
+    const authToken = "testauthtoken123123x123";
+    res.redirect(`exp://192.168.1.10:19000/?authToken=${authToken}`); // This should point to the Mobile App. Should include info like /?authToken=23xbdbb21b3
   }
 );
 
