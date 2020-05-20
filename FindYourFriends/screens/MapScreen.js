@@ -11,7 +11,7 @@ const LATITUDE = 45.464664;
 const LONGITUDE = 9.18854; //Milan, Italy
 const {width, height} = Dimensions.get('window');
 const ASPECT_RATIO = width / height;
-const LATITUDE_DELTA = 0.0922;
+const LATITUDE_DELTA = 0.1;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
 const MapScreen = (props) => {
@@ -27,14 +27,16 @@ const MapScreen = (props) => {
 	//pass all users as props and map to screen as markers. Update every so often? streams, subscriptions?
 
 	useEffect(() => {
-		// setRegion({
-		// 	...region,
-		// 	latitude: location.latitude | 5,
-		// 	longitude: location.longitude | 5,
-		// 	latitudeDelta: LATITUDE_DELTA,
-		// 	longitudeDelta: LONGITUDE_DELTA,
-		// });
-	}, []);
+		if (location) {
+			setRegion({
+				...region,
+				latitude: location.coords.latitude,
+				longitude: location.coords.longitude,
+				latitudeDelta: LATITUDE_DELTA,
+				longitudeDelta: LONGITUDE_DELTA,
+			});
+		}
+	}, [changeRegion]);
 	useEffect(() => {
 		setTimeout(() => {
 			(async () => {
@@ -45,7 +47,7 @@ const MapScreen = (props) => {
 
 				let location = await Location.getCurrentPositionAsync({});
 				setLocation(location);
-
+				setChangeRegion(true);
 				console.log('happened ' + new Date(Date.now()).toLocaleTimeString());
 			})();
 			//No return as we want user to update in the background
@@ -66,15 +68,15 @@ const MapScreen = (props) => {
 	} else if (location) {
 		userMessage = JSON.stringify(location);
 	}
-	const handleRegion = () => {
-		setRegion({
-			...region,
-			latitude: location.latitude | LATITUDE,
-			longitude: location.longitude | LONGITUDE,
-			latitudeDelta: LATITUDE_DELTA,
-			longitudeDelta: LONGITUDE_DELTA,
-		});
-	};
+	// const handleRegion = () => {
+	// 	setRegion({
+	// 		...region,
+	// 		latitude: location.latitude | LATITUDE,
+	// 		longitude: location.longitude | LONGITUDE,
+	// 		latitudeDelta: LATITUDE_DELTA,
+	// 		longitudeDelta: LONGITUDE_DELTA,
+	// 	});
+	// };
 
 	return (
 		<TouchableWithoutFeedback
@@ -83,14 +85,15 @@ const MapScreen = (props) => {
 				Keyboard.dismiss();
 			}}>
 			<View style={styles.screen}>
-				{/* <Text style={styles.text}>{userMessage}</Text> */}
+				<Text style={styles.text}>{userMessage}</Text>
+				<Text> {location && location.coords.longitude}</Text>
 				<View style={styles.container}>
 					<MapView
 						style={styles.mapStyle}
 						region={region}
 						showsUserLocation
 						loadingEnabled
-						onMapReady={() => handleRegion()}
+						// onMapReady={() => handleRegion()}
 					/>
 				</View>
 			</View>
