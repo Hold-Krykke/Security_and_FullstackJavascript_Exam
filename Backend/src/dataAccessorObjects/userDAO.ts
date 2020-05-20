@@ -141,8 +141,7 @@ export default class UserDataAccessorObject {
         }
         else {
           try {
-            // currentSchema is decided within the program and not by any user so this doesn't create a vulnerability
-            connection.query('INSERT INTO `' + this._currentSchema + '`.`users` (`username`, `password`, `email`, `isOAuth`, `refreshToken`) VALUES ( ?, ?, ?, ?, ?);',
+            connection.query('INSERT INTO `users` (`username`, `password`, `email`, `isOAuth`, `refreshToken`) VALUES ( ?, ?, ?, ?, ?);',
             [user.username, user.password, user.email, user.isOAuth, user.refreshToken], function(error){
               if (error) {
                 console.log("An error occurred when trying to insert user in database");
@@ -182,7 +181,7 @@ export default class UserDataAccessorObject {
         }
         else {
           try {
-            connection.query('UPDATE `' + this._currentSchema + '`.`users` SET `refreshToken` = ? WHERE (`username` = ?);',
+            connection.query('UPDATE `users` SET `refreshToken` = ? WHERE (`username` = ?);',
             [token, username], function(error, result){
               if (error) {
                 console.log("An error occurred when trying to update user refresh token");
@@ -222,7 +221,7 @@ export default class UserDataAccessorObject {
         }
         else {
           try {
-            connection.query('DELETE FROM `' + this._currentSchema + '`.`users` WHERE (`username` = ?);',
+            connection.query('DELETE FROM `users` WHERE (`username` = ?);',
             [username], function(error, result){
               if (error) {
                 console.log("An error occurred when trying to delete user");
@@ -263,7 +262,7 @@ export default class UserDataAccessorObject {
         }
         else {
           try {
-            connection.query('SELECT `username`, `password` FROM `' + this._currentSchema + '`.`users` WHERE (`username` = ?);',
+            connection.query('SELECT `username`, `password` FROM `users` WHERE (`username` = ?);',
              [username], function (error, result) {
               if (error) {
                 console.log("An error occurred when trying to check user");
@@ -298,7 +297,7 @@ export default class UserDataAccessorObject {
         }
         else {
           try {
-            connection.query('SELECT `username`, `isOAuth` FROM `' + this._currentSchema + '`.`users` WHERE (`username` = ?);',
+            connection.query('SELECT `username`, `isOAuth` FROM `users` WHERE (`username` = ?);',
              [username], function (error, result) {
               if (error) {
                 console.log("An error occurred when trying to check user status (OAuth)");
@@ -338,7 +337,7 @@ export default class UserDataAccessorObject {
         }
         else {
           try {
-            connection.query('SELECT `refreshToken` FROM `' + this._currentSchema + '`.`users` WHERE (`username` = ?);',
+            connection.query('SELECT `refreshToken` FROM `users` WHERE (`username` = ?);',
              [username], function (error, result) {
               if (error) {
                 console.log("An error occurred when trying to get refresh token");
