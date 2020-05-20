@@ -8,15 +8,18 @@ import IUser from "../interfaces/IUser.js";
 const host = process.env.DATABASE_IP;
 const username = process.env.DATABASE_USER_USERNAME;
 const password = process.env.DATABASE_USER_PASSWORD;
-const schema = process.env.DATABASE_SCHEMA;
 const port = 3306
 
+/**
+ * Class used to connect to MySQL database. 
+ * Pass schema to constructor to choose which database to work with
+ */
 export default class UserDataAccessorObject {
 
   private _pool: mysql.Pool;
 
-  constructor() {
-    this._pool = this._createConnectionPool();
+  constructor(schema: string) {
+    this._pool = this._createConnectionPool(schema);
   }
 
   // Does not work
@@ -36,7 +39,7 @@ export default class UserDataAccessorObject {
   //   })
   // }
 
-  private _createConnectionPool(): mysql.Pool {
+  private _createConnectionPool(schema: string): mysql.Pool {
     return mysql.createPool({
       host,
       port,

@@ -5,6 +5,10 @@ require('dotenv').config({ path: path.join(process.cwd(), '.env') })
 import UserFacade from './facades/userFacade'
 import IUser from './interfaces/IUser';
 
+const schema: string = process.env.DATABASE_SCHEMA || "";
+
+const facade: UserFacade = new UserFacade(schema);
+
 // Resolvers
 // Used in Schema to make a GraphQL schema
 // Schema is used to make Apollo Server
@@ -21,7 +25,7 @@ const resolverMap: IResolvers = {
         //     return UserFacade.getAllUsers();
         // },
         getUser(_: void, args: any): any {
-            return UserFacade.getUser(args.username);
+            return facade.getUser(args.username);
         },
     },
     Mutation: {
@@ -31,12 +35,12 @@ const resolverMap: IResolvers = {
             const email: string = input.email;
             const isOAuth: boolean = false;
             const user: IUser = { username, password, email, isOAuth, refreshToken: null };
-            const added = UserFacade.addNonOAuthUser(user);
+            const added = facade.addNonOAuthUser(user);
             return added;
         },
         deleteUser: (_, args: any) => {
             const userName: string = args.username;
-            const msg = UserFacade.deleteUser(userName);
+            const msg = facade.deleteUser(userName);
             return msg;
         },
     },
