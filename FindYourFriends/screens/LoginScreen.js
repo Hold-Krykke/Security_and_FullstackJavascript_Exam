@@ -40,7 +40,7 @@ const LoginScreen = (props) => {
             let redirectUrl = await Linking.getInitialURL()
             console.log('redirectUrl', redirectUrl);
             // this should change depending on where the server is running
-            let authUrl = `${backendURL}/auth/google?redirecturl=${redirectUrl}`
+            let authUrl = `${backendURL}/auth/google?redirecturl=${redirectUrl}` // do in post instead!!!!!!!!!!!!!!!
             console.log('authUrl', authUrl);
 
             let result = await WebBrowser.openAuthSessionAsync(
