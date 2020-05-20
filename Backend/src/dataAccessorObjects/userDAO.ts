@@ -17,9 +17,11 @@ const port = 3306
 export default class UserDataAccessorObject {
 
   private _pool: mysql.Pool;
+  private _currentSchema: string;
 
   constructor(schema: string) {
     this._pool = this._createConnectionPool(schema);
+    this._currentSchema = schema;
   }
 
   // Does not work
@@ -66,8 +68,9 @@ export default class UserDataAccessorObject {
    * Do not use this method unless you are absolutely sure you're not going 
    * to use the instance anymore
    */
-  terminateConnectionPool() {
-    this._pool.end();
+  terminateConnectionPool(): boolean {
+      this._pool.end();
+      return true;
   }
 
   /**
@@ -92,7 +95,6 @@ export default class UserDataAccessorObject {
                 return;
               }
               const data = result[0];
-              console.log(typeof(data));
               if (typeof(data) == "undefined") {
                 resolve(null);
                 // return statement necessary to end method
@@ -139,7 +141,8 @@ export default class UserDataAccessorObject {
         }
         else {
           try {
-            connection.query('INSERT INTO `exam`.`users` (`username`, `password`, `email`, `isOAuth`, `refreshToken`) VALUES ( ?, ?, ?, ?, ?);',
+            // currentSchema is decided within the program and not by any user so this doesn't create a vulnerability
+            connection.query('INSERT INTO `' + this._currentSchema + '`.`users` (`username`, `password`, `email`, `isOAuth`, `refreshToken`) VALUES ( ?, ?, ?, ?, ?);',
             [user.username, user.password, user.email, user.isOAuth, user.refreshToken], function(error){
               if (error) {
                 console.log("An error occurred when trying to insert user in database");
@@ -179,14 +182,13 @@ export default class UserDataAccessorObject {
         }
         else {
           try {
-            connection.query('UPDATE `exam`.`users` SET `refreshToken` = ? WHERE (`username` = ?);',
+            connection.query('UPDATE `' + this._currentSchema + '`.`users` SET `refreshToken` = ? WHERE (`username` = ?);',
             [token, username], function(error, result){
               if (error) {
                 console.log("An error occurred when trying to update user refresh token");
                 reject(error);
                 return;
               }
-              console.log(result);
               if (result.affectedRows == 0) {
                 // Should promise be resolved instead (a bit less aggressive strategy)
                 reject({"message": `User ${username} does not exist`});
@@ -220,9 +222,8 @@ export default class UserDataAccessorObject {
         }
         else {
           try {
-            connection.query('DELETE FROM `exam`.`users` WHERE (`username` = ?);',
+            connection.query('DELETE FROM `' + this._currentSchema + '`.`users` WHERE (`username` = ?);',
             [username], function(error, result){
-              console.log(result);
               if (error) {
                 console.log("An error occurred when trying to delete user");
                 reject(error);
@@ -262,7 +263,7 @@ export default class UserDataAccessorObject {
         }
         else {
           try {
-            connection.query('SELECT `username`, `password` FROM `exam`.`users` WHERE (`username` = ?);',
+            connection.query('SELECT `username`, `password` FROM `' + this._currentSchema + '`.`users` WHERE (`username` = ?);',
              [username], function (error, result) {
               if (error) {
                 console.log("An error occurred when trying to check user");
@@ -297,7 +298,7 @@ export default class UserDataAccessorObject {
         }
         else {
           try {
-            connection.query('SELECT `username`, `isOAuth` FROM `exam`.`users` WHERE (`username` = ?);',
+            connection.query('SELECT `username`, `isOAuth` FROM `' + this._currentSchema + '`.`users` WHERE (`username` = ?);',
              [username], function (error, result) {
               if (error) {
                 console.log("An error occurred when trying to check user status (OAuth)");
@@ -337,7 +338,7 @@ export default class UserDataAccessorObject {
         }
         else {
           try {
-            connection.query('SELECT `refreshToken` FROM `exam`.`users` WHERE (`username` = ?);',
+            connection.query('SELECT `refreshToken` FROM `' + this._currentSchema + '`.`users` WHERE (`username` = ?);',
              [username], function (error, result) {
               if (error) {
                 console.log("An error occurred when trying to get refresh token");
@@ -361,9 +362,50 @@ export default class UserDataAccessorObject {
     })
   }
 
+  /**
+   * Used to delete all data in users table.
+   * Only allows deletion in test databases.
+   * Returns false if: 
+   * deletion fails
+   * current database is not a test database
+   */
+  truncateUserTable(): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this._pool.getConnection((err, connection) => {
+        if (err) {
+          console.log("Failed to get connection from pool");
+          reject(err);
+          return;
+        }
+        else {
+          if (!this._currentSchema.includes("_test")) {
+            resolve(false);
+            return;
+          }
+          try {
+            connection.query('TRUNCATE TABLE users;',
+             [], function (error, result) {
+              if (error) {
+                console.log("An error occurred when truncating table");
+                reject(false);
+                return;
+              }
+              resolve(true);
+            });
+          } catch (error) {
+            console.log("Failed to truncate table");
+            reject(false);
+          } finally {
+            connection.release();
+          }
+        }
+      });
+    })
+  }
+
 }
 
-// const dao: UserDataAccessorObject = new UserDataAccessorObject();
+// const dao: UserDataAccessorObject = new UserDataAccessorObject("exam_test");
 // async function getUser() {
 //   const user: IUser = await dao.getUserByUsername("ass");
 //   console.log(user);
@@ -409,8 +451,14 @@ export default class UserDataAccessorObject {
 // }
 // getRefreshToken("Johnny");
 
+// async function getRefreshToken(){
+//     let success = await dao.truncateUserTable();
+//     console.log(success);
+//   }
+//   getRefreshToken();
+  
 
 // setTimeout(() => {
 //   console.log("Ending pool");
 //   dao.terminateConnectionPool();
-// }, 6000);
+// }, 4000);

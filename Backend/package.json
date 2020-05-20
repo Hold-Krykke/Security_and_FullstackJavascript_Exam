@@ -39,6 +39,7 @@
     "winston": "^3.2.1"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.2",
     "@types/chai": "^4.2.11",
     "@types/compression": "^1.7.0",
     "@types/cors": "^2.8.6",
