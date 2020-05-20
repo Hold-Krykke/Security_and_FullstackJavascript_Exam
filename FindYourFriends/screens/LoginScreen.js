@@ -1,19 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, View, Text, TouchableWithoutFeedback, Keyboard, Image, Button } from "react-native";
+import { StyleSheet, View, Text, TouchableWithoutFeedback, Keyboard, Image, Button, } from "react-native";
 import Card from "../components/Card";
 import colors from "../constants/colors";
 import Input from "../components/Input";
 import facade from "../facade";
-import { Linking } from "expo";
+import { AuthSession, Linking } from "expo";
 import * as WebBrowser from "expo-web-browser";
 import jwt_decode from "jwt-decode"; // https://www.npmjs.com/package/jwt-decode
-import WebViewScreen from "../screens/WebViewScreen";
 /*
   We dont verify token here. 
   We have to verify it on the backend on every request. 
 */
 
-const backendURL = 'http://e1e92de2.ngrok.io';
+const backendURL = 'http://391bd83a.ngrok.io';
 /**
  * Google Login SSO - IMPLICIT FLOW
  *
@@ -33,23 +32,24 @@ const LoginScreen = (props) => {
         photoUrl: "",
         email: "",
     });
-    const [loginPressed, setLoginPressed] = useState(false);
-
-    let webview;
-
-    useEffect(() => {
-        if (loginPressed) {
-            webview = <WebViewScreen />;
-        }
-    }, [loginPressed]);
 
     const handleGoogleLogin = async () => {
         try {
+
+            // gets the app's deep link
+            let redirectUrl = await Linking.getInitialURL()
+            console.log('redirectUrl', redirectUrl);
+            // this should change depending on where the server is running
+            let authUrl = `${backendURL}/auth/google?redirecturl=${redirectUrl}`
+            console.log('authUrl', authUrl);
+
             let result = await WebBrowser.openAuthSessionAsync(
-                `${backendURL}/auth/google`,
-                `https://dr.dk`
+                authUrl,
+                redirectUrl
             );
-            console.log('RESULT', result)
+
+            console.log('result', result)
+
             if ((result.type = "success")) {
                 const url = result.url;
                 const token = url.split("token=")[1];
@@ -69,8 +69,20 @@ const LoginScreen = (props) => {
             console.log(error);
         }
     };
-    const handleLogin = async () => {
-        setLoginPressed(true)
+
+    const addLinkingListener = () => {
+        console.log('add listener');
+        Linking.addEventListener('url', handleRedirect)
+    }
+
+    const removeLinkingListener = () => {
+        console.log('remove listener');
+        Linking.removeEventListener('url', handleRedirect)
+    }
+
+    const handleRedirect = async event => {
+        console.log('handle redirect');
+        WebBrowser.dismissBrowser()
     }
 
     return (
@@ -84,12 +96,11 @@ const LoginScreen = (props) => {
                     {signedIn ? (
                         <LoggedInPage name={user.name} photoUrl={user.photoUrl} />
                     ) : (
-                            <LoginPage googleLoginHandler={handleLogin} />
+                            <LoginPage googleLoginHandler={handleGoogleLogin} />
                         )}
                 </Card>
-                {loginPressed && (<WebViewScreen />)}
             </View>
-        </TouchableWithoutFeedback >
+        </TouchableWithoutFeedback>
     );
 };
 

@@ -12,6 +12,7 @@ import faketoken from "./util/makeTestJWT";
 import initPassport from './middlewares/passportSetup';
 import passport from 'passport';
 import { requestLogger, errorLogger } from './middlewares/logger'
+import { stringify } from "querystring";
 const jwt = require('jsonwebtoken');
 const bodyParser = require('body-parser')
 const app = express();
@@ -55,22 +56,38 @@ app.post('/auth/jwt', (req, res) => {
     )(req, res);
 });
 
-// Kept out because typeScript is angry
-const params = { scope: 'openid email', accessType: 'offline', prompt: 'consent' }
-app.get('/auth/google', passport.authenticate('google', params));
+
+app.get('/auth/google', (req, res) => {
+    //console.log('redirecturl', req.params['redirecturl']);
+    console.log('redirecturlquery', req.query.redirecturl);
+    //console.log('REQUEST', req)
+    const stringState = JSON.stringify({ redirectUrl: req.query.redirecturl.toString() })
+
+    // Kept out because typeScript is angry
+    const params = { scope: 'openid email', accessType: 'offline', prompt: 'consent', state: stringState }
+    passport.authenticate('google', params)
+        (req, res)
+
+});
 
 
-app.get("/api/dummy", (req, res) => {
-    res.json({ msg: "Welcome" })
+app.get('/auth/redirect', (req, res) => {
+    //res.sendFile(path.join(__dirname + '/static/appRedirect.html'))
+    res.redirect('exp://something')
 })
 
-app.get("/auth/google/callback", (req, res) => {
-    passport.authenticate("google", { failureRedirect: "/login" },
+app.get('/auth/google/callback', (req, res) => {
+    passport.authenticate('google', { failureRedirect: '/login' },
         (error: Error, user: any) => {
+            console.log('pis¨ålårt\n\n')
+            console.log('error', error)
+            console.log('user', user)
             if (error || !user) {
                 res.status(400).json({ error });
                 return
             }
+            const thing = JSON.parse(req.query.state.toString());
+            console.log('\n\nLÅÅÅÅÅRT!!!!!\n\n', thing)
             const payload = {
                 useremail: user.profile.emails[0].value,
                 expires: Date.now() + 3600000,
@@ -82,9 +99,11 @@ app.get("/auth/google/callback", (req, res) => {
                 }
                 const token = jwt.sign(JSON.stringify(payload), process.env.SECRET);
                 res.cookie('jwt', jwt, { httpOnly: true, secure: false });
-                res.redirect(`https://dr.dk`);
+
+                res.redirect(thing.redirectUrl + '?token=' + token);
             });
         })
+
         (req, res)
     //{
     //     //console.log('\nPROFILE', res.user.profile)
@@ -121,3 +140,5 @@ app.use(function (err: any, req: any, res: any, next: Function) {
 app.listen({ port: 3000 }, (): void =>
     console.log(`\n\nGraphQL is now running on http://localhost:3000/graphql\n`)
 );
+
+
