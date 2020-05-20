@@ -26,7 +26,7 @@ const initPassport = () => {
     passport.use(new GoogleStrategy({
         clientID: process.env.CLIENT_ID,
         clientSecret: process.env.CLIENT_SECRET,
-        callbackURL: 'http://localhost:3000/auth/google/callback',
+        callbackURL: 'http://e1e92de2.ngrok.io/auth/google/callback'//'http://localhost:3000/auth/google/callback',
     }, GoogleTokenStrategyCallback));
 
     passport.use(new LocalStrategy({ usernameField: 'username', passwordField: 'password' },

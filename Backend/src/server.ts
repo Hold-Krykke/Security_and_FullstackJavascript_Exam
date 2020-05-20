@@ -59,6 +59,11 @@ app.post('/auth/jwt', (req, res) => {
 const params = { scope: 'openid email', accessType: 'offline', prompt: 'consent' }
 app.get('/auth/google', passport.authenticate('google', params));
 
+
+app.get("/api/dummy", (req, res) => {
+    res.json({ msg: "Welcome" })
+})
+
 app.get("/auth/google/callback", (req, res) => {
     passport.authenticate("google", { failureRedirect: "/login" },
         (error: Error, user: any) => {
@@ -77,7 +82,7 @@ app.get("/auth/google/callback", (req, res) => {
                 }
                 const token = jwt.sign(JSON.stringify(payload), process.env.SECRET);
                 res.cookie('jwt', jwt, { httpOnly: true, secure: false });
-                res.redirect(`https://localhost:3000/graphql`);
+                res.redirect(`https://dr.dk`);
             });
         })
         (req, res)
