@@ -1,29 +1,20 @@
 const path = require('path')
 require('dotenv').config({ path: path.join(process.cwd(), '.env') })
-import * as mongo from 'mongodb'
 import IUser from '../interfaces/IUser';
 const bcrypt = require('bcryptjs');
-import { ApiError } from '../customErrors/apiError'
+import { ApiError } from '../customErrors/apiError';
+import UserDataAccessorObject from '../dataAccessorObjects/userDAO';
 
-let userCollection: mongo.Collection;
+const UDAO = new UserDataAccessorObject();
 
 export default class UserFacade {
-    static async setDatabase(client: mongo.MongoClient) {
-        try {
-            if (!client.isConnected()) {
-                await client.connect();
-            }
-            userCollection = client.db().collection('users');
-            await userCollection.createIndex({ userName: 1 }, { unique: true })
-            await userCollection.createIndex({ name: 1 }, { unique: true })
-            return client.db();
 
-        } catch (err) {
-            console.error('\nCould not create connect\n', err)
-        }
-    }
-
-    static async addUser(user: IUser): Promise<boolean> {
+    /**
+     * Used to add a new non OAuth user to the database.
+     * User added will be a non OAuth type.
+     * @param user IUser with at least username, password (plain text) and email
+     */
+    static async addNonOAuthUser(user: IUser): Promise<boolean> {
         const hash: string = await new Promise((resolve, reject) => {
             bcrypt.hash(user.password, 10, (err: Error, hash: string) => {
                 if (err) {
@@ -33,42 +24,52 @@ export default class UserFacade {
             });
         });
 
-        let newUser: IUser = { userName: user.userName, password: hash, name: user.name }
+        let newUser: IUser = { username: user.username, password: hash, email: user.email, isOAuth: user.isOAuth, refreshToken: null }
         try {
-            await userCollection.insertOne(newUser);
+            await UDAO.addUser(newUser);
             return true;
         } catch (err) {
-            throw new ApiError(`User could not be added, username (${user.userName}) and name (${user.name}) must be unique`, 400)
+            throw new ApiError(`User could not be added, username (${user.username}) or (${user.email}) already exists`, 400)
         }
     }
 
-    static async getUser(userName: string, proj?: object): Promise<IUser> {
-        const user = await userCollection.findOne(
-            { userName },
-            proj
-        )
+    /**
+     * Used to get specific user from the database.
+     * @param username username of user
+     */
+    static async getUser(username: string): Promise<IUser> {
+        const user = await UDAO.getUserByUsername(username)
         if (!user) {
-            throw new ApiError(`User with username: ${userName} was not found`, 404)
+            throw new ApiError(`User with username: ${username} was not found`, 404)
         }
         return user;
     }
 
-    static async deleteUser(userName: string): Promise<string> {
-        const status = await userCollection.deleteOne({ userName })
-        if (status.deletedCount === 1) {
-            return `${userName} was removed`;
+    /**
+     * Used to delete specific user from the database.
+     * Returns promise with success message if user was deleted
+     * @param username username of user
+     */
+    static async deleteUser(username: string): Promise<string> {
+        const status = await UDAO.deleteUser(username);
+        // Weird way of checking for succes. Maybe this should be refactored.
+        if (status.message.includes("succesfully deleted")) {
+            return `User ${username} was removed`;
         }
-        else throw new ApiError(`Requested user ${userName} could not be removed`, 400)
+        else throw new ApiError(`Requested user ${username} could not be removed`, 400)
     }
 
-    static async getAllUsers(proj?: object): Promise<Array<any>> {
-        const all = userCollection.find(
-            {},
-            { projection: proj }
-        )
-        return all.toArray();
-    }
+    // Do we even want this functionality? What for?
+    // static async getAllUsers(): Promise<Array<any>> {
+    //     const all = UDAO.thisMethodIsNotSupported();
+    //     return all.toArray();
+    // }
 
+    /**
+     * Used for login.
+     * @param userName username of user
+     * @param plainTextPassword password in plain text
+     */
     static async checkUser(userName: string, plainTextPassword: string): Promise<boolean> {
         let result = false;
         const user = await UserFacade.getUser(userName);
@@ -85,5 +86,66 @@ export default class UserFacade {
             });
         })
         return result;
+    }
+
+    /* ------------------------------------------ */
+    /* --------- OAuth specific methods --------- */
+    /* ------------------------------------------ */
+
+    /**
+     * Used to add OAuth type user.
+     * This type of user is saved without a password and without an email
+     * @param user 
+     */
+    static async addOAuthUser(user: IUser): Promise<boolean> {
+        const newUser: IUser = user;
+        newUser.isOAuth = true;
+        try {
+            await UDAO.addUser(newUser);
+            return true;
+        } catch (err) {
+            throw new ApiError(`User could not be added, username (${user.username}) or (${user.email}) already exists`, 400)
+        }
+    }
+
+    /**
+     * Used to check if user is an OAuth type user or not
+     * @param username username of user
+     */
+    static async isOAuthUser(username: string): Promise<boolean> {
+        try {
+            const status = await UDAO.isOAuthUser(username);
+            return status;
+        } catch (err) {
+            throw new ApiError(`User ${username} not found`, 400)
+        }
+    }
+
+    /**
+     * Used to update the refresh token of specific user.
+     * @param username username of user
+     * @param token refresh token 
+     */
+    static async updateUserRefreshToken(username: string, token: string): Promise<boolean> {
+        try {
+            return await UDAO.updateUserRefreshToken(username, token);
+        } catch (err) {
+            throw new ApiError(`User ${username} not found`, 400)
+        }
+    }
+
+    /**
+     * Used to get the refresh token of specific user.
+     * Returns empty string if the user has no token
+     * @param username username of user
+     */
+    static async getUserRefreshToken(username: string): Promise<string> {
+        try {
+            const result = await UDAO.getRefreshToken(username);
+            if (result) return result;
+            else return "";
+        } catch (err) {
+            throw new ApiError(`User ${username} not found`, 400)
+        }
     }
 }
