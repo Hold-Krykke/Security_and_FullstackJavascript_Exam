@@ -78,6 +78,7 @@ export default class UserDataAccessorObject {
         if (err) {
           console.log("Failed to get connection from pool");
           reject(err);
+          return;
         }
         else {
           try {
@@ -85,6 +86,7 @@ export default class UserDataAccessorObject {
               if (error) {
                 console.log("An error occurred when trying to fetch user");
                 reject(error);
+                return;
               }
               const data = result[0];
               console.log(typeof(data));
@@ -130,6 +132,7 @@ export default class UserDataAccessorObject {
         if (err) {
           console.log("Failed to get connection from pool");
           reject(err);
+          return;
         }
         else {
           try {
@@ -139,8 +142,10 @@ export default class UserDataAccessorObject {
                 console.log("An error occurred when trying to insert user in database");
                 if (error.message.includes("ER_DUP_ENTRY: Duplicate entry")) {
                   reject({"message": "Username or email already exists"});
+                  return;
                 }
                 reject(error);
+                return;
               }
               resolve({"message": `User ${user.username} was succesfully created`});
             })
@@ -157,7 +162,7 @@ export default class UserDataAccessorObject {
 
   /**
    * Used to update the refresh token of a user.
-   * Returns promise with success message if token was updated
+   * Returns promise boolean true if token was updated
    * @param username username of user
    * @param token new refresh token
    */
@@ -167,16 +172,24 @@ export default class UserDataAccessorObject {
         if (err) {
           console.log("Failed to get connection from pool");
           reject(err);
+          return;
         }
         else {
           try {
             connection.query('UPDATE `exam`.`users` SET `refreshToken` = ? WHERE (`username` = ?);',
-            [token, username], function(error){
+            [token, username], function(error, result){
               if (error) {
                 console.log("An error occurred when trying to update user refresh token");
                 reject(error);
+                return;
               }
-              resolve({"message": `User ${username}'s refresh token was succesfully updated`});
+              console.log(result);
+              if (result.affectedRows == 0) {
+                // Should promise be resolved instead (a bit less aggressive strategy)
+                reject({"message": `User ${username} does not exist`});
+                return;
+              }
+              resolve(true);
             })
           } catch (err) {
             console.log("Failed to update token");
@@ -200,6 +213,7 @@ export default class UserDataAccessorObject {
         if (err) {
           console.log("Failed to get connection from pool");
           reject(err);
+          return;
         }
         else {
           try {
@@ -209,10 +223,12 @@ export default class UserDataAccessorObject {
               if (error) {
                 console.log("An error occurred when trying to delete user");
                 reject(error);
+                return;
               }
               if (result.affectedRows == 0) {
-                // Should promise be resolved instead (a bit less aggressive strategy)
-                reject({"message": `User ${username} does not exist`})
+                // Should promise be resolved instead (a bit less aggressive strategy)?
+                reject({"message": `User ${username} does not exist`});
+                return;
               }
               resolve({"message": `User ${username} succesfully deleted`});
             })
@@ -239,6 +255,7 @@ export default class UserDataAccessorObject {
         if (err) {
           console.log("Failed to get connection from pool");
           reject(err);
+          return;
         }
         else {
           try {
@@ -247,6 +264,7 @@ export default class UserDataAccessorObject {
               if (error) {
                 console.log("An error occurred when trying to check user");
                 reject(false);
+                return;
               }
               if (result[0].password == password) resolve(true);
               else resolve(false);
@@ -272,6 +290,7 @@ export default class UserDataAccessorObject {
         if (err) {
           console.log("Failed to get connection from pool");
           reject(err);
+          return;
         }
         else {
           try {
@@ -280,6 +299,12 @@ export default class UserDataAccessorObject {
               if (error) {
                 console.log("An error occurred when trying to check user status (OAuth)");
                 reject(false);
+                return;
+              }
+              if (typeof(result[0]) == "undefined") {
+                // Should promise be resolved instead (a bit less aggressive strategy)
+                reject({"message": `User ${username} does not exist`});
+                return;
               }
               if (result[0].isOAuth) resolve(true);
               else resolve(false);
@@ -305,6 +330,7 @@ export default class UserDataAccessorObject {
         if (err) {
           console.log("Failed to get connection from pool");
           reject(err);
+          return;
         }
         else {
           try {
@@ -313,6 +339,7 @@ export default class UserDataAccessorObject {
               if (error) {
                 console.log("An error occurred when trying to get refresh token");
                 reject(false);
+                return;
               }
               if (result[0].refreshToken) {
                 resolve(result[0].refreshToken);
@@ -353,7 +380,7 @@ export default class UserDataAccessorObject {
 //   let success = await dao.updateUserRefreshToken(username, token);
 //   console.log(success);
 // }
-// updateUserRefreshToken("Jenny", "megatoken");
+// updateUserRefreshToken("fail", "megatoken");
 
 // async function deleteUser(username: string){
 //   let success = await dao.deleteUser(username);
@@ -371,7 +398,7 @@ export default class UserDataAccessorObject {
 //   let success = await dao.isOAuthUser(username);
 //   console.log(success);
 // }
-// isOAuthUser("Jenny");
+// isOAuthUser("fail");
 
 // async function getRefreshToken(username: string){
 //   let success = await dao.getRefreshToken(username);

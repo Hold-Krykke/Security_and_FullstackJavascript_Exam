@@ -128,8 +128,7 @@ export default class UserFacade {
      */
     static async updateUserRefreshToken(username: string, token: string): Promise<boolean> {
         try {
-            const status = await UDAO.updateUserRefreshToken(username, token);
-            return status;
+            return await UDAO.updateUserRefreshToken(username, token);
         } catch (err) {
             throw new ApiError(`User ${username} not found`, 400)
         }
