@@ -13,6 +13,7 @@
   "author": "Camilla, Runi, Asger, Malte",
   "license": "ISC",
   "dependencies": {
+    "@types/jsonwebtoken": "^8.5.0",
     "@types/mongodb": "^3.5.17",
     "@types/passport": "^1.0.3",
     "apollo-server-express": "^2.13.1",
@@ -26,6 +27,7 @@
     "google-auth-library": "^6.0.0",
     "graphql": "^14.0.0",
     "graphql-passport": "^0.6.3",
+    "jsonwebtoken": "^8.5.1",
     "mongodb": "^3.5.7",
     "ncp": "^2.0.0",
     "passport": "^0.4.1",
