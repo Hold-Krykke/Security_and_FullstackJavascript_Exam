@@ -12,8 +12,15 @@ import Card from "../components/Card";
 import colors from "../constants/colors";
 import Input from "../components/Input";
 import facade from "../facade";
-import * as Google from "expo-google-app-auth";
+import { Linking } from "expo";
+import * as WebBrowser from "expo-web-browser";
+import jwt_decode from "jwt-decode"; // https://www.npmjs.com/package/jwt-decode
+/*
+  We dont verify token here. 
+  We have to verify it on the backend on every request. 
+*/
 
+const backendURL = "https://87a26532.ngrok.io";
 /**
  * Google Login SSO - IMPLICIT FLOW
  *
@@ -23,12 +30,9 @@ import * as Google from "expo-google-app-auth";
  * When we want to add backend, read here: https://docs.expo.io/versions/latest/sdk/google/#server-side-apis
  */
 
-const ClientID =
-  "848374281346-g9rmruc01l44mj46q2ftgtvm0e5ol7t1.apps.googleUsercontent.com";
-
 const LoginScreen = (props) => {
   const [signedIn, setSignedIn] = useState(false);
-  const [googleUser, setgoogleUser] = useState({
+  const [user, setUser] = useState({
     id: "",
     name: "",
     givenName: "",
@@ -36,53 +40,30 @@ const LoginScreen = (props) => {
     photoUrl: "",
     email: "",
   });
-  const [loginResult, setLoginResult] = useState({
-    type: "cancel",
-    accessToken: "",
-    idToken: "",
-    refreshToken: "",
-    googleUser: {
-      id: "",
-      name: "",
-      givenName: "",
-      familyName: "",
-      photoUrl: "",
-      email: "",
-    },
-  });
 
-  const signIn = async () => {
+  const handleGoogleLogin = async () => {
     try {
-      const config = {
-        clientId: ClientID,
-        scopes: ["profile", "email"],
-        // redirectUrl: string | undefined	// Defaults to ${AppAuth.OAuthRedirect}:/oauth2redirect/google. Optionally you can define your own redirect URL, just make sure to see the note below.
-        // Note on redirectUrl: If you choose to provide your own redirectUrl, it should start with the value returned by AppAuth.OAuthRedirect. This way, the method will function correctly and consistently whether you are testing in the Expo Client or as a standalone app.
-      };
-      const loginResult = await Google.logInAsync(config); // Returns Promise<LogInResult>
-      const { type, accessToken, idToken, refreshToken, user } = loginResult;
-
-      if (type === "success") {
-        console.log(
-          JSON.stringify(
-            {
-              "Google User": user,
-              loginResult,
-            },
-            null,
-            4
-          )
-        );
-        setgoogleUser({
+      let result = await WebBrowser.openAuthSessionAsync(
+        `${backendURL}/auth/google`,
+        "exp://192.168.1.10:19000"
+      );
+      if ((result.type = "success")) {
+        const url = result.url;
+        const token = url.split("token=")[1];
+        const decoded = jwt_decode(token);
+        console.log(decoded);
+        setUser({
           ...user,
+          name: decoded.name,
+          photoUrl: decoded.photoUrl,
+          email: decoded.email,
         });
-        setLoginResult(loginResult);
         setSignedIn(true);
       } else {
-        console.log("User cancelled login");
+        console.log("User Cancelled.");
       }
-    } catch (e) {
-      console.log("error", e);
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -95,12 +76,9 @@ const LoginScreen = (props) => {
       <View style={styles.screen}>
         <Card style={styles.container}>
           {signedIn ? (
-            <LoggedInPage
-              name={googleUser.name}
-              photoUrl={googleUser.photoUrl}
-            />
+            <LoggedInPage name={user.name} photoUrl={user.photoUrl} />
           ) : (
-            <LoginPage signIn={signIn} />
+            <LoginPage googleLoginHandler={handleGoogleLogin} />
           )}
         </Card>
       </View>
@@ -112,7 +90,7 @@ const LoginPage = (props) => {
   return (
     <View>
       <Text style={styles.title}>Sign In With Google</Text>
-      <Button title="Sign in with Google" onPress={props.signIn} />
+      <Button title="Sign in with Google" onPress={props.googleLoginHandler} />
     </View>
   );
 };
