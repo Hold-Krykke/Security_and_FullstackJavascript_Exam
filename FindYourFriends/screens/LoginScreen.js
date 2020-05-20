@@ -30,9 +30,6 @@ const backendURL = "https://87a26532.ngrok.io";
  * When we want to add backend, read here: https://docs.expo.io/versions/latest/sdk/google/#server-side-apis
  */
 
-const ClientID =
-  "848374281346-g9rmruc01l44mj46q2ftgtvm0e5ol7t1.apps.googleUsercontent.com";
-
 const LoginScreen = (props) => {
   const [signedIn, setSignedIn] = useState(false);
   const [user, setUser] = useState({
@@ -52,7 +49,8 @@ const LoginScreen = (props) => {
       );
       if ((result.type = "success")) {
         const url = result.url;
-        const decoded = jwt_decode(url.split("token=")[1]);
+        const token = url.split("token=")[1];
+        const decoded = jwt_decode(token);
         console.log(decoded);
         setUser({
           ...user,
