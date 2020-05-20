@@ -11,7 +11,7 @@ const authMiddleware = async function (req: any, res: Response, next: Function) 
             console.log('in if')
             const user = await UserFacade.getUser(credentials.name)
             console.log('user', user)
-            req.userName = user.userName;
+            req.userName = user.username;
             console.log('req.userName', req.userName)
             return next();
         }

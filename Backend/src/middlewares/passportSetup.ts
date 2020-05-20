@@ -42,6 +42,7 @@ const initPassport = () => {
                 done(error);
             }
         }));
+
     passport.use(new JWTStrategy({
         jwtFromRequest: (req: any) => req.cookies.jwt,
         secretOrKey: process.env.SECRET,
