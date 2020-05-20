@@ -8,14 +8,19 @@ import cors from "cors";
 import schema from "./schema";
 import { ApiError } from "./customErrors/apiError";
 import authMiddleware from "./middlewares/basicAuth";
-import initPassport from "./middlewares/passportOauth";
-import passport from "passport";
 import token from "./util/makeTestJWT";
+import initPassport from './middlewares/passportOauth';
+import passport from 'passport';
+import { requestLogger, errorLogger } from './middlewares/logger'
+
 
 initPassport();
 const app = express();
 
 app.use(passport.initialize());
+
+//The regular logger needs to be before the router
+app.use(requestLogger)
 
 // Keept out because typeScript is angry
 const params = {
@@ -34,6 +39,9 @@ app.get(
     res.redirect(`exp://192.168.1.10:19000/?token=${authToken}`); // This should point to the Mobile App. Should include info like /?authToken=23xbdbb21b3
   }
 );
+
+//The errorlogger needs to be added AFTER the express router and BEFORE any custom error handlers.
+app.use(errorLogger)
 
 const server = new ApolloServer({
   schema,
