@@ -6,7 +6,7 @@ import { ApiError } from '../customErrors/apiError';
 import UserDataAccessorObject from '../dataAccessorObjects/userDAO';
 
 
-export default class facade {
+export default class UserFacade {
 
     private _UDAO: UserDataAccessorObject;
     constructor(schema: string) {
