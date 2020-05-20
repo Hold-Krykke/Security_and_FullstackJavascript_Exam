@@ -44,12 +44,113 @@ describe("Verify the UserFacade", () => {
 
     it("Should add non OAuth user Donald Trump", async () => {
         const user: IUser = { username: "Donald Trump", password: "secret", email: "donald@trump.com", isOAuth: false, refreshToken: null };
-        try{
+        try {
             const success: boolean = await facade.addNonOAuthUser(user);
             expect(success).to.be.equal(true);
-        } catch(err) {
-            console.log("Test failed");
-            console.log(err);
+        } catch (err) {
+        }
+    })
+
+    it("Should add OAuth user Google Boi", async () => {
+        const user: IUser = { username: "Google Boi", password: null, email: null, isOAuth: true, refreshToken: "GoogleRefreshToken" };
+        try {
+            const success: boolean = await facade.addOAuthUser(user);
+            expect(success).to.be.equal(true);
+        } catch (err) {
+        }
+    })
+
+    it("Should get user Johnny", async () => {
+        try {
+            const user: IUser = await facade.getUser("Johnny");
+            expect(user.email).to.be.equal("johnny@ringo.com");
+            expect(user.isOAuth).to.be.equal(false);
+            expect(user.password).to.not.be.equal(null);
+        } catch (err) {
+        }
+    })
+
+    it("Negative, Should fail to get user IDontExist", async () => {
+        try {
+            const user: IUser = await facade.getUser("IDontExist");
+        } catch (err) {
+            expect(err instanceof ApiError).to.be.equal(true)
+            expect(err.message).to.be.equal("User with username: IDontExist was not found")
+        }
+    })
+
+    it("Should delete user Johnny", async () => {
+        try {
+            const success: string = await facade.deleteUser("Johnny");
+            expect(success).to.be.equal("User Johnny was removed");
+        } catch (err) {
+        }
+    })
+
+    it("Should check user Jenny", async () => {
+        try {
+            const success: boolean = await facade.checkUser("Jenny", "secret");
+            expect(success).to.be.equal(true);
+        } catch (err) {
+        }
+    })
+
+    it("Negative, Should check user Jenny", async () => {
+        try {
+            const success: boolean = await facade.checkUser("Jenny", "bad password");
+            expect(success).to.be.equal(false);
+        } catch (err) {
+        }
+    })
+
+    it("Negative, Should fail to check user IDontExist", async () => {
+        try {
+            const success: boolean = await facade.checkUser("IDontExist", "secret");
+        } catch (err) {
+            expect(err instanceof ApiError).to.be.equal(true)
+            expect(err.message).to.be.equal("User with username: IDontExist was not found")
+        }
+    })
+
+    it("Should check if user Jenny is OAuth type user", async () => {
+        try {
+            const status: boolean = await facade.isOAuthUser("Jenny");
+            expect(status).to.be.equal(false);
+        } catch (err) {
+        }
+    })
+
+    it("Negative, Should fail to check if user IDontExist is OAuth type user", async () => {
+        try {
+            const status: boolean = await facade.isOAuthUser("IDontExist");
+        } catch (err) {
+            expect(err instanceof ApiError).to.be.equal(true)
+            expect(err.message).to.be.equal("User IDontExist not found")
+        }
+    })
+
+    it("Should update refresh token of user Dimwit", async () => {
+        try {
+            const status: boolean = await facade.updateUserRefreshToken("Dimwit", "NewToken");
+            expect(status).to.be.equal(true);
+        } catch (err) {
+        }
+    })
+
+    it("Negative, Should fail to update refresh token of user IDontExist", async () => {
+        try {
+            const status: boolean = await facade.updateUserRefreshToken("IDontExist", "NewToken");
+        } catch (err) {
+            expect(err instanceof ApiError).to.be.equal(true)
+            expect(err.message).to.be.equal("User IDontExist not found")
+        }
+    })
+
+    it("Should get refresh token of user Dimwit", async () => {
+        try {
+            const token: string = await facade.getUserRefreshToken("Dimwit");
+            expect(token).to.be.equal("MansGotThatRefreshToken");
+        } catch (err) {
         }
     })
 })
