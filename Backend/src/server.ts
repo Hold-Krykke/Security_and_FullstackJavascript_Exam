@@ -1,5 +1,5 @@
 import express from "express";
-import { ApolloServer } from "apollo-server-express";
+import { ApolloServer, ApolloError } from "apollo-server-express";
 import depthLimit from "graphql-depth-limit"; // https://www.npmjs.com/package/graphql-depth-limit
 // Gzip compressing can greatly decrease the size of the response body and hence increase the speed of a web app.
 // https://expressjs.com/en/advanced/best-practice-performance.html
@@ -51,6 +51,18 @@ const server = new ApolloServer({
   schema,
   validationRules: [depthLimit(7)], // see import
   debug: process.env.NODE_ENV !== "production",
+  formatError: (err: any) => {
+    if (err.originalError instanceof ApiError) {
+      return new ApolloError(
+        err.originalError.msg,
+        String(err.originalError.errorCode)
+      );
+    }
+
+    // Otherwise return the original error.  The error can also
+    // be manipulated in other ways, so long as it's returned.
+    return err;
+  },
 });
 
 app.use("*", cors());

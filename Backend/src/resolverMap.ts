@@ -37,11 +37,7 @@ const resolverMap: IResolvers = {
     //     return UserFacade.getAllUsers();
     // },
     getUser(_: void, args: any): any {
-      try {
-        return facade.getUser(args.username);
-      } catch (err) {
-        throw new ApolloError(err.msg, err.errorCode);
-      }
+      return facade.getUser(args.username);
     },
   },
   Mutation: {
@@ -62,18 +58,10 @@ const resolverMap: IResolvers = {
         isOAuth,
         refreshToken: null,
       };
-      try {
-        return facade.addNonOAuthUser(user);
-      } catch (err) {
-        throw new ApolloError(err.msg, err.errorCode);
-      }
+      return facade.addNonOAuthUser(user);
     },
     deleteUser: (_, args: any) => {
-      try {
-        return facade.deleteUser(args.username);
-      } catch (err) {
-        throw new ApolloError(err.msg, err.errorCode);
-      }
+      return facade.deleteUser(args.username);
     },
   },
 };
