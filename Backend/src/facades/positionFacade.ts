@@ -78,7 +78,7 @@ export default class PositionFacade {
             return formatted
 
         } catch (err) {
-            throw new ApiError("Failed to get nearby players"), 400;
+            throw new ApiError("Failed to get nearby players", 400);
         }
     }
 
@@ -101,7 +101,7 @@ export default class PositionFacade {
             )
             return found.toArray();
         } catch (err) {
-            throw new ApiError("Failed to get nearby players");
+            throw new ApiError("Failed to get nearby players", 400);
         }
     }
 
@@ -134,7 +134,7 @@ export default class PositionFacade {
             }
             return formatted;
         } catch (err) {
-            throw new ApiError("Failed to create or update position"), 400;
+            throw new ApiError("Failed to create or update position", 400);
         }
     }
 

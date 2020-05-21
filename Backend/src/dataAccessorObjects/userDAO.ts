@@ -124,6 +124,55 @@ export default class UserDataAccessorObject {
   }
 
   /**
+   * Used to get a user by email. Use this for authentication.
+   * @param email email of user
+   */
+  getUserByEmail(email: string): Promise<IUser> | Promise<any> {
+    return new Promise((resolve, reject) => {
+      this._pool.getConnection((err, connection) => {
+        if (err) {
+          console.log("Failed to get connection from pool");
+          reject(err);
+          return;
+        }
+        else {
+          try {
+            connection.query('SELECT * FROM users WHERE email = ?', [email], function (error, result) {
+              if (error) {
+                console.log("An error occurred when trying to fetch user");
+                reject(error);
+                return;
+              }
+              const data = result[0];
+              if (typeof(data) == "undefined") {
+                resolve(null);
+                // return statement necessary to end method
+                return;
+              } 
+              //I couldn't find a better way to destructure this data
+              const { username, password, email, isOAuth, refreshToken } = data;
+              const user: IUser = {
+                username,
+                password,
+                email,
+                isOAuth,
+                refreshToken
+              }
+              resolve(user);
+            });
+          } catch (error) {
+            console.log("Failed to get user by email");
+            reject(error);
+          } finally {
+            //console.log("Releasing connection back to the pool");
+            connection.release();
+          }
+        }
+      });
+    })
+  }
+
+  /**
    * Used to create user in database. 
    * Can be used to add both OAuth users and normal users
    * Will return promise with success message if user was persisted.
@@ -248,11 +297,11 @@ export default class UserDataAccessorObject {
 
   /**
    * Used to check if the user provided correct credentials.
-   * Perhaps this method should be removed?
-   * @param username username of user
+   * (Not used) Perhaps this method should be removed? 
+   * @param email email of user
    * @param password password of use
    */
-  checkUser(username: string, password: string): Promise<boolean> {
+  checkUser(email: string, password: string): Promise<boolean> {
     return new Promise((resolve, reject) => {
       this._pool.getConnection((err, connection) => {
         if (err) {
@@ -263,7 +312,7 @@ export default class UserDataAccessorObject {
         else {
           try {
             connection.query('SELECT `username`, `password` FROM `users` WHERE (`username` = ?);',
-             [username], function (error, result) {
+             [email], function (error, result) {
               if (error) {
                 console.log("An error occurred when trying to check user");
                 reject(false);
