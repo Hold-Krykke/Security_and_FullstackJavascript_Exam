@@ -69,7 +69,6 @@ const LoginScreen = ({ signedIn, setSignedIn }) => {
     );
 };
 
-
 // This should be removed, is only temporarily here untill MapScreen is ready
 const LoggedInPage = (props) => {
     return (
