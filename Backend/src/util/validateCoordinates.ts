@@ -1,8 +1,8 @@
 const validateLongitude = (lon: number): Boolean => {
-  return !!(lon >= -180 && lon <= 180);
+  return lon >= -180 && lon <= 180;
 };
 const validateLatitude = (lat: number): Boolean => {
-  return !!(lat >= -90 && lat <= 90);
+  return lat >= -90 && lat <= 90;
 };
 const validateCoordinates = (lon: number, lat: number): Boolean => {
   return validateLatitude(lat) && validateLongitude(lon);
