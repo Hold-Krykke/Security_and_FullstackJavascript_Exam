@@ -69,9 +69,11 @@ const resolverMap: IResolvers = {
       }
     },
     deleteUser: (_, args: any) => {
-      const userName: string = args.username;
-      const msg = facade.deleteUser(userName);
-      return msg;
+      try {
+        return facade.deleteUser(args.username);
+      } catch (err) {
+        throw new ApolloError(err.msg, err.errorCode);
+      }
     },
   },
 };
