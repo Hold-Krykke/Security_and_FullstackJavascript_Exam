@@ -1,9 +1,10 @@
-import { IResolvers } from 'graphql-tools';
-const path = require('path')
-require('dotenv').config({ path: path.join(process.cwd(), '.env') })
+import { IResolvers } from "graphql-tools";
+const path = require("path");
+require("dotenv").config({ path: path.join(process.cwd(), ".env") });
 // import setup from './config/setupDB'
-import UserFacade from './facades/userFacade'
-import IUser from './interfaces/IUser';
+import UserFacade from "./facades/userFacade";
+import IUser from "./interfaces/IUser";
+import { AuthenticationError } from "apollo-server-express";
 
 const schema: string = process.env.DATABASE_SCHEMA || "";
 
@@ -19,31 +20,41 @@ const facade: UserFacade = new UserFacade(schema);
 // })()
 
 const resolverMap: IResolvers = {
-    Query: {
-        // Do we need this?
-        // allUsers(_: void, args: void): any {
-        //     return UserFacade.getAllUsers();
-        // },
-        getUser(_: void, args: any): any {
-            return facade.getUser(args.username);
-        },
+  Query: {
+    // Do we need this?
+    // allUsers(_: void, args: void): any {
+    //     return UserFacade.getAllUsers();
+    // },
+    getUser(_: void, args: any): any {
+      return facade.getUser(args.username);
     },
-    Mutation: {
-        addUser: (_, { input }) => {
-            const username: string = input.username;
-            const password: string = input.password;
-            const email: string = input.email;
-            const isOAuth: boolean = false;
-            const user: IUser = { username, password, email, isOAuth, refreshToken: null };
-            const added = facade.addNonOAuthUser(user);
-            return added;
-        },
-        deleteUser: (_, args: any) => {
-            const userName: string = args.username;
-            const msg = facade.deleteUser(userName);
-            return msg;
-        },
+  },
+  Mutation: {
+    addUser: (_, { input }) => {
+      const username: string = input.username;
+      const password: string = input.password;
+      const email: string = input.email;
+      const isOAuth: boolean = false;
+      const user: IUser = {
+        username,
+        password,
+        email,
+        isOAuth,
+        refreshToken: null,
+      };
+      try {
+        const added = facade.addNonOAuthUser(user);
+        return added;
+      } catch (err) {
+        throw new AuthenticationError(err.msg);
+      }
     },
+    deleteUser: (_, args: any) => {
+      const userName: string = args.username;
+      const msg = facade.deleteUser(userName);
+      return msg;
+    },
+  },
 };
 
 export default resolverMap;
