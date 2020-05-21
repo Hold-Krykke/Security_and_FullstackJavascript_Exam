@@ -1,42 +1,83 @@
-import React, {useState, useEffect} from 'react';
-import {Dimensions, StyleSheet, View, Text, TouchableWithoutFeedback, Keyboard} from 'react-native';
+import React, {useState, useEffect, useRef} from 'react';
+import {
+	Dimensions,
+	StyleSheet,
+	View,
+	Text,
+	TouchableWithoutFeedback,
+	Keyboard,
+	Animated,
+} from 'react-native';
 import * as Location from 'expo-location';
 import MapView from 'react-native-maps';
 import Card from '../components/Card';
 import colors from '../constants/colors';
 import Input from '../components/Input';
 import facade from '../facade';
+import MapScreenSettings from '../components/MapScreenSettings';
 
-const LATITUDE = 45.464664;
-const LONGITUDE = 9.18854; //Milan, Italy
+const INITIAL_REGION = {
+	//Milan, Italy - start location
+	latitude: 45.464664,
+	longitude: 9.18854,
+	latitudeDelta: 30,
+	longitudeDelta: 30,
+};
 const {width, height} = Dimensions.get('window');
 const ASPECT_RATIO = width / height;
-const LATITUDE_DELTA = 0.1;
+const LATITUDE_DELTA = 0.2;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
+const MARKER_COLORS = [
+	'red',
+	'tomato',
+	'orange',
+	'yellow',
+	'gold',
+	'wheat',
+	'tan',
+	'linen',
+	'green',
+	'aqua',
+	'teal',
+	'turquoise',
+	'violet',
+	'purple',
+	'plum',
+	'indigo',
+];
+
 const MapScreen = (props) => {
-	const [location, setLocation] = useState(null);
+	let mapRef = useRef(null);
+	const DEBUG = true; //use to display settings on screen
+	const [settings, setSettings] = useState({
+		username: 'Johnny',
+		distance: 1000,
+		longitude: null,
+		latitude: null,
+	});
 	const [errorMsg, setErrorMsg] = useState(null);
 	const [changeRegion, setChangeRegion] = useState(false);
-	const [region, setRegion] = useState({
-		latitude: LATITUDE,
-		longitude: LONGITUDE,
-		latitudeDelta: 30,
-		longitudeDelta: 30,
-	});
-	//pass all users as props and map to screen as markers. Update every so often? streams, subscriptions?
-
+	const [region, setRegion] = useState(INITIAL_REGION);
+	const [nearbyUsers, setNearbyUsers] = useState([]);
+	//grab all users from facade and map to screen. Update every so often? streams, subscriptions?
+	//pass userInfo as props
 	useEffect(() => {
-		if (location) {
+		//set MapView region close to user only on startup
+		if (settings.latitude && settings.longitude) {
 			setRegion({
 				...region,
-				latitude: location.coords.latitude,
-				longitude: location.coords.longitude,
+				latitude: settings.latitude,
+				longitude: settings.longitude,
 				latitudeDelta: LATITUDE_DELTA,
 				longitudeDelta: LONGITUDE_DELTA,
 			});
 		}
 	}, [changeRegion]);
+
+	useEffect(() => {
+		if (region) mapRef.current.animateToRegion(region, 1000);
+	}, [region]);
 	useEffect(() => {
 		setTimeout(() => {
 			(async () => {
@@ -46,58 +87,61 @@ const MapScreen = (props) => {
 				}
 
 				let location = await Location.getCurrentPositionAsync({});
-				setLocation(location);
+				setSettings({
+					...settings,
+					longitude: location.coords.longitude,
+					latitude: location.coords.latitude,
+				});
 				setChangeRegion(true);
 				console.log('happened ' + new Date(Date.now()).toLocaleTimeString());
 			})();
 			//No return as we want user to update in the background
 		}, 1000);
-		//console.log(location.latitude | 'no', location.longitude | 'no', 'yeet');
-		// setRegion({
-		// 	...region,
-		// 	latitude: location.latitude,
-		// 	longitude: location.longitude,
-		// 	latitudeDelta: LATITUDE_DELTA,
-		// 	longitudeDelta: LONGITUDE_DELTA,
-		// });
 	}, []); //will replicate between reloads of component, ffs
 
-	let userMessage = 'Waiting for location...';
-	if (errorMsg) {
-		userMessage = errorMsg;
-	} else if (location) {
-		userMessage = JSON.stringify(location);
-	}
-	// const handleRegion = () => {
-	// 	setRegion({
-	// 		...region,
-	// 		latitude: location.latitude | LATITUDE,
-	// 		longitude: location.longitude | LONGITUDE,
-	// 		latitudeDelta: LATITUDE_DELTA,
-	// 		longitudeDelta: LONGITUDE_DELTA,
-	// 	});
-	// };
+	// let userMessage = 'Waiting for location...';
+	// if (errorMsg) {
+	// 	userMessage = errorMsg;
+	// } else if (settings.latitude && settings.longitude) {
+	// 	userMessage = "";
+	// }
 
 	return (
-		<TouchableWithoutFeedback
-			touchSoundDisabled={true}
-			onPress={() => {
-				Keyboard.dismiss();
-			}}>
-			<View style={styles.screen}>
-				<Text style={styles.text}>{userMessage}</Text>
-				<Text> {location && location.coords.longitude}</Text>
-				<View style={styles.container}>
-					<MapView
-						style={styles.mapStyle}
-						region={region}
-						showsUserLocation
-						loadingEnabled
-						// onMapReady={() => handleRegion()}
-					/>
+		<>
+			<MapScreenSettings settings={settings} setSettings={setSettings} />
+			{<Text>{DEBUG && JSON.stringify(settings, null, 4)}</Text>}
+
+			<TouchableWithoutFeedback
+				touchSoundDisabled={true}
+				onPress={() => {
+					Keyboard.dismiss();
+				}}>
+				<View style={styles.screen}>
+					{/* <Text style={styles.text}>{userMessage}</Text> */}
+
+					<View style={styles.container}>
+						<MapView
+							ref={mapRef}
+							style={styles.mapStyle}
+							region={INITIAL_REGION}
+							showsUserLocation
+							loadingEnabled>
+							{settings.latitude && settings.longitude && (
+								<MapView.Marker
+									title={settings.username + ' (YOU)'}
+									pinColor="blue"
+									key={settings.username}
+									coordinate={{
+										longitude: settings.longitude,
+										latitude: settings.latitude,
+									}}
+								/>
+							)}
+						</MapView>
+					</View>
 				</View>
-			</View>
-		</TouchableWithoutFeedback>
+			</TouchableWithoutFeedback>
+		</>
 	);
 };
 
