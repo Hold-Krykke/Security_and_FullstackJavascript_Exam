@@ -29,6 +29,7 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (networkError) console.log(`[Network error]: ${networkError}`);
 });
 
+// Needs improvement: Read here: https://www.apollographql.com/docs/link/links/context/
 // You can also make an "authLink" that attaches the token properly to every request here
 // And then .concat it.
 // Kinda like a middleware
