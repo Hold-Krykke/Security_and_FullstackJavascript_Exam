@@ -4,6 +4,9 @@ const getToken = () => {
   return "FAKE TOKEN";
 };
 
+/**
+ * Put logic here, on how to handle errors.
+ */
 const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (graphQLErrors) {
     graphQLErrors.map((err) => {
