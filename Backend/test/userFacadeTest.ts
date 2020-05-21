@@ -6,7 +6,6 @@ import bcrypt from "bcryptjs";
 import UserDataAccessorObject from "../src/dataAccessorObjects/userDAO";
 import IUser from "../src/interfaces/IUser";
 import UserFacade from "../src/facades/userFacade";
-// import "jest";
 
 const schema: string = process.env.DATABASE_SCHEMA_TEST || "";
 let UDAO: UserDataAccessorObject;

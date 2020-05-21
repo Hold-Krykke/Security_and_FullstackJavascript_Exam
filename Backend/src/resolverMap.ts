@@ -5,9 +5,10 @@ require("dotenv").config({ path: path.join(process.cwd(), ".env") });
 import UserFacade from "./facades/userFacade";
 import IUser from "./interfaces/IUser";
 import {
-  AuthenticationError,
-  UserInputError,
-  ApolloError,
+  AuthenticationError, // IF NOT AUTHENTICATED
+  UserInputError, // IF WRONG INPUT, THAT GRAPHQL CANT CATCH ITSELF
+  ForbiddenError, // IF NOT AUTHORIZED
+  ApolloError, // IF NOT ANY OF THE ABOVE THREE
 } from "apollo-server-express";
 import validateEmail from "./util/validateEmail";
 import PositionFacade from "./facades/positionFacade";
