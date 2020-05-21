@@ -15,6 +15,12 @@ const schema: string = process.env.DATABASE_SCHEMA || "";
 
 const facade: UserFacade = new UserFacade(schema);
 
+/**
+ * AUTHENTICATION ERROR HANDLING:
+ * In the Resolver for a protected Action, we can check Context for the User.
+ * So if the User is not there, we throw a new AuthenticationError(err.msg); or with a custom String like "You must be logged in."
+ */
+
 // Resolvers
 // Used in Schema to make a GraphQL schema
 // Schema is used to make Apollo Server
@@ -57,8 +63,7 @@ const resolverMap: IResolvers = {
         refreshToken: null,
       };
       try {
-        const added = facade.addNonOAuthUser(user);
-        return added;
+        return facade.addNonOAuthUser(user);
       } catch (err) {
         throw new ApolloError(err.msg, err.errorCode);
       }
