@@ -9,10 +9,9 @@ import schema from "./schema";
 import { ApiError } from "./customErrors/apiError";
 import authMiddleware from "./middlewares/basicAuth";
 import token from "./util/makeTestJWT";
-import initPassport from './middlewares/passportOauth';
-import passport from 'passport';
-import { requestLogger, errorLogger } from './middlewares/logger'
-
+import initPassport from "./middlewares/passportOauth";
+import passport from "passport";
+import { requestLogger, errorLogger } from "./middlewares/logger";
 
 initPassport();
 const app = express();
@@ -20,7 +19,7 @@ const app = express();
 app.use(passport.initialize());
 
 //The regular logger needs to be before the router
-app.use(requestLogger)
+app.use(requestLogger);
 
 // Keept out because typeScript is angry
 const params = {
@@ -41,11 +40,17 @@ app.get(
 );
 
 //The errorlogger needs to be added AFTER the express router and BEFORE any custom error handlers.
-app.use(errorLogger)
+app.use(errorLogger);
 
+// let debug = true;
+// if (process.env.NODE_ENV !== "production") {
+//   debug = false;
+// }
+//process.env.NODE_ENV = "production";
 const server = new ApolloServer({
   schema,
   validationRules: [depthLimit(7)], // see import
+  debug: process.env.NODE_ENV !== "production",
 });
 
 app.use("*", cors());
