@@ -12,6 +12,7 @@ import {
 import validateEmail from "./util/validateEmail";
 import PositionFacade from "./facades/positionFacade";
 import setup from "./config/setupDB";
+import validateCoordinates from "./util/validateCoordinates";
 
 /**
  * AUTHENTICATION ERROR HANDLING:
@@ -68,6 +69,22 @@ const resolverMap: IResolvers = {
       return userFacade.deleteUser(args.username);
     },
     getNearbyUsers: (_, args: any) => {
+      if (args.distance <= 0) {
+        throw new UserInputError(
+          "Please provide a search distance that is greater than 0",
+          {
+            invalidArgs: "distance",
+          }
+        );
+      }
+      if (!validateCoordinates(args.coordinates.lon, args.coordinates.lat)) {
+        throw new UserInputError(
+          "Please provide proper Coordinates. lon between -180 and 180, and lat between -90 and 90",
+          {
+            invalidArgs: "coordinates",
+          }
+        );
+      }
       const username: string = args.username;
       const lon: number = args.coordinates.lon;
       const lat: number = args.coordinates.lat;
