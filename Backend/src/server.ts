@@ -49,7 +49,7 @@ app.post('/auth/jwt', (req, res) => {
                 }
                 const token = jwt.sign(JSON.stringify(payload), process.env.SECRET);
                 res.cookie('jwt', jwt, { httpOnly: true, secure: true });
-                res.status(200).send({ token: token, username: user.username, email: user.email });
+                res.status(200).send({ token: token, username: user.username, useremail: user.email });
             });
         },
     )(req, res);

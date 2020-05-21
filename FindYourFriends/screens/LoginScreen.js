@@ -1,31 +1,16 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { StyleSheet, View, Text, TouchableWithoutFeedback, Keyboard, Image, Button, } from "react-native";
 import Card from "../components/Card";
 import LoginCard from "../components/LoginCard";
 import colors from "../constants/colors";
-import Input from "../components/Input";
-import facade from "../facade";
-import { AuthSession, Linking } from "expo";
+import { Linking } from "expo";
 import * as WebBrowser from "expo-web-browser";
 import jwt_decode from "jwt-decode"; // https://www.npmjs.com/package/jwt-decode
-/*
-  We dont verify token here. 
-  We have to verify it on the backend on every request. 
-*/
 
 const backendURL = 'http://177f1c87.ngrok.io';
-/**
- * Google Login SSO - IMPLICIT FLOW
- *
- * What we want to eventually implement is a SERVER FLOW. https://developers.google.com/identity/protocols/oauth2/openid-connect
- *
- * Documentation for Google Login https://docs.expo.io/versions/latest/sdk/google/
- * When we want to add backend, read here: https://docs.expo.io/versions/latest/sdk/google/#server-side-apis
- */
 
-const LoginScreen = (props) => {
-    const [signedIn, setSignedIn] = useState(false);
-    const [user, setUser] = useState({ email: '' });
+const LoginScreen = ({ signedIn, setSignedIn }) => {
+    const [user, setUser] = useState({ email: '', token: '' });
     const [userEmail, setUserEmail] = useState('');
     const [password, setPassword] = useState('');
 
@@ -39,6 +24,7 @@ const LoginScreen = (props) => {
                 const token = result.url.split("token=")[1];
                 const decoded = jwt_decode(token);
                 user.email = decoded.useremail
+                user.token = token
                 setUser(user);
                 console.log('user', user)
                 setSignedIn(true);
@@ -51,10 +37,6 @@ const LoginScreen = (props) => {
     };
 
     const handleUserLogin = async () => {
-        console.log(userEmail)
-        console.log(password)
-        //const res = await fetch(`${backendURL}/auth/jwt?`, request).then(res => res.json());
-
         const request = {
             method: "POST",
             headers: {
@@ -64,7 +46,11 @@ const LoginScreen = (props) => {
             body: JSON.stringify({ useremail: userEmail, password: password })
         };
         const res = await fetch(`${backendURL}/auth/jwt?`, request).then(res => res.json());
+        user.email = res.useremail
+        user.token = res.token
+        setUser(user);
         console.log(res)
+        setSignedIn(true);
     }
 
     return (
@@ -95,6 +81,7 @@ const LoggedInPage = (props) => {
         </Card >
     );
 };
+////////////////////////////////////////////////////////////////////////////
 
 const styles = StyleSheet.create({
     screen: {

@@ -7,25 +7,26 @@ import LoginScreen from "./screens/LoginScreen";
 import ChatScreen from "./screens/ChatScreen";
 
 export default function App() {
-  // USE SCREENS LIKE THIS
-  const [test, setTest] = useState(true);
+    // USE SCREENS LIKE THIS
+    const [test, setTest] = useState(true);
+    const [signedIn, setSignedIn] = useState(false);
 
-  let content = <HomeScreen setTest={setTest} />;
-  if (test) {
-    content = <LoginScreen />;
-    //content = <MapScreen test={test} />
-  }
+    let content = <HomeScreen setTest={setTest} />;
+    if (test) {
+        content = <LoginScreen signedIn={signedIn} setSignedIn={setSignedIn} />;
+        //content = <MapScreen test={test} />
+    }
 
-  return (
-    <View style={styles.screen}>
-      <Header title="Find Your Friends" />
-      {content}
-    </View>
-  );
+    return (
+        <View style={styles.screen}>
+            <Header title="Find Your Friends" />
+            {content}
+        </View>
+    );
 }
 
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-  },
+    screen: {
+        flex: 1,
+    },
 });
