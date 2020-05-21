@@ -16,9 +16,12 @@ import setup from "./config/setupDB";
 import validateCoordinates from "./util/validateCoordinates";
 
 /**
- * AUTHENTICATION ERROR HANDLING:
+ * AUTHENTICATION / AUTHORIZATION ERROR HANDLING:
+ * If Token is not OK, throw authentication error
+ * If Token is OK, but person is not permitted to do an action, throw ForbiddenError.
+ *
  * In the Resolver for a protected Action, we can check Context for the User.
- * So if the User is not there, we throw a new AuthenticationError(err.msg); or with a custom String like "You must be logged in."
+ * So if the User is not there, we throw a new ForbiddenError(err.msg); or with a custom String like "You must be logged in."
  */
 
 const schema: string = process.env.DATABASE_SCHEMA || "";
