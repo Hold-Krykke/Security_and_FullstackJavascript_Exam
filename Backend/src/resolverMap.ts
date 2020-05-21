@@ -10,10 +10,8 @@ import {
   ApolloError,
 } from "apollo-server-express";
 import validateEmail from "./util/validateEmail";
-
-const schema: string = process.env.DATABASE_SCHEMA || "";
-
-const facade: UserFacade = new UserFacade(schema);
+import PositionFacade from "./facades/positionFacade";
+import setup from "./config/setupDB";
 
 /**
  * AUTHENTICATION ERROR HANDLING:
@@ -21,14 +19,20 @@ const facade: UserFacade = new UserFacade(schema);
  * So if the User is not there, we throw a new AuthenticationError(err.msg); or with a custom String like "You must be logged in."
  */
 
+const schema: string = process.env.DATABASE_SCHEMA || "";
+
+const userFacade: UserFacade = new UserFacade(schema);
+const positionFacade: PositionFacade = new PositionFacade();
 // Resolvers
 // Used in Schema to make a GraphQL schema
 // Schema is used to make Apollo Server
 
-// (async function setupDB() {
-//     const client = await setup()
-//     //UserFacade.setDatabase(client)
-// })()
+(async function setupDB() {
+  const client = await setup();
+  positionFacade.setDatabase(client, "exam");
+})();
+
+// We need to implement security in the resolvers, JWT etc. when the login system is ready
 
 const resolverMap: IResolvers = {
   Query: {
@@ -37,7 +41,7 @@ const resolverMap: IResolvers = {
     //     return UserFacade.getAllUsers();
     // },
     getUser(_: void, args: any): any {
-      return facade.getUser(args.username);
+      return userFacade.getUser(args.username);
     },
   },
   Mutation: {
@@ -58,10 +62,30 @@ const resolverMap: IResolvers = {
         isOAuth,
         refreshToken: null,
       };
-      return facade.addNonOAuthUser(user);
+      return userFacade.addNonOAuthUser(user);
     },
     deleteUser: (_, args: any) => {
-      return facade.deleteUser(args.username);
+      return userFacade.deleteUser(args.username);
+    },
+    getNearbyUsers: (_, args: any) => {
+      const username: string = args.username;
+      const lon: number = args.coordinates.lon;
+      const lat: number = args.coordinates.lat;
+      const distance: number = args.distance;
+      const nearbyUsers = positionFacade.nearbyUsers(
+        username,
+        lon,
+        lat,
+        distance
+      );
+      return nearbyUsers;
+    },
+    updatePosition: (_, args: any) => {
+      const username: string = args.username;
+      const lon: number = args.coordinates.lon;
+      const lat: number = args.coordinates.lat;
+      const result = positionFacade.createOrUpdatePosition(username, lon, lat);
+      return result;
     },
   },
 };
