@@ -139,14 +139,19 @@ export default class UserFacade {
 
     /**
      * Used to update the refresh token of specific user.
-     * @param username username of user
-     * @param token refresh token 
+     * @param identifier username or email
+     * @param token new refresh token
+     * @param identifierIsEmail pass true if identifier is an email, pass false if identifier is a username
      */
-    async updateUserRefreshToken(username: string, token: string): Promise<boolean> {
+    async updateUserRefreshToken(identifier: string, token: string, identifierIsEmail: boolean): Promise<boolean> {
         try {
-            return await this._UDAO.updateUserRefreshToken(username, token);
+            if (identifierIsEmail) {
+                return await this._UDAO.updateUserRefreshTokenByEmail(identifier, token);
+            } else {
+                return await this._UDAO.updateUserRefreshTokenByUsername(identifier, token);
+            }
         } catch (err) {
-            throw new ApiError(`User ${username} not found`, 400)
+            throw new ApiError(`User ${identifier} not found`, 400)
         }
     }
 
@@ -157,7 +162,7 @@ export default class UserFacade {
      */
     async getUserRefreshToken(username: string): Promise<string> {
         try {
-            const result = await this._UDAO.getRefreshToken(username);
+            const result = await this._UDAO.getRefreshTokenByUsername(username);
             if (result) return result;
             else return "";
         } catch (err) {

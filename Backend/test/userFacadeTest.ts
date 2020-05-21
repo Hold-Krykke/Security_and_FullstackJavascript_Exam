@@ -109,13 +109,13 @@ describe("Verify the UserFacade", () => {
     })
 
     it("Should update refresh token of user Dimwit", async () => {
-        const status: boolean = await facade.updateUserRefreshToken("Dimwit", "NewToken");
+        const status: boolean = await facade.updateUserRefreshToken("Dimwit", "NewToken", false);
         expect(status).to.be.equal(true);
     })
 
     it("Negative, Should fail to update refresh token of user IDontExist", async () => {
         try {
-            const status: boolean = await facade.updateUserRefreshToken("IDontExist", "NewToken");
+            const status: boolean = await facade.updateUserRefreshToken("IDontExist", "NewToken", false);
         } catch (err) {
             expect(err instanceof ApiError).to.be.equal(true)
             expect(err.message).to.be.equal("User IDontExist not found")
