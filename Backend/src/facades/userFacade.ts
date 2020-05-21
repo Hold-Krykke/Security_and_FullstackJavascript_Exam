@@ -41,10 +41,22 @@ export default class UserFacade {
      * Used to get specific user from the database.
      * @param username username of user
      */
-    async getUser(username: string): Promise<IUser> {
+    async getUserByUsername(username: string): Promise<IUser> {
         const user = await this._UDAO.getUserByUsername(username)
         if (!user) {
             throw new ApiError(`User with username: ${username} was not found`, 404)
+        }
+        return user;
+    }
+
+    /**
+     * Used to get specific user from the database based on email. Use this for authentication
+     * @param email email of user
+     */
+    async getUserByEmail(email: string): Promise<IUser> {
+        const user = await this._UDAO.getUserByEmail(email)
+        if (!user) {
+            throw new ApiError(`User with email: ${email} was not found`, 404)
         }
         return user;
     }
@@ -71,13 +83,13 @@ export default class UserFacade {
 
     /**
      * Used for login.
-     * @param userName username of user
+     * @param email email of user
      * @param plainTextPassword password in plain text
      */
-    async checkUser(userName: string, plainTextPassword: string): Promise<boolean> {
+    async checkUser(email: string, plainTextPassword: string): Promise<boolean> {
         let result = false;
-        const user = await this.getUser(userName);
-        if (!user) throw new ApiError(`User ${userName} not found`, 404);
+        const user = await this.getUserByEmail(email);
+        if (!user) throw new ApiError(`User with email: ${email} not found`, 404);
 
         await new Promise((resolve, reject) => {
             bcrypt.compare(plainTextPassword, user.password, (err: Error, res: boolean) => {

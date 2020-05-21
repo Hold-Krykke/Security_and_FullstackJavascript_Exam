@@ -28,7 +28,7 @@ const resolverMap: IResolvers = {
         //     return UserFacade.getAllUsers();
         // },
         getUser(_: void, args: any): any {
-            return userFacade.getUser(args.username);
+            return userFacade.getUserByUsername(args.username);
         },
 
     },

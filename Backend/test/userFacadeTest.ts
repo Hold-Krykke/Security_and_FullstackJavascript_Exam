@@ -62,7 +62,7 @@ describe("Verify the UserFacade", () => {
 
     it("Should get user Johnny", async () => {
         try {
-            const user: IUser = await facade.getUser("Johnny");
+            const user: IUser = await facade.getUserByUsername("Johnny");
             expect(user.email).to.be.equal("johnny@ringo.com");
             expect(user.isOAuth).to.be.equal(false);
             expect(user.password).to.not.be.equal(null);
@@ -72,7 +72,7 @@ describe("Verify the UserFacade", () => {
 
     it("Negative, Should fail to get user IDontExist", async () => {
         try {
-            const user: IUser = await facade.getUser("IDontExist");
+            const user: IUser = await facade.getUserByUsername("IDontExist");
         } catch (err) {
             expect(err instanceof ApiError).to.be.equal(true)
             expect(err.message).to.be.equal("User with username: IDontExist was not found")
@@ -89,7 +89,7 @@ describe("Verify the UserFacade", () => {
 
     it("Should check user Jenny", async () => {
         try {
-            const success: boolean = await facade.checkUser("Jenny", "secret");
+            const success: boolean = await facade.checkUser("jenny@thekill.com", "secret");
             expect(success).to.be.equal(true);
         } catch (err) {
         }
@@ -97,7 +97,7 @@ describe("Verify the UserFacade", () => {
 
     it("Negative, Should check user Jenny", async () => {
         try {
-            const success: boolean = await facade.checkUser("Jenny", "bad password");
+            const success: boolean = await facade.checkUser("jenny@thekill.com", "bad password");
             expect(success).to.be.equal(false);
         } catch (err) {
         }
@@ -105,10 +105,10 @@ describe("Verify the UserFacade", () => {
 
     it("Negative, Should fail to check user IDontExist", async () => {
         try {
-            const success: boolean = await facade.checkUser("IDontExist", "secret");
+            const success: boolean = await facade.checkUser("i@dont.exist", "secret");
         } catch (err) {
             expect(err instanceof ApiError).to.be.equal(true)
-            expect(err.message).to.be.equal("User with username: IDontExist was not found")
+            expect(err.message).to.be.equal("User with email: i@dont.exist was not found")
         }
     })
 
