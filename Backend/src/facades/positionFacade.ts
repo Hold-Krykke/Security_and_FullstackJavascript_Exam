@@ -25,16 +25,16 @@ export default class PositionFacade {
 
     }
 
-    async nearbyPlayers(username: string, lon: number, lat: number, distance: number): Promise<Array<any>> {
+    async nearbyUsers(username: string, lon: number, lat: number, distance: number): Promise<Array<any>> {
         try {
             const point: IPoint = { type: "Point", coordinates: [lon, lat] }
             const date = new Date();
 
-            const position: IPosition = {
-                username,
-                lastUpdated: date,
-                location: point
-            }
+            // const position: IPosition = {
+            //     username,
+            //     lastUpdated: date,
+            //     location: point
+            // }
             await positionCollection.findOneAndUpdate(
                 // Filter: What are we searching for?
                 { username },
@@ -42,14 +42,14 @@ export default class PositionFacade {
                 {
                     // The $set operator replaces the value of a field with the specified value.
                     // Doc: https://docs.mongodb.com/manual/reference/operator/update/set/
-                    $set: { position }
+                    $set: { lastUpdated: date, location: point }
                 },
                 // Options:
                 // upsert creates the document, if it does not exist already
                 { upsert: true, returnOriginal: false }
 
             )
-            const nearbyPlayers = await this.findNearbyPlayers(username, point, distance);
+            const nearbyPlayers = await this.findNearbyUsers(username, point, distance);
 
             //If anyone found,  format acording to requirements
             const formatted = nearbyPlayers.map((user) => {
@@ -66,7 +66,7 @@ export default class PositionFacade {
         }
     }
 
-    findNearbyPlayers(username: string, point: IPoint, distance: number): Promise<Array<IPosition>> {
+    private findNearbyUsers(username: string, point: IPoint, distance: number): Promise<Array<IPosition>> {
         try {
             const found = positionCollection.find(
                 {
@@ -89,7 +89,7 @@ export default class PositionFacade {
         }
     }
 
-    static async createOrUpdatePosition(username: string, lat: number, lon: number): Promise<any> {
+    async createOrUpdatePosition(username: string, lon: number, lat: number): Promise<any> {
         const point: IPoint = { type: "Point", coordinates: [lon, lat] }
         const date = new Date();
         try {
