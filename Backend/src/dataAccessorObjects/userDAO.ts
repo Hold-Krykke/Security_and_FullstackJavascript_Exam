@@ -8,15 +8,20 @@ import IUser from "../interfaces/IUser.js";
 const host = process.env.DATABASE_IP;
 const username = process.env.DATABASE_USER_USERNAME;
 const password = process.env.DATABASE_USER_PASSWORD;
-const schema = process.env.DATABASE_SCHEMA;
 const port = 3306
 
+/**
+ * Class used to connect to MySQL database. 
+ * Pass schema to constructor to choose which database to work with
+ */
 export default class UserDataAccessorObject {
 
   private _pool: mysql.Pool;
+  private _currentSchema: string;
 
-  constructor() {
-    this._pool = this._createConnectionPool();
+  constructor(schema: string) {
+    this._pool = this._createConnectionPool(schema);
+    this._currentSchema = schema;
   }
 
   // Does not work
@@ -36,7 +41,7 @@ export default class UserDataAccessorObject {
   //   })
   // }
 
-  private _createConnectionPool(): mysql.Pool {
+  private _createConnectionPool(schema: string): mysql.Pool {
     return mysql.createPool({
       host,
       port,
@@ -63,8 +68,9 @@ export default class UserDataAccessorObject {
    * Do not use this method unless you are absolutely sure you're not going 
    * to use the instance anymore
    */
-  terminateConnectionPool() {
-    this._pool.end();
+  terminateConnectionPool(): boolean {
+      this._pool.end();
+      return true;
   }
 
   /**
@@ -89,7 +95,6 @@ export default class UserDataAccessorObject {
                 return;
               }
               const data = result[0];
-              console.log(typeof(data));
               if (typeof(data) == "undefined") {
                 resolve(null);
                 // return statement necessary to end method
@@ -119,6 +124,55 @@ export default class UserDataAccessorObject {
   }
 
   /**
+   * Used to get a user by email. Use this for authentication.
+   * @param email email of user
+   */
+  getUserByEmail(email: string): Promise<IUser> | Promise<any> {
+    return new Promise((resolve, reject) => {
+      this._pool.getConnection((err, connection) => {
+        if (err) {
+          console.log("Failed to get connection from pool");
+          reject(err);
+          return;
+        }
+        else {
+          try {
+            connection.query('SELECT * FROM users WHERE email = ?', [email], function (error, result) {
+              if (error) {
+                console.log("An error occurred when trying to fetch user");
+                reject(error);
+                return;
+              }
+              const data = result[0];
+              if (typeof(data) == "undefined") {
+                resolve(null);
+                // return statement necessary to end method
+                return;
+              } 
+              //I couldn't find a better way to destructure this data
+              const { username, password, email, isOAuth, refreshToken } = data;
+              const user: IUser = {
+                username,
+                password,
+                email,
+                isOAuth,
+                refreshToken
+              }
+              resolve(user);
+            });
+          } catch (error) {
+            console.log("Failed to get user by email");
+            reject(error);
+          } finally {
+            //console.log("Releasing connection back to the pool");
+            connection.release();
+          }
+        }
+      });
+    })
+  }
+
+  /**
    * Used to create user in database. 
    * Can be used to add both OAuth users and normal users
    * Will return promise with success message if user was persisted.
@@ -136,7 +190,7 @@ export default class UserDataAccessorObject {
         }
         else {
           try {
-            connection.query('INSERT INTO `exam`.`users` (`username`, `password`, `email`, `isOAuth`, `refreshToken`) VALUES ( ?, ?, ?, ?, ?);',
+            connection.query('INSERT INTO `users` (`username`, `password`, `email`, `isOAuth`, `refreshToken`) VALUES ( ?, ?, ?, ?, ?);',
             [user.username, user.password, user.email, user.isOAuth, user.refreshToken], function(error){
               if (error) {
                 console.log("An error occurred when trying to insert user in database");
@@ -176,14 +230,13 @@ export default class UserDataAccessorObject {
         }
         else {
           try {
-            connection.query('UPDATE `exam`.`users` SET `refreshToken` = ? WHERE (`username` = ?);',
+            connection.query('UPDATE `users` SET `refreshToken` = ? WHERE (`username` = ?);',
             [token, username], function(error, result){
               if (error) {
                 console.log("An error occurred when trying to update user refresh token");
                 reject(error);
                 return;
               }
-              console.log(result);
               if (result.affectedRows == 0) {
                 // Should promise be resolved instead (a bit less aggressive strategy)
                 reject({"message": `User ${username} does not exist`});
@@ -217,9 +270,8 @@ export default class UserDataAccessorObject {
         }
         else {
           try {
-            connection.query('DELETE FROM `exam`.`users` WHERE (`username` = ?);',
+            connection.query('DELETE FROM `users` WHERE (`username` = ?);',
             [username], function(error, result){
-              console.log(result);
               if (error) {
                 console.log("An error occurred when trying to delete user");
                 reject(error);
@@ -245,11 +297,11 @@ export default class UserDataAccessorObject {
 
   /**
    * Used to check if the user provided correct credentials.
-   * Perhaps this method should be removed?
-   * @param username username of user
+   * (Not used) Perhaps this method should be removed? 
+   * @param email email of user
    * @param password password of use
    */
-  checkUser(username: string, password: string): Promise<boolean> {
+  checkUser(email: string, password: string): Promise<boolean> {
     return new Promise((resolve, reject) => {
       this._pool.getConnection((err, connection) => {
         if (err) {
@@ -259,8 +311,8 @@ export default class UserDataAccessorObject {
         }
         else {
           try {
-            connection.query('SELECT `username`, `password` FROM `exam`.`users` WHERE (`username` = ?);',
-             [username], function (error, result) {
+            connection.query('SELECT `username`, `password` FROM `users` WHERE (`username` = ?);',
+             [email], function (error, result) {
               if (error) {
                 console.log("An error occurred when trying to check user");
                 reject(false);
@@ -294,7 +346,7 @@ export default class UserDataAccessorObject {
         }
         else {
           try {
-            connection.query('SELECT `username`, `isOAuth` FROM `exam`.`users` WHERE (`username` = ?);',
+            connection.query('SELECT `username`, `isOAuth` FROM `users` WHERE (`username` = ?);',
              [username], function (error, result) {
               if (error) {
                 console.log("An error occurred when trying to check user status (OAuth)");
@@ -334,7 +386,7 @@ export default class UserDataAccessorObject {
         }
         else {
           try {
-            connection.query('SELECT `refreshToken` FROM `exam`.`users` WHERE (`username` = ?);',
+            connection.query('SELECT `refreshToken` FROM `users` WHERE (`username` = ?);',
              [username], function (error, result) {
               if (error) {
                 console.log("An error occurred when trying to get refresh token");
@@ -358,56 +410,46 @@ export default class UserDataAccessorObject {
     })
   }
 
+  /**
+   * Used to delete all data in users table.
+   * Only allows deletion in test databases.
+   * Returns false if: 
+   * deletion fails
+   * current database is not a test database
+   */
+  truncateUserTable(): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this._pool.getConnection((err, connection) => {
+        if (err) {
+          console.log("Failed to get connection from pool");
+          reject(err);
+          return;
+        }
+        else {
+          if (!this._currentSchema.includes("_test")) {
+            resolve(false);
+            return;
+          }
+          try {
+            connection.query('TRUNCATE TABLE users;',
+             [], function (error, result) {
+              if (error) {
+                console.log("An error occurred when truncating table");
+                reject(false);
+                return;
+              }
+              resolve(true);
+            });
+          } catch (error) {
+            console.log("Failed to truncate table");
+            reject(false);
+          } finally {
+            connection.release();
+          }
+        }
+      });
+    })
+  }
+
 }
 
-// const dao: UserDataAccessorObject = new UserDataAccessorObject();
-// async function getUser() {
-//   const user: IUser = await dao.getUserByUsername("ass");
-//   console.log(user);
-// }
-// getUser();
-
-// const newUser: IUser = {username: "ass", password: "xyzhash", isOAuth: false, email: "bitch@mail.com", refreshToken: null};
-// const newOAuthUser: IUser = {username: "Neko Chan", password: null, email: null, isOAuth: true, refreshToken: "Meow meow"}
-
-// async function addUser(newUser: IUser){
-//   let success = await dao.addUser(newUser);
-//   console.log(success);
-// }
-// addUser(newOAuthUser);
-
-// async function updateUserRefreshToken(username: string, token: string){
-//   let success = await dao.updateUserRefreshToken(username, token);
-//   console.log(success);
-// }
-// updateUserRefreshToken("fail", "megatoken");
-
-// async function deleteUser(username: string){
-//   let success = await dao.deleteUser(username);
-//   console.log(success);
-// }
-// deleteUser("TestBoi");
-
-// async function checkUser(username: string, password: string){
-//   let success = await dao.checkUser(username, password);
-//   console.log(success);
-// }
-// checkUser("Jenny", "badhash");
-
-// async function isOAuthUser(username: string){
-//   let success = await dao.isOAuthUser(username);
-//   console.log(success);
-// }
-// isOAuthUser("fail");
-
-// async function getRefreshToken(username: string){
-//   let success = await dao.getRefreshToken(username);
-//   console.log(success);
-// }
-// getRefreshToken("Johnny");
-
-
-// setTimeout(() => {
-//   console.log("Ending pool");
-//   dao.terminateConnectionPool();
-// }, 6000);
