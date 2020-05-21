@@ -17,9 +17,9 @@ import validateCoordinates from "./util/validateCoordinates";
 
 /**
  * AUTHENTICATION / AUTHORIZATION ERROR HANDLING:
- * If Token is not OK, throw authentication error
+ * If Token is not OK, throw AuthenticationError
  * If Token is OK, but person is not permitted to do an action, throw ForbiddenError.
- * If User Input has passed GraphQLs own type-checks, then do your own. Like for lon/lat or email.
+ * If User Input has passed GraphQLs own type-checks, then do your own and throw UserInputError if not OK. Like for lon/lat or email.
  * Those are just strings in GraphQL, but has to be a certain way, so we make custom checks.
  * In the Resolver for a protected Action, we can check Context for the User.
  * So if the User is not there, we throw a new ForbiddenError(err.msg); or with a custom String like "You must be logged in."
