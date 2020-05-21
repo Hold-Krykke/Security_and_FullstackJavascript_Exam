@@ -5,10 +5,10 @@ require("dotenv").config({ path: path.join(process.cwd(), ".env") });
 import UserFacade from "./facades/userFacade";
 import IUser from "./interfaces/IUser";
 import {
-  AuthenticationError, // IF NOT AUTHENTICATED
-  UserInputError, // IF WRONG INPUT, THAT GRAPHQL CANT CATCH ITSELF
-  ForbiddenError, // IF NOT AUTHORIZED
-  ApolloError, // IF NOT ANY OF THE ABOVE THREE
+  AuthenticationError, // IF NOT AUTHENTICATED - for authentication failures
+  UserInputError, // For validation errors on user input
+  ForbiddenError, // IF NOT AUTHORIZED - for authorization failures
+  ApolloError, // IF NOT ANY OF THE ABOVE THREE - If failure is not caught in one of these three, message will be INTERNAL_SERVER_ERROR
 } from "apollo-server-express";
 import validateEmail from "./util/validateEmail";
 import PositionFacade from "./facades/positionFacade";
