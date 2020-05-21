@@ -6,52 +6,21 @@ import MapScreen from "./screens/MapScreen";
 import LoginScreen from "./screens/LoginScreen";
 import ChatScreen from "./screens/ChatScreen";
 import { ApolloClient } from "apollo-client";
+import { InMemoryCache } from "apollo-cache-inmemory";
 import { ApolloProvider } from "@apollo/react-hooks";
-import { onError } from "apollo-link-error";
+import { authLink, errorLink, httpLink } from "./utils/links";
+import { createHttpLink } from "apollo-link-http";
 
 export default function App() {
   // USE SCREENS LIKE THIS
   const [test, setTest] = useState(true);
 
   const backendUri = "https://localhost:3000/graphql";
-
-  const getToken = () => {
-    return "FAKE TOKEN";
-  };
-
-  const errorLink = onError(({ graphQLErrors, networkError }) => {
-    if (graphQLErrors) {
-      graphQLErrors.map((err) => {
-        const { message, locations, path } = err;
-        console.log(
-          `[GraphQL error]: 
-          Message: ${message}, 
-          Location: ${locations}, 
-          Path: ${path}, 
-          \n\nFull Error: ${err}`
-        );
-
-        if (err.extensions.code == "UNAUTHENTICATED") {
-          // Add logic here like "If not authenticated, send to login-page"
-          // And set errorMessage to user somewhere,
-          // that they tried something that required login, but they weren't logged in
-        }
-      });
-    }
-    if (networkError) console.log(`[Network error]: ${networkError}`);
-  });
-
-  // You can also make an "authLink" that attaches the token properly to every request here
-  // And then .concat it.
-  // Kinda like a middleware
-  const authLink = setContext((_, { headers }) => {
-    const token = getToken(); //
-    return { headers: { ...headers, cookie: token ? `qid=${token}` : "" } };
-  });
-
+  const httpLink = createHttpLink({ uri: backendUri });
   const client = new ApolloClient({
     uri: backendUri,
-    link: errorLink.concat(authLink),
+    link: errorLink.concat(authLink.concat(httpLink)), // Some kinda apollo middleware. See ./utils/links // https://www.apollographql.com/docs/link/links/error/
+    cache: new InMemoryCache(),
   });
 
   let content = <HomeScreen setTest={setTest} />;
