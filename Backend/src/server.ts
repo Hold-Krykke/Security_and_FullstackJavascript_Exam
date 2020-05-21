@@ -7,7 +7,6 @@ import compression from "compression";
 import cors from "cors";
 import schema from "./schema";
 import { ApiError } from "./customErrors/apiError";
-import authMiddleware from "./middlewares/basicAuth";
 import initPassport from './middlewares/passportSetup';
 import passport from 'passport';
 import { requestLogger, errorLogger } from './middlewares/logger'
