@@ -7,6 +7,9 @@ const validateLatitude = (lat: number): Boolean => {
 const validateCoordinates = (lon: number, lat: number): Boolean => {
   return validateLatitude(lat) && validateLongitude(lon);
 };
+
+console.log(validateCoordinates(-200, 60));
+
 export default validateCoordinates;
 // https://love2dev.com/blog/javascript-not-operator/
 // https://stackoverflow.com/questions/784929/what-is-the-not-not-operator-in-javascript
