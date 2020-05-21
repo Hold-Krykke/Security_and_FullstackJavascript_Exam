@@ -220,7 +220,7 @@ export default class UserDataAccessorObject {
    * @param username username of user
    * @param token new refresh token
    */
-  updateUserRefreshToken(username: string, token: string): Promise<any> {
+  updateUserRefreshTokenByUsername(username: string, token: string): Promise<any> {
     return new Promise((resolve, reject) => {
       this._pool.getConnection((err, connection) => {
         if (err) {
@@ -240,6 +240,47 @@ export default class UserDataAccessorObject {
               if (result.affectedRows == 0) {
                 // Should promise be resolved instead (a bit less aggressive strategy)
                 reject({"message": `User ${username} does not exist`});
+                return;
+              }
+              resolve(true);
+            })
+          } catch (err) {
+            console.log("Failed to update token");
+            reject(err);
+          } finally {
+            connection.release();
+          }
+        }
+      });
+    })
+  }
+
+  /**
+   * Used to update the refresh token of a user.
+   * Returns promise boolean true if token was updated
+   * @param email email of user
+   * @param token new refresh token
+   */
+  updateUserRefreshTokenByEmail(email: string, token: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this._pool.getConnection((err, connection) => {
+        if (err) {
+          console.log("Failed to get connection from pool");
+          reject(err);
+          return;
+        }
+        else {
+          try {
+            connection.query('UPDATE `users` SET `refreshToken` = ? WHERE (`email` = ?);',
+            [token, email], function(error, result){
+              if (error) {
+                console.log("An error occurred when trying to update user refresh token");
+                reject(error);
+                return;
+              }
+              if (result.affectedRows == 0) {
+                // Should promise be resolved instead (a bit less aggressive strategy)
+                reject({"message": `User with email: ${email} does not exist`});
                 return;
               }
               resolve(true);
@@ -374,9 +415,10 @@ export default class UserDataAccessorObject {
 
   /**
    * Used to get refresh token of specific user.
+   * Should be removed because it is unnecessary?
    * @param username username of user
    */
-  getRefreshToken(username: string): Promise<string> | Promise<any> {
+  getRefreshTokenByUsername(username: string): Promise<string> | Promise<any> {
     return new Promise((resolve, reject) => {
       this._pool.getConnection((err, connection) => {
         if (err) {
@@ -388,6 +430,44 @@ export default class UserDataAccessorObject {
           try {
             connection.query('SELECT `refreshToken` FROM `users` WHERE (`username` = ?);',
              [username], function (error, result) {
+              if (error) {
+                console.log("An error occurred when trying to get refresh token");
+                reject(false);
+                return;
+              }
+              if (result[0].refreshToken) {
+                resolve(result[0].refreshToken);
+                return;
+              }
+              else resolve(null);
+            });
+          } catch (error) {
+            console.log("Failed to refresh token");
+            reject(false);
+          } finally {
+            connection.release();
+          }
+        }
+      });
+    })
+  }
+
+  /**
+   * Used to get refresh token of specific user.
+   * @param email email of user
+   */
+  getRefreshTokenByEmail(email: string): Promise<string> | Promise<any> {
+    return new Promise((resolve, reject) => {
+      this._pool.getConnection((err, connection) => {
+        if (err) {
+          console.log("Failed to get connection from pool");
+          reject(err);
+          return;
+        }
+        else {
+          try {
+            connection.query('SELECT `refreshToken` FROM `users` WHERE (`email` = ?);',
+             [email], function (error, result) {
               if (error) {
                 console.log("An error occurred when trying to get refresh token");
                 reject(false);
