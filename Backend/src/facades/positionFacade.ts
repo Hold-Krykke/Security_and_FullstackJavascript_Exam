@@ -10,6 +10,12 @@ const EXPIRATION_TIME: number = 30; // Seconds
 
 export default class PositionFacade {
 
+    /**
+     * Used to setup the connection to the correct database. 
+     * Collection is automatically set to [positions]
+     * @param client mongo client
+     * @param databaseName name of the database you want to connect to
+     */
     async setDatabase(client: mongo.MongoClient, databaseName: string) {
         try {
             positionCollection = client.db(databaseName).collection("positions");
@@ -25,7 +31,17 @@ export default class PositionFacade {
 
     }
 
+    /**
+     * Used to find nearby users.
+     * @param username name of user
+     * @param lon longitude 
+     * @param lat latitude
+     * @param distance the radius of your search
+     */
     async nearbyUsers(username: string, lon: number, lat: number, distance: number): Promise<Array<any>> {
+        if (distance <= 0) {
+            throw new ApiError("Please provide a search distance that is greater than 0");
+        }
         try {
             const point: IPoint = { type: "Point", coordinates: [lon, lat] }
             const date = new Date();
@@ -62,7 +78,7 @@ export default class PositionFacade {
             return formatted
 
         } catch (err) {
-            throw new ApiError("Failed to get nearby players");
+            throw new ApiError("Failed to get nearby players"), 400;
         }
     }
 
@@ -71,7 +87,7 @@ export default class PositionFacade {
             const found = positionCollection.find(
                 {
                     // The $ne operator matches all values that are not equal to a specified value.
-                    userName: { $ne: username },
+                    username: { $ne: username },
                     location:
                     {
                         // The $near operator returns geospatial objects in proximity to a point.
@@ -89,6 +105,13 @@ export default class PositionFacade {
         }
     }
 
+    /**
+     * Used to update the position of a single user based on username.
+     * Returns position that contains lastUpdated, username and coordinates (result of update)
+     * @param username name of user
+     * @param lon longitude
+     * @param lat latitude
+     */
     async createOrUpdatePosition(username: string, lon: number, lat: number): Promise<any> {
         const point: IPoint = { type: "Point", coordinates: [lon, lat] }
         const date = new Date();
@@ -111,7 +134,7 @@ export default class PositionFacade {
             }
             return formatted;
         } catch (err) {
-            throw new ApiError("Failed to create or update position");
+            throw new ApiError("Failed to create or update position"), 400;
         }
     }
 
