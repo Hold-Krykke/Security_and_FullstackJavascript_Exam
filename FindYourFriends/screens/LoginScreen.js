@@ -61,7 +61,7 @@ const LoginScreen = (props) => {
                 Accept: "application/json",
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ username: userEmail, password: password })
+            body: JSON.stringify({ useremail: userEmail, password: password })
         };
         const res = await fetch(`${backendURL}/auth/jwt?`, request).then(res => res.json());
         console.log(res)

@@ -6,7 +6,8 @@ import UserFacade from '../facades/userFacade'
 const LocalStrategy = require('passport-local').Strategy;
 const passportJWT = require('passport-jwt');
 const JWTStrategy = passportJWT.Strategy;
-
+const schema: string = process.env.DATABASE_SCHEMA || '';
+const userFacade: UserFacade = new UserFacade(schema);
 
 const initPassport = () => {
     const GoogleTokenStrategyCallback = (accessToken: String, refreshToken: String, profile: any, done: Function) => {
@@ -20,14 +21,14 @@ const initPassport = () => {
         callbackURL: `${process.env.SERVER_URL}/auth/google/callback` // skal skiftes til deployet url i .env
     }, GoogleTokenStrategyCallback));
 
-    passport.use(new LocalStrategy({ usernameField: 'username', passwordField: 'password' },
-        async function (username: string, password: string, done: any) {
+    passport.use(new LocalStrategy({ usernameField: 'useremail', passwordField: 'password' },
+        async function (useremail: string, password: string, done: any) {
             try {
-                if (username && password && await UserFacade.checkUser(username, password)) {
-                    const user = await UserFacade.getUser(username)
+                if (useremail && password && await userFacade.checkUser(useremail, password)) {
+                    const user = await userFacade.getUserByEmail(useremail)
                     return done(null, user);
                 } else {
-                    return done('Incorrect Username / Password');
+                    return done('Incorrect useremail / Password');
                 }
             } catch (error) {
                 done(error);
