@@ -71,10 +71,10 @@ app.get('/auth/google', (req, res) => {
 });
 
 
-app.get('/auth/redirect', (req, res) => {
-    //res.sendFile(path.join(__dirname + '/static/appRedirect.html'))
-    res.redirect('exp://something')
-})
+// app.get('/auth/redirect', (req, res) => {
+//     //res.sendFile(path.join(__dirname + '/static/appRedirect.html'))
+//     res.redirect('exp://something')
+// })
 
 app.get('/auth/google/callback', (req, res) => {
     passport.authenticate('google', { failureRedirect: '/login' },

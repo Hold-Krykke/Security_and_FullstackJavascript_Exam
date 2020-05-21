@@ -36,19 +36,17 @@ const LoginScreen = (props) => {
     const handleGoogleLogin = async () => {
         try {
 
-            // gets the app's deep link
             let redirectUrl = await Linking.getInitialURL()
-            console.log('redirectUrl', redirectUrl);
-            // this should change depending on where the server is running
+            //console.log('redirectUrl', redirectUrl);
             let authUrl = `${backendURL}/auth/google?redirecturl=${redirectUrl}` // do in post instead!!!!!!!!!!!!!!!
-            console.log('authUrl', authUrl);
+            //console.log('authUrl', authUrl);
 
             let result = await WebBrowser.openAuthSessionAsync(
                 authUrl,
                 redirectUrl
             );
 
-            console.log('result', result)
+            //console.log('result', result)
 
             if ((result.type = "success")) {
                 const url = result.url;
