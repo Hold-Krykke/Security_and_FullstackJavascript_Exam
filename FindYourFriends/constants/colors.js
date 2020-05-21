@@ -1,4 +1,5 @@
 export default {
     primary: 'darkslategrey',
-    secondary: 'rosybrown'
+    secondary: 'rosybrown',
+    grey: 'lightslategrey'
 }
