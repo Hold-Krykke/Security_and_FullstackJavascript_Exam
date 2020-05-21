@@ -8,10 +8,13 @@
     "eject": "expo eject"
   },
   "dependencies": {
+    "@apollo/react-hooks": "^3.1.5",
+    "apollo-client": "^2.6.10",
     "expo": "~37.0.3",
     "expo-app-auth": "~9.0.0",
     "expo-google-app-auth": "^8.1.0",
     "expo-web-browser": "~8.2.1",
+    "graphql": "^15.0.0",
     "jwt-decode": "^2.2.0",
     "react": "~16.9.0",
     "react-dom": "~16.9.0",
