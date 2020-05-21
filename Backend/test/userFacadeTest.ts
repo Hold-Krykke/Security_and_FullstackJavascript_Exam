@@ -61,34 +61,54 @@ describe("Verify the UserFacade", () => {
     await UDAO.addUser(user3);
   });
 
-    before(async () => {
-        if (!schema) {
-            throw new Error("DataAccessorObject could not created - check .env for missing values");
-        }
-        if (schema != "exam_test") {
-            throw new Error("You must use a test database");
-        }
-        UDAO = new UserDataAccessorObject(schema);
-        console.log("New data accessor object created using database: ", schema);
-        facade = new UserFacade(schema);
-    })
-    after(() => {
-        const status = UDAO.terminateConnectionPool();
-        console.log("Database connection pool has been terminated? ", status);
-    })
-    beforeEach(async () => {
-        if (UDAO == null) {
-            throw new Error("Data accessor object has not been instantiated");
-        }
-        await UDAO.truncateUserTable();
-        const hashedPassword = await bcrypt.hash("secret", await bcrypt.genSalt());
-        const user1: IUser = { username: "Johnny", password: hashedPassword, email: "johnny@ringo.com", isOAuth: false, refreshToken: null };
-        const user2: IUser = { username: "Jenny", password: hashedPassword, email: "jenny@thekill.com", isOAuth: false, refreshToken: null };
-        const user3: IUser = { username: "Dimwit", password: null, email: "dim@wit.com", isOAuth: true, refreshToken: "MansGotThatRefreshToken" };
-        await UDAO.addUser(user1);
-        await UDAO.addUser(user2);
-        await UDAO.addUser(user3);
-    })
+  before(async () => {
+    if (!schema) {
+      throw new Error(
+        "DataAccessorObject could not created - check .env for missing values"
+      );
+    }
+    if (schema != "exam_test") {
+      throw new Error("You must use a test database");
+    }
+    UDAO = new UserDataAccessorObject(schema);
+    console.log("New data accessor object created using database: ", schema);
+    facade = new UserFacade(schema);
+  });
+  after(() => {
+    const status = UDAO.terminateConnectionPool();
+    console.log("Database connection pool has been terminated? ", status);
+  });
+  beforeEach(async () => {
+    if (UDAO == null) {
+      throw new Error("Data accessor object has not been instantiated");
+    }
+    await UDAO.truncateUserTable();
+    const hashedPassword = await bcrypt.hash("secret", await bcrypt.genSalt());
+    const user1: IUser = {
+      username: "Johnny",
+      password: hashedPassword,
+      email: "johnny@ringo.com",
+      isOAuth: false,
+      refreshToken: null,
+    };
+    const user2: IUser = {
+      username: "Jenny",
+      password: hashedPassword,
+      email: "jenny@thekill.com",
+      isOAuth: false,
+      refreshToken: null,
+    };
+    const user3: IUser = {
+      username: "Dimwit",
+      password: null,
+      email: "dim@wit.com",
+      isOAuth: true,
+      refreshToken: "MansGotThatRefreshToken",
+    };
+    await UDAO.addUser(user1);
+    await UDAO.addUser(user2);
+    await UDAO.addUser(user3);
+  });
 
   it("Should add OAuth user Google Boi", async () => {
     const user: IUser = {
@@ -169,32 +189,45 @@ describe("Verify the UserFacade", () => {
   it("Should update refresh token of user Dimwit", async () => {
     const status: boolean = await facade.updateUserRefreshToken(
       "Dimwit",
-      "NewToken"
+      "NewToken",
+      false
     );
     expect(status).to.be.equal(true);
   });
 
-    it("Should update refresh token of user Dimwit based on username", async () => {
-        const status: boolean = await facade.updateUserRefreshToken("Dimwit", "NewToken", false);
-        expect(status).to.be.equal(true);
-    })
+  it("Should update refresh token of user Dimwit based on username", async () => {
+    const status: boolean = await facade.updateUserRefreshToken(
+      "Dimwit",
+      "NewToken",
+      false
+    );
+    expect(status).to.be.equal(true);
+  });
 
-    it("Should update refresh token of user Dimwit based on email", async () => {
-        const status: boolean = await facade.updateUserRefreshToken("dim@wit.com", "NewToken", true);
-        expect(status).to.be.equal(true);
-    })
+  it("Should update refresh token of user Dimwit based on email", async () => {
+    const status: boolean = await facade.updateUserRefreshToken(
+      "dim@wit.com",
+      "NewToken",
+      true
+    );
+    expect(status).to.be.equal(true);
+  });
 
-    it("Negative, Should fail to update refresh token of user IDontExist", async () => {
-        try {
-            const status: boolean = await facade.updateUserRefreshToken("IDontExist", "NewToken", false);
-        } catch (err) {
-            expect(err instanceof ApiError).to.be.equal(true)
-            expect(err.message).to.be.equal("User IDontExist not found")
-        }
-    })
+  it("Negative, Should fail to update refresh token of user IDontExist", async () => {
+    try {
+      const status: boolean = await facade.updateUserRefreshToken(
+        "IDontExist",
+        "NewToken",
+        false
+      );
+    } catch (err) {
+      expect(err instanceof ApiError).to.be.equal(true);
+      expect(err.message).to.be.equal("User IDontExist not found");
+    }
+  });
 
-    it("Should get refresh token of user Dimwit", async () => {
-        const token: string = await facade.getUserRefreshToken("dim@wit.com");
-        expect(token).to.be.equal("MansGotThatRefreshToken");
-    })
-})
+  it("Should get refresh token of user Dimwit", async () => {
+    const token: string = await facade.getUserRefreshToken("dim@wit.com");
+    expect(token).to.be.equal("MansGotThatRefreshToken");
+  });
+});
