@@ -4,7 +4,8 @@ require("dotenv").config({ path: path.join(process.cwd(), ".env") });
 // import setup from './config/setupDB'
 import UserFacade from "./facades/userFacade";
 import IUser from "./interfaces/IUser";
-import { AuthenticationError } from "apollo-server-express";
+import { AuthenticationError, UserInputError } from "apollo-server-express";
+import validateEmail from "./util/validateEmail";
 
 const schema: string = process.env.DATABASE_SCHEMA || "";
 
@@ -31,9 +32,14 @@ const resolverMap: IResolvers = {
   },
   Mutation: {
     addUser: (_, { input }) => {
+      const email: string = input.email;
+      if (!validateEmail(email)) {
+        throw new UserInputError("Email Argument invalid", {
+          invalidArgs: "email",
+        });
+      }
       const username: string = input.username;
       const password: string = input.password;
-      const email: string = input.email;
       const isOAuth: boolean = false;
       const user: IUser = {
         username,
