@@ -158,15 +158,15 @@ export default class UserFacade {
     /**
      * Used to get the refresh token of specific user.
      * Returns empty string if the user has no token
-     * @param username username of user
+     * @param email email of user
      */
-    async getUserRefreshToken(username: string): Promise<string> {
+    async getUserRefreshToken(email: string): Promise<string> {
         try {
-            const result = await this._UDAO.getRefreshTokenByUsername(username);
+            const result = await this._UDAO.getRefreshTokenByEmail(email);
             if (result) return result;
             else return "";
         } catch (err) {
-            throw new ApiError(`User ${username} not found`, 400)
+            throw new ApiError(`User ${email} not found`, 400)
         }
     }
 }

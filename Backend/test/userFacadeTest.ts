@@ -36,7 +36,7 @@ describe("Verify the UserFacade", () => {
         const hashedPassword = await bcrypt.hash("secret", await bcrypt.genSalt());
         const user1: IUser = { username: "Johnny", password: hashedPassword, email: "johnny@ringo.com", isOAuth: false, refreshToken: null };
         const user2: IUser = { username: "Jenny", password: hashedPassword, email: "jenny@thekill.com", isOAuth: false, refreshToken: null };
-        const user3: IUser = { username: "Dimwit", password: null, email: null, isOAuth: true, refreshToken: "MansGotThatRefreshToken" };
+        const user3: IUser = { username: "Dimwit", password: null, email: "dim@wit.com", isOAuth: true, refreshToken: "MansGotThatRefreshToken" };
         await UDAO.addUser(user1);
         await UDAO.addUser(user2);
         await UDAO.addUser(user3);
@@ -108,8 +108,13 @@ describe("Verify the UserFacade", () => {
         }
     })
 
-    it("Should update refresh token of user Dimwit", async () => {
+    it("Should update refresh token of user Dimwit based on username", async () => {
         const status: boolean = await facade.updateUserRefreshToken("Dimwit", "NewToken", false);
+        expect(status).to.be.equal(true);
+    })
+
+    it("Should update refresh token of user Dimwit based on email", async () => {
+        const status: boolean = await facade.updateUserRefreshToken("dim@wit.com", "NewToken", true);
         expect(status).to.be.equal(true);
     })
 
@@ -123,7 +128,7 @@ describe("Verify the UserFacade", () => {
     })
 
     it("Should get refresh token of user Dimwit", async () => {
-        const token: string = await facade.getUserRefreshToken("Dimwit");
+        const token: string = await facade.getUserRefreshToken("dim@wit.com");
         expect(token).to.be.equal("MansGotThatRefreshToken");
     })
 })
