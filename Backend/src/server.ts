@@ -49,9 +49,10 @@ app.use(errorLogger);
 //process.env.NODE_ENV = "production";
 const server = new ApolloServer({
   schema,
-  validationRules: [depthLimit(7)], // see import
+  validationRules: [depthLimit(7)], // https://www.npmjs.com/package/graphql-depth-limit
   debug: process.env.NODE_ENV !== "production",
   formatError: (err: any) => {
+    // https://www.apollographql.com/docs/apollo-server/data/errors/#for-the-client-response
     if (err.originalError instanceof ApiError) {
       return new ApolloError(
         err.originalError.msg,
