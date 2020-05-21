@@ -77,14 +77,7 @@ const resolverMap: IResolvers = {
           }
         );
       }
-      if (!validateCoordinates(args.coordinates.lon, args.coordinates.lat)) {
-        throw new UserInputError(
-          "Please provide proper Coordinates. lon between -180 and 180, and lat between -90 and 90",
-          {
-            invalidArgs: "coordinates",
-          }
-        );
-      }
+      isCoordinates(args.coordinates);
       const username: string = args.username;
       const lon: number = args.coordinates.lon;
       const lat: number = args.coordinates.lat;
@@ -98,6 +91,7 @@ const resolverMap: IResolvers = {
       return nearbyUsers;
     },
     updatePosition: (_, args: any) => {
+      isCoordinates(args.coordinates);
       const username: string = args.username;
       const lon: number = args.coordinates.lon;
       const lat: number = args.coordinates.lat;
@@ -108,3 +102,16 @@ const resolverMap: IResolvers = {
 };
 
 export default resolverMap;
+
+// This could be placed in utils, but I wanted to keep Apollo Errors thrown in this file.
+function isCoordinates(coordinates: any) {
+  if (!validateCoordinates(coordinates.lon, coordinates.lat)) {
+    throw new UserInputError(
+      "Please provide proper Coordinates. lon between -180 and 180, and lat between -90 and 90",
+      {
+        invalidArgs: "coordinates",
+        errorCode: 400,
+      }
+    );
+  }
+}
