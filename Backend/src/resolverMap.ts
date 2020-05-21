@@ -4,7 +4,11 @@ require("dotenv").config({ path: path.join(process.cwd(), ".env") });
 // import setup from './config/setupDB'
 import UserFacade from "./facades/userFacade";
 import IUser from "./interfaces/IUser";
-import { AuthenticationError, UserInputError } from "apollo-server-express";
+import {
+  AuthenticationError,
+  UserInputError,
+  ApolloError,
+} from "apollo-server-express";
 import validateEmail from "./util/validateEmail";
 
 const schema: string = process.env.DATABASE_SCHEMA || "";
@@ -27,7 +31,11 @@ const resolverMap: IResolvers = {
     //     return UserFacade.getAllUsers();
     // },
     getUser(_: void, args: any): any {
-      return facade.getUser(args.username);
+      try {
+        return facade.getUser(args.username);
+      } catch (err) {
+        throw new ApolloError(err.msg, err.errorCode);
+      }
     },
   },
   Mutation: {
@@ -52,7 +60,7 @@ const resolverMap: IResolvers = {
         const added = facade.addNonOAuthUser(user);
         return added;
       } catch (err) {
-        throw new AuthenticationError(err.msg);
+        throw new ApolloError(err.msg, err.errorCode);
       }
     },
     deleteUser: (_, args: any) => {
