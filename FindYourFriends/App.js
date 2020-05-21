@@ -12,9 +12,9 @@ import { authLink, errorLink, httpLink } from "./utils/links";
 import { createHttpLink } from "apollo-link-http";
 
 export default function App() {
-    // USE SCREENS LIKE THIS
-    const [test, setTest] = useState(true);
-    const [signedIn, setSignedIn] = useState(false);
+  // USE SCREENS LIKE THIS
+  const [test, setTest] = useState(true);
+  const [signedIn, setSignedIn] = useState(false);
 
   const backendUri = "https://localhost:3000/graphql";
   const httpLink = createHttpLink({ uri: backendUri });
@@ -27,9 +27,8 @@ export default function App() {
   let content = <HomeScreen setTest={setTest} />;
   if (test) {
     //content = <MapScreen test={test} />
+    content = <LoginScreen signedIn={signedIn} setSignedIn={setSignedIn} />;
   }
-        content = <LoginScreen signedIn={signedIn} setSignedIn={setSignedIn} />;
-    content = <LoginScreen />;
 
   return (
     <ApolloProvider client={client}>
@@ -42,7 +41,7 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-    screen: {
-        flex: 1,
-    },
+  screen: {
+    flex: 1,
+  },
 });
