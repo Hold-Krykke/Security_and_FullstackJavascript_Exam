@@ -31,7 +31,7 @@ const LoginScreen = ({ signedIn, setSignedIn, setTest, backendURL }) => {
 
       if ((result.type = "success")) {
         const token = result.url.split("token=")[1];
-        SecureStore.setItemAsync(secureStoreKey, token);
+        await SecureStore.setItemAsync(secureStoreKey, token);
         const decoded = jwt_decode(token);
         user.email = decoded.useremail;
         user.token = token;
@@ -60,7 +60,7 @@ const LoginScreen = ({ signedIn, setSignedIn, setTest, backendURL }) => {
     );
     user.email = res.useremail;
     user.token = res.token;
-    SecureStore.setItemAsync(secureStoreKey, res.token);
+    await SecureStore.setItemAsync(secureStoreKey, res.token);
     setUser(user);
     console.log(res);
     setSignedIn(true);
@@ -74,7 +74,7 @@ const LoginScreen = ({ signedIn, setSignedIn, setTest, backendURL }) => {
     >
       <View style={styles.screen}>
         {signedIn ? (
-          <LoggedInPage email={user.email} />
+          <LoggedInPage email={user.email} setSignedIn={setSignedIn} />
         ) : (
           <LoginCard
             googleLoginHandler={handleGoogleLogin}
@@ -96,6 +96,7 @@ const LoggedInPage = (props) => {
   return (
     <Card style={styles.container}>
       <View style={styles.container}>
+        <Button title="Log out" onPress={() => props.setSignedIn(false)} />
         <Text style={styles.title}>Welcome!</Text>
         <Text style={styles.text}>{props.email}</Text>
       </View>
