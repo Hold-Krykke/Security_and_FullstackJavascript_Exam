@@ -32,28 +32,41 @@ const HomeScreen = (props) => {
 };
 
 const UserInfo = () => {
-  const [username, setUsername] = useState("");
+  //const [username, setUsername] = useState("");
   const [User, { loading, error, data }] = useLazyQuery(facade.GET_USER);
 
+  let content = (
+    <View>
+      <Text>ass</Text>
+    </View>
+  );
+
   if (loading)
-    return (
+    content = (
       <View>
         <Text>Loading...</Text>
       </View>
     );
   if (error)
-    return (
+    content = (
       <View>
-        <Text>Error! {JSON.stringify(error, null, 4)}</Text>
+        <Text>
+          Error! {JSON.stringify(error.graphQLErrors[0].message, null, 4)}
+        </Text>
       </View>
     );
   if (data) {
     console.log(JSON.stringify({ data }, null, 4));
-    setUsername(data.getUser.username);
+    content = (
+      <View>
+        <Text>{JSON.stringify(data.getUser.username, null, 4)}</Text>
+      </View>
+    );
   }
+
   return (
     <View>
-      <Text>{username && JSON.stringify(username, null, 4)}</Text>
+      {content}
       <Button
         title="Click me!"
         onPress={() => {

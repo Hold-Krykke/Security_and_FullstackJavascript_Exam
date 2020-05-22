@@ -35,7 +35,7 @@ const authLink = setContext((request, previousContext) => {
   // get the authentication token from storage if it exists
   // Login should place the token in SecureStore // https://docs.expo.io/versions/latest/sdk/securestore/
   // So here should be logic that goes into SecureStore and gets the Token back out, then returns it.
-  const token = "DUMMY TOKEN"; // await SecureStore.getItemAsync("token")
+  const token = "DUMMY TOKEN"; // "DUMMY TOKEN" // await SecureStore.getItemAsync("token")
   // return the headers to the context so httpLink can read them
   return {
     headers: {
