@@ -47,6 +47,7 @@ const resolverMap: IResolvers = {
     //     return UserFacade.getAllUsers();
     // },
     getUser(_: void, args: any, context): any {
+      console.log(context);
       if (!context.valid) {
         throw new ForbiddenError("You need to be logged in.");
       }

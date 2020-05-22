@@ -16,16 +16,16 @@ export default function App() {
   const [test, setTest] = useState(true);
   const [signedIn, setSignedIn] = useState(false);
 
-  const backendUri = "https://localhost:3000/graphql";
-  //const httpLink = createHttpLink({ uri: backendUri });
+  const backendUri = "http://f94dc486.ngrok.io";
+  const httpLink = createHttpLink({ uri: backendUri });
   const client = new ApolloClient({
     uri: backendUri,
-    link: errorLink.concat(authLink), //.concat(httpLink)), // Add in when links are made properly // Some kinda apollo middleware. See ./utils/links // https://www.apollographql.com/docs/link/links/error/
-    // cache: new InMemoryCache(), // automatic caching of requests of the same data // https://www.apollographql.com/docs/angular/basics/caching/
+    link: errorLink.concat(authLink.concat(httpLink)), // Add in when links are made properly // Some kinda apollo middleware. See ./utils/links // https://www.apollographql.com/docs/link/links/error/
+    cache: new InMemoryCache(), // automatic caching of requests of the same data // https://www.apollographql.com/docs/angular/basics/caching/
   });
 
   let content = <HomeScreen setTest={setTest} />;
-  if (test) {
+  if (!test) {
     //content = <MapScreen test={test} />
     content = <LoginScreen signedIn={signedIn} setSignedIn={setSignedIn} />;
   }

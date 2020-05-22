@@ -16,7 +16,9 @@ const app = express();
 const path = require("path");
 require("dotenv").config({ path: path.join(process.cwd(), ".env") });
 
-initPassport();
+// Just commented out for testing purposes. Comment back in after testing.
+// TypeScript threw this for Malte:  throw new TypeError('JwtStrategy requires a secret or key');
+// initPassport();
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());

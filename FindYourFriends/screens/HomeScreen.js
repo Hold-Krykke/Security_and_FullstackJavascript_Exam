@@ -5,6 +5,7 @@ import {
   Text,
   TouchableWithoutFeedback,
   Keyboard,
+  Button,
 } from "react-native";
 import Card from "../components/Card";
 import colors from "../constants/colors";
@@ -43,7 +44,14 @@ const UserInfo = () => {
         </View>
       </>
     );
-  if (error) return `Error! ${error}`;
+  if (error)
+    return (
+      <>
+        <View>
+          <Text>`Error! ${error}`</Text>
+        </View>
+      </>
+    );
   if (data) {
     console.log(JSON.stringify({ data }, null, 4));
     setUsername(data.getUser.username);
