@@ -31,6 +31,7 @@ const LoginScreen = ({ signedIn, setSignedIn, setTest, backendURL }) => {
 
       if ((result.type = "success")) {
         const token = result.url.split("token=")[1];
+        console.log("GOOGLE LOGIN TOKEN\n", JSON.stringify({ token }, null, 4));
         await SecureStore.setItemAsync(secureStoreKey, token);
         const decoded = jwt_decode(token);
         user.email = decoded.useremail;
