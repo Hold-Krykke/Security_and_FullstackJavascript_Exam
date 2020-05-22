@@ -6,8 +6,11 @@ import colors from "../constants/colors";
 import { Linking } from "expo";
 import * as WebBrowser from "expo-web-browser";
 import jwt_decode from "jwt-decode"; // https://www.npmjs.com/package/jwt-decode
+import * as SecureStore from 'expo-secure-store';
+
 
 const backendURL = 'http://a171e5e9.ngrok.io';
+const secureStoreKey = "token"
 
 const LoginScreen = ({ signedIn, setSignedIn }) => {
     const [user, setUser] = useState({ email: '', token: '' });
@@ -22,6 +25,7 @@ const LoginScreen = ({ signedIn, setSignedIn }) => {
 
             if ((result.type = "success")) {
                 const token = result.url.split("token=")[1];
+                SecureStore.setItemAsync(secureStoreKey, token)
                 const decoded = jwt_decode(token);
                 user.email = decoded.useremail
                 user.token = token
@@ -48,6 +52,7 @@ const LoginScreen = ({ signedIn, setSignedIn }) => {
         const res = await fetch(`${backendURL}/auth/jwt?`, request).then(res => res.json());
         user.email = res.useremail
         user.token = res.token
+        SecureStore.setItemAsync(secureStoreKey, res.token)
         setUser(user);
         console.log(res)
         setSignedIn(true);
