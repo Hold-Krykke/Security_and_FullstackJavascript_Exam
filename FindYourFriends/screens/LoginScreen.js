@@ -7,7 +7,7 @@ import { Linking } from "expo";
 import * as WebBrowser from "expo-web-browser";
 import jwt_decode from "jwt-decode"; // https://www.npmjs.com/package/jwt-decode
 
-const backendURL = 'http://177f1c87.ngrok.io';
+const backendURL = 'http://a171e5e9.ngrok.io';
 
 const LoginScreen = ({ signedIn, setSignedIn }) => {
     const [user, setUser] = useState({ email: '', token: '' });
