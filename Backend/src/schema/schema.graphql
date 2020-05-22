@@ -3,7 +3,6 @@ type Query {
   Get a single user with the given username
   """
   getUser(username: String!): User
-  protectedGet(): String
 }
 
 type User {
@@ -42,22 +41,26 @@ input LocationInput {
 }
 
 type Mutation {
-    """
-    Adds a new user to the facade
-    """
-    addUser(input: UserInput!): Boolean
-    """
-    Deletes an existing user with the given username
-    """
-    deleteUser(username: String!): String
-    """
-    Get nearby users based on location and distance and update own position
-    """
-    getNearbyUsers(username: String!, coordinates: LocationInput!, distance: Float!): [Position]
-    """
-    Update or create own position and returns result of the update
-    """
-    updatePosition(username: String!, coordinates: LocationInput!): OwnPosition
+  """
+  Adds a new user to the facade
+  """
+  addUser(input: UserInput!): Boolean
+  """
+  Deletes an existing user with the given username
+  """
+  deleteUser(username: String!): String
+  """
+  Get nearby users based on location and distance and update own position
+  """
+  getNearbyUsers(
+    username: String!
+    coordinates: LocationInput!
+    distance: Float!
+  ): [Position]
+  """
+  Update or create own position and returns result of the update
+  """
+  updatePosition(username: String!, coordinates: LocationInput!): OwnPosition
 }
 # You can comment like this here.
 # https://github.com/apollographql/graphql-tag#importing-graphql-files
