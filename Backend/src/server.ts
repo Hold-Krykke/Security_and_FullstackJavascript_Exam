@@ -134,7 +134,7 @@ const server = new ApolloServer({
       // Validate the token.
       try {
         // If token is valid and not expired.
-        const token = jwt.verify(encryptedToken, process.env.JWT_SECRET);
+        const token = jwt.verify(encryptedToken, process.env.SECRET);
         // add the token to the context, so resolvers can get it.
         console.log({ token });
         return { valid: true, token };
