@@ -16,7 +16,7 @@ export default function App() {
   const [test, setTest] = useState(true);
   const [signedIn, setSignedIn] = useState(false);
 
-  const backendUri = "http://091a67f3.ngrok.io";
+  const backendUri = "http://c4c25ff2.ngrok.io";
   const httpLink = createHttpLink({ uri: backendUri + "/graphql" });
   const client = new ApolloClient({
     uri: backendUri,
