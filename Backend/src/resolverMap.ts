@@ -49,6 +49,13 @@ const resolverMap: IResolvers = {
     getUser(_: void, args: any): any {
       return userFacade.getUserByUsername(args.username);
     },
+    protectedGet(parent, args, context): any {
+      // Protect route via "valid" from server.ts context
+      if (!context.valid) {
+        throw new ForbiddenError("You need to be logged in.");
+      }
+      return "Token is valid, here is your data!";
+    },
   },
   Mutation: {
     addUser: (_, { input }) => {

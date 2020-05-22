@@ -3,6 +3,7 @@ type Query {
   Get a single user with the given username
   """
   getUser(username: String!): User
+  protectedGet(): String
 }
 
 type User {
