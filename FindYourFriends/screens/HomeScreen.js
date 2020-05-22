@@ -24,14 +24,14 @@ const HomeScreen = (props) => {
         <Card style={styles.container}>
           <Text style={styles.title}>This is HomeScreen</Text>
           <Input style={styles.input} placeholder="Placeholder" />
-          <UserInfo />
+          <UserInfo setTest={props.setTest} />
         </Card>
       </View>
     </TouchableWithoutFeedback>
   );
 };
 
-const UserInfo = () => {
+const UserInfo = ({ setTest }) => {
   //const [username, setUsername] = useState("");
   const [User, { loading, error, data }] = useLazyQuery(facade.GET_USER);
 
@@ -64,6 +64,9 @@ const UserInfo = () => {
 
   return (
     <View>
+      <View>
+        <Button title="Go to Login" onPress={() => setTest(true)} />
+      </View>
       {content}
       <Button
         title="Click me to fetch Johnny!"
@@ -71,9 +74,6 @@ const UserInfo = () => {
           User({ variables: { username: "Johnny" } });
         }}
       ></Button>
-      <View>
-        <Button title="Go to Login" onPress={() => props.setTest(true)} />
-      </View>
     </View>
   );
 };

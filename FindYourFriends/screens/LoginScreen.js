@@ -74,7 +74,7 @@ const LoginScreen = ({ signedIn, setSignedIn, setTest, backendURL }) => {
     >
       <View style={styles.screen}>
         {signedIn ? (
-          <LoggedInPage email={user.email} setTest={setTest} />
+          <LoggedInPage email={user.email} />
         ) : (
           <LoginCard
             googleLoginHandler={handleGoogleLogin}
@@ -85,6 +85,7 @@ const LoginScreen = ({ signedIn, setSignedIn, setTest, backendURL }) => {
             password={password}
           />
         )}
+        <Button title="Go to HomeScreen" onPress={() => setTest(false)} />
       </View>
     </TouchableWithoutFeedback>
   );
@@ -97,7 +98,6 @@ const LoggedInPage = (props) => {
       <View style={styles.container}>
         <Text style={styles.title}>Welcome!</Text>
         <Text style={styles.text}>{props.email}</Text>
-        <Button title="HomeScreen" onPress={() => props.setTest(false)} />
       </View>
     </Card>
   );
