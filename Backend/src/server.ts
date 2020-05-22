@@ -124,6 +124,32 @@ const server = new ApolloServer({
     // be manipulated in other ways, so long as it's returned.
     return err;
   },
+  context: ({ req }) => {
+    // Note! This example uses the `req` object to access headers,
+    // but the arguments received by `context` vary by integration.
+    // This means they will vary for Express, Koa, Lambda, etc.!
+    //
+    // To find out the correct arguments for a specific integration,
+    // see the `context` option in the API reference for `apollo-server`:
+    // https://www.apollographql.com/docs/apollo-server/api/apollo-server/
+
+    // Get the token from the headers.
+    const token = req.headers.authorization || "";
+
+    const validateToken = (token: string): Boolean => {
+      // Do something, like validate the token.
+      // If token is OK, but expired, then refresh it and resume.
+      // If token is OK, th
+      return true;
+    };
+    // try to validate the token
+    const valid = validateToken(token);
+
+    // add the token to the context
+    // Maybe it should just be a boolean, like "True if valid token", "False if no token, or invalid token."
+    // Then protected Resolvers, can just listen to that?
+    return { valid };
+  },
 });
 
 app.use("*", cors());
