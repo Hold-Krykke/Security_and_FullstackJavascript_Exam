@@ -17,10 +17,10 @@ export default function App() {
   const [signedIn, setSignedIn] = useState(false);
 
   const backendUri = "https://localhost:3000/graphql";
-  const httpLink = createHttpLink({ uri: backendUri });
+  //const httpLink = createHttpLink({ uri: backendUri });
   const client = new ApolloClient({
     uri: backendUri,
-    // link: errorLink.concat(authLink.concat(httpLink)), // Add in when links are made properly // Some kinda apollo middleware. See ./utils/links // https://www.apollographql.com/docs/link/links/error/
+    link: errorLink.concat(authLink), //.concat(httpLink)), // Add in when links are made properly // Some kinda apollo middleware. See ./utils/links // https://www.apollographql.com/docs/link/links/error/
     // cache: new InMemoryCache(), // automatic caching of requests of the same data // https://www.apollographql.com/docs/angular/basics/caching/
   });
 

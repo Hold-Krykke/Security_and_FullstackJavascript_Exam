@@ -137,10 +137,11 @@ const server = new ApolloServer({
     const token = req.headers.authorization || "";
 
     const validateToken = (token: string): Boolean => {
-      // Do something, like validate the token.
+      // Validate the token.
       // If token is OK, but expired, then refresh it and resume.
-      // If token is OK, th
-      return true;
+      // If token is OK, then return true
+      // If token is not OK, then return false
+      return token == "DUMMY TOKEN";
     };
     // try to validate the token
     const valid = validateToken(token);
