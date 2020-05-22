@@ -12,7 +12,6 @@ import colors from "../constants/colors";
 import Input from "../components/Input";
 import facade from "../facade";
 import { useQuery, useLazyQuery } from "@apollo/react-hooks";
-import { GET_USER } from "../facade";
 
 const HomeScreen = (props) => {
   return (
@@ -34,23 +33,19 @@ const HomeScreen = (props) => {
 
 const UserInfo = () => {
   const [username, setUsername] = useState("");
-  const [getUser, { loading, error, data }] = useLazyQuery(GET_USER);
+  const [User, { loading, error, data }] = useLazyQuery(facade.GET_USER);
 
   if (loading)
     return (
-      <>
-        <View>
-          <Text>Loading...</Text>
-        </View>
-      </>
+      <View>
+        <Text>Loading...</Text>
+      </View>
     );
   if (error)
     return (
-      <>
-        <View>
-          <Text>`Error! ${error}`</Text>
-        </View>
-      </>
+      <View>
+        <Text>Error! {JSON.stringify(error, null, 4)}</Text>
+      </View>
     );
   if (data) {
     console.log(JSON.stringify({ data }, null, 4));
@@ -58,10 +53,11 @@ const UserInfo = () => {
   }
   return (
     <View>
-      {username && <Text>{username}</Text>}
-      <Button onPress={() => getUser({ variables: { username: "Johnny" } })}>
-        Click me!
-      </Button>
+      <Text>{JSON.stringify(username, null, 4)}</Text>
+      <Button
+        title="Click me!"
+        onPress={() => User({ variables: { username: "Johnny" } })}
+      ></Button>
     </View>
   );
 };
