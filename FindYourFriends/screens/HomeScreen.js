@@ -50,9 +50,7 @@ const UserInfo = () => {
   if (error)
     content = (
       <View>
-        <Text>
-          Error! {JSON.stringify(error.graphQLErrors[0].message, null, 4)}
-        </Text>
+        <Text>Error! {JSON.stringify(error, null, 4)}</Text>
       </View>
     );
   if (data) {
@@ -68,11 +66,14 @@ const UserInfo = () => {
     <View>
       {content}
       <Button
-        title="Click me!"
+        title="Click me to fetch Johnny!"
         onPress={() => {
           User({ variables: { username: "Johnny" } });
         }}
       ></Button>
+      <View>
+        <Button title="Go to Login" onPress={() => props.setTest(true)} />
+      </View>
     </View>
   );
 };

@@ -16,7 +16,7 @@ export default function App() {
   const [test, setTest] = useState(true);
   const [signedIn, setSignedIn] = useState(false);
 
-  const backendUri = "http://f94dc486.ngrok.io";
+  const backendUri = "http://091a67f3.ngrok.io";
   const httpLink = createHttpLink({ uri: backendUri + "/graphql" });
   const client = new ApolloClient({
     uri: backendUri,
@@ -26,9 +26,16 @@ export default function App() {
   });
 
   let content = <HomeScreen setTest={setTest} />;
-  if (!test) {
+  if (test) {
     //content = <MapScreen test={test} />
-    content = <LoginScreen signedIn={signedIn} setSignedIn={setSignedIn} />;
+    content = (
+      <LoginScreen
+        backendURL={backendUri}
+        signedIn={signedIn}
+        setSignedIn={setSignedIn}
+        setTest={setTest}
+      />
+    );
   }
 
   return (
