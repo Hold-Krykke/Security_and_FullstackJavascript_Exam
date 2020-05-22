@@ -53,10 +53,12 @@ const UserInfo = () => {
   }
   return (
     <View>
-      <Text>{JSON.stringify(username, null, 4)}</Text>
+      <Text>{username && JSON.stringify(username, null, 4)}</Text>
       <Button
         title="Click me!"
-        onPress={() => User({ variables: { username: "Johnny" } })}
+        onPress={() => {
+          User({ variables: { username: "Johnny" } });
+        }}
       ></Button>
     </View>
   );

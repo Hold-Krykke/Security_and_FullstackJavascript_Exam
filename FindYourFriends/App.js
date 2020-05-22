@@ -17,7 +17,7 @@ export default function App() {
   const [signedIn, setSignedIn] = useState(false);
 
   const backendUri = "http://f94dc486.ngrok.io";
-  const httpLink = createHttpLink({ uri: backendUri });
+  const httpLink = createHttpLink({ uri: backendUri + "/graphql" });
   const client = new ApolloClient({
     uri: backendUri,
     link: errorLink.concat(authLink.concat(httpLink)), // Add in when links are made properly // Some kinda apollo middleware. See ./utils/links // https://www.apollographql.com/docs/link/links/error/
