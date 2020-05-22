@@ -136,12 +136,14 @@ const server = new ApolloServer({
         // If token is valid and not expired.
         const token = jwt.verify(encryptedToken, process.env.SECRET);
         // add the token to the context, so resolvers can get it.
-        console.log({ token });
+        console.log("TOKEN WAS VALID:", { token });
         return { valid: true, token };
       } catch (err) {
+        console.log("TOKEN WAS INVALID");
         return { valid: false };
       }
     } else {
+      console.log("NO TOKEN");
       // No token at all on header.
       return { valid: false };
     }
