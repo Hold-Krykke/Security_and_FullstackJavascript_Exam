@@ -97,7 +97,13 @@ const LoggedInPage = (props) => {
   return (
     <Card style={styles.container}>
       <View style={styles.container}>
-        <Button title="Log out" onPress={() => props.setSignedIn(false)} />
+        <Button
+          title="Log out"
+          onPress={() => {
+            props.setSignedIn(false);
+            SecureStore.deleteItemAsync("token");
+          }}
+        />
         <Text style={styles.title}>Welcome!</Text>
         <Text style={styles.text}>{props.email}</Text>
       </View>
