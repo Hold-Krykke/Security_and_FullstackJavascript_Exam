@@ -16,6 +16,7 @@ import * as WebBrowser from "expo-web-browser";
 import jwt_decode from "jwt-decode"; // https://www.npmjs.com/package/jwt-decode
 import * as SecureStore from "expo-secure-store";
 
+// The key for Secure Store. Use this key, to fetch token again.
 const secureStoreKey = "token";
 
 const LoginScreen = ({ signedIn, setSignedIn, setTest, backendURL }) => {
@@ -30,6 +31,7 @@ const LoginScreen = ({ signedIn, setSignedIn, setTest, backendURL }) => {
       let result = await WebBrowser.openAuthSessionAsync(authUrl, redirectUrl);
 
       if ((result.type = "success")) {
+        // The .slice(0, -1) is to remove a false # thats at then end, for some reason.
         const token = result.url.split("token=")[1].slice(0, -1);
         //console.log("GOOGLE LOGIN TOKEN\n", JSON.stringify({ token }, null, 4));
         await SecureStore.setItemAsync(secureStoreKey, token);
@@ -97,6 +99,10 @@ const LoggedInPage = (props) => {
   return (
     <Card style={styles.container}>
       <View style={styles.container}>
+        {/* 
+        Upon Logout, be sure to set both the SignedIn state, 
+        But also remove the Token from the SecureStore. 
+        */}
         <Button
           title="Log out"
           onPress={() => {

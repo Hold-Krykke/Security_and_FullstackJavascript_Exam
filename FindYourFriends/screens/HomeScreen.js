@@ -11,7 +11,7 @@ import Card from "../components/Card";
 import colors from "../constants/colors";
 import Input from "../components/Input";
 import facade from "../facade";
-import { useQuery, useLazyQuery } from "@apollo/react-hooks";
+import { useQuery, useLazyQuery } from "@apollo/react-hooks"; // https://www.apollographql.com/docs/react/api/react-hooks/
 
 const HomeScreen = (props) => {
   return (
@@ -33,7 +33,8 @@ const HomeScreen = (props) => {
 
 const UserInfo = ({ setTest }) => {
   //const [username, setUsername] = useState("");
-  const [User, { loading, error, data }] = useLazyQuery(facade.GET_USER);
+  // This is keeping state for us. Just look at truthy values on these 3, and its fine.
+  const [User, { loading, error, data }] = useLazyQuery(facade.GET_USER); // https://www.apollographql.com/docs/react/api/react-hooks/#uselazyquery
 
   let content = (
     <View>
