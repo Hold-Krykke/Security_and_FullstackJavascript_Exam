@@ -134,6 +134,7 @@ const server = new ApolloServer({
       try {
         // If token is valid and not expired
         const token = jwt.verify(encryptedToken, process.env.SECRET);
+        // Maybe we should ALSO check here, if the user exists in our database?
         // Add the token to the context, so resolvers can get it.
         console.log("TOKEN WAS VALID:", { token });
         return { valid: true, token };
