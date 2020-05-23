@@ -28,7 +28,7 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
 });
 
 /**
- * The setContext function takes a function that returns either an object or a promise that returns an object to set the new context of a request.
+The setContext function takes a function that returns either an object or a promise that returns an object to set the new context of a request.
 It receives two arguments: the GraphQL request being executed, and the previous context. 
 This link makes it easy to perform async look up of things like authentication tokens and more!
  */
