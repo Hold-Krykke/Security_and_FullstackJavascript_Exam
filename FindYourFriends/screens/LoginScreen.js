@@ -32,7 +32,7 @@ const LoginScreen = ({ signedIn, setSignedIn, setTest, backendURL }) => {
    */
   useEffect(() => {
     const checkIfLoggedIn = async () => {
-      const token = await SecureStore.getItemAsync("token");
+      const token = await SecureStore.getItemAsync(secureStoreKey);
       if (token) {
         const decoded = jwt_decode(token);
         setUser({ email: decoded.useremail, token });
@@ -126,7 +126,7 @@ const LoggedInPage = (props) => {
           title="Log out"
           onPress={() => {
             props.setSignedIn(false);
-            SecureStore.deleteItemAsync("token");
+            SecureStore.deleteItemAsync(secureStoreKey);
           }}
         />
         <Text style={styles.title}>Welcome!</Text>
