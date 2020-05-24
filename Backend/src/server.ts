@@ -124,6 +124,33 @@ const server = new ApolloServer({
     // be manipulated in other ways, so long as it's returned.
     return err;
   },
+  // This is run on every incoming request to the GraphQL endpoint.
+  context: ({ req }) => {
+    // Get the token from the headers.
+    const encryptedToken = req.headers.authorization || "";
+
+    if (encryptedToken) {
+      // Validate the token, if it's on the request authorization header.
+      try {
+        // If token is valid and not expired
+        const token = jwt.verify(encryptedToken, process.env.SECRET);
+        // Maybe we should ALSO check here, if the user exists in our database?
+        // Add the token to the context, so resolvers can get it.
+        console.log("TOKEN WAS VALID:", { token });
+        return { valid: true, token };
+      } catch (err) {
+        // Token was Expired, or simply invalid.
+        // A token can be valid, but just expired.
+        // We have to handle that somehow.
+        console.log("TOKEN WAS INVALID");
+        return { valid: false };
+      }
+    } else {
+      console.log("NO TOKEN");
+      // No token at all on header.
+      return { valid: false };
+    }
+  },
 });
 
 app.use("*", cors());

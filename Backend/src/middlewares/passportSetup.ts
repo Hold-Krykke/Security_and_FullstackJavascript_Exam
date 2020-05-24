@@ -12,6 +12,7 @@ const userFacade: UserFacade = new UserFacade(schema);
 const initPassport = () => {
     const GoogleTokenStrategyCallback = (accessToken: String, refreshToken: String, profile: any, done: Function) => {
         console.log('\nREFRESH TOKEN\n', refreshToken);
+
         // Calls for logic or simply logic for storing these tokens goes here
         done(null, { accessToken, refreshToken, profile, })
     };

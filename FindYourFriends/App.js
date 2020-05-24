@@ -17,28 +17,33 @@ export default function App() {
   const [test, setTest] = useState(false);
   const [signedIn, setSignedIn] = useState(false);
 
-  // const backendUri = "https://localhost:3000/graphql";
-  // const httpLink = createHttpLink({ uri: backendUri });
-  // const client = new ApolloClient({
-  //   uri: backendUri,
-    
-  //   // link: errorLink.concat(authLink.concat(httpLink)), // Add in when links are made properly // Some kinda apollo middleware. See ./utils/links // https://www.apollographql.com/docs/link/links/error/
-  //   // cache: new InMemoryCache(), // automatic caching of requests of the same data // https://www.apollographql.com/docs/angular/basics/caching/
-  // });
-  // const backendUri = "http://f94dc486.ngrok.io";
   const backendUri = "https://712e1546.ngrok.io";
+  // the URI key is a string endpoint or function resolving to an endpoint -- will default to "/graphql" if not specified
   const httpLink = createHttpLink({ uri: backendUri + "/graphql" });
+  /** httpLink and cache are requirements as of Apollo 2 https://www.apollographql.com/docs/react/api/apollo-client/#required-fields
+   * - Error link - https://www.apollographql.com/docs/link/links/error/
+   * - In Memory Cache - https://www.apollographql.com/docs/angular/basics/caching/
+   * Whenever Apollo Client fetches query results from your server,
+   * it automatically caches those results locally.
+   * This makes subsequent executions of the same query extremely fast.
+   */
   const client = new ApolloClient({
     uri: backendUri,
-    // httpLink and cache are requirements as of Apollo 2
-    link: errorLink.concat(authLink.concat(httpLink)), // Add in when links are made properly // Some kinda apollo middleware. See ./utils/links // https://www.apollographql.com/docs/link/links/error/
-    cache: new InMemoryCache(), // automatic caching of requests of the same data // https://www.apollographql.com/docs/angular/basics/caching/
+    link: errorLink.concat(authLink.concat(httpLink)),
+    cache: new InMemoryCache(), // automatic caching
   });
 
   let content = <CreateUserScreen />;
   if (test) {
     //content = <MapScreen test={test} />
-    content = <LoginScreen signedIn={signedIn} setSignedIn={setSignedIn} />;
+    content = (
+      <LoginScreen
+        backendURL={backendUri}
+        signedIn={signedIn}
+        setSignedIn={setSignedIn}
+        setTest={setTest}
+      />
+    );
   }
 
   return (
