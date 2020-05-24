@@ -20,26 +20,31 @@ import * as SecureStore from "expo-secure-store";
 const secureStoreKey = "token";
 
 const LoginScreen = ({ signedIn, setSignedIn, setTest, backendURL }) => {
-  const [user, setUser] = useState({ email: "", token: "" }); // Maybe Token should be removed from here, since we now have token in SecureStore? 
+  const [user, setUser] = useState({ email: "", token: "" }); // Maybe Token should be removed from here, since we now have token in SecureStore?
   const [userEmail, setUserEmail] = useState("");
   const [password, setPassword] = useState("");
 
-
   /**
-   * If there is a JWT in SecureStore from previous login and app-use. 
+   * If there is a JWT in SecureStore from previous login and app-use.
+   * Maybe implement something similar in App.js?
+   * Right now this is only run on mount of LoginScreen,
+   * but that's not a problem, if this is the first screen user sees.
    */
-  useEffect(()=>{
-    const token = await SecureStore.getItemAsync("token")
-    if (token) {
-      const decoded = jwt_decode(token);
-      const user = { email: "", token: "" }
+  useEffect(() => {
+    const checkIfLoggedIn = async () => {
+      const token = await SecureStore.getItemAsync("token");
+      if (token) {
+        const decoded = jwt_decode(token);
+        const user = { email: "", token: "" };
         user.email = decoded.useremail;
         user.token = token;
         setUser(user);
-        console.log({user});
+        console.log(JSON.stringify({ user }, null, 4));
         setSignedIn(true);
-    }
-  },[])
+      }
+    };
+    checkIfLoggedIn();
+  }, []);
 
   const handleGoogleLogin = async () => {
     try {
