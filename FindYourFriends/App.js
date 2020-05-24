@@ -33,6 +33,7 @@ export default function App() {
     cache: new InMemoryCache(), // automatic caching
   });
 
+  // let content = <HomeScreen setTest={setTest} />;
   let content = <CreateUserScreen />;
   if (test) {
     //content = <MapScreen test={test} />
