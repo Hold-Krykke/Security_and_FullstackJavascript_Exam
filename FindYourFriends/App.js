@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, Alert, Button } from "react-native";
 import Header from "./components/Header";
 import HomeScreen from "./screens/HomeScreen";
 import MapScreen from "./screens/MapScreen";
@@ -15,6 +15,7 @@ export default function App() {
   // USE SCREENS LIKE THIS
   const [test, setTest] = useState(true);
   const [signedIn, setSignedIn] = useState(false);
+  const [error, setError] = useState(null);
 
   const backendUri = "http://c4c25ff2.ngrok.io";
   // the URI key is a string endpoint or function resolving to an endpoint -- will default to "/graphql" if not specified
@@ -32,6 +33,30 @@ export default function App() {
     cache: new InMemoryCache(), // automatic caching
   });
 
+  /**
+   * Errorhandling Alert.
+   * Tapping any button will fire the respective onPress callback and dismiss the alert.
+   * @param {string} error Text describing the error that occurred.
+   * @param {string} title The Title for the Error Alert.
+   */
+  const MyAlert = (error, title = "An Error Occurred") =>
+    // static alert(title, message?, buttons?, options?)
+    Alert.alert(
+      title,
+      error,
+      [
+        {
+          text: "OK",
+          onPress: () => {
+            console.log(JSON.stringify({ error }), null, 4);
+            setError(null);
+            console.log("OK Pressed in Error Alert.");
+          },
+        },
+      ],
+      { cancelable: false } // If false, you can only dismiss via the onPress. If True, you can dismiss by pressing outside the alert.
+    );
+
   let content = <HomeScreen setTest={setTest} />;
   if (test) {
     //content = <MapScreen test={test} />
@@ -48,6 +73,7 @@ export default function App() {
   return (
     <ApolloProvider client={client}>
       <View style={styles.screen}>
+        {error && MyAlert(error)}
         <Header title="Find Your Friends" />
         {content}
       </View>
