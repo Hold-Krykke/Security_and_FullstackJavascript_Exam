@@ -46,7 +46,13 @@ const resolverMap: IResolvers = {
     // allUsers(_: void, args: void): any {
     //     return UserFacade.getAllUsers();
     // },
-    getUser(_: void, args: any): any {
+    getUser(_: void, args: any, context): any {
+      console.log(context);
+      // This is an Authorization Guard.
+      // Protect GraphQL mutations like this.
+      if (!context.valid) {
+        throw new ForbiddenError("You need to be logged in.");
+      }
       return userFacade.getUserByUsername(args.username);
     },
   },
