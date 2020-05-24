@@ -89,7 +89,10 @@ const LoginScreen = ({
         "Something went wrong while logging in:\n",
         JSON.stringify({ res }, null, 4)
       );
-      setError("Wrong username or password!");
+      setError({
+        message: "Wrong username or password!",
+        title: "Login Error!",
+      });
     }
   };
 
