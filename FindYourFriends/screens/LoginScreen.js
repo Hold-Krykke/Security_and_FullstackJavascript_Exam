@@ -35,10 +35,7 @@ const LoginScreen = ({ signedIn, setSignedIn, setTest, backendURL }) => {
       const token = await SecureStore.getItemAsync("token");
       if (token) {
         const decoded = jwt_decode(token);
-        const user = { email: "", token: "" };
-        user.email = decoded.useremail;
-        user.token = token;
-        setUser(user);
+        setUser({ email: decoded.useremail, token });
         console.log(JSON.stringify({ user }, null, 4));
         setSignedIn(true);
       }
