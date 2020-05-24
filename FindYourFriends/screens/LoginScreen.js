@@ -19,7 +19,13 @@ import * as SecureStore from "expo-secure-store";
 // The key for Secure Store. Use this key, to fetch token again.
 const secureStoreKey = "token";
 
-const LoginScreen = ({ signedIn, setSignedIn, setTest, backendURL }) => {
+const LoginScreen = ({
+  signedIn,
+  setSignedIn,
+  setTest,
+  backendURL,
+  setError,
+}) => {
   const [user, setUser] = useState({ email: "", token: "" });
   const [userEmail, setUserEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -30,7 +36,7 @@ const LoginScreen = ({ signedIn, setSignedIn, setTest, backendURL }) => {
       let authUrl = `${backendURL}/auth/google?redirecturl=${redirectUrl}`;
       let result = await WebBrowser.openAuthSessionAsync(authUrl, redirectUrl);
 
-      if ((result.type = "success")) {
+      if (result.type == "success") {
         // The .slice(0, -1) is to remove a false # thats at then end, for some reason.
         const token = result.url.split("token=")[1].slice(0, -1);
         //console.log("GOOGLE LOGIN TOKEN\n", JSON.stringify({ token }, null, 4));
@@ -41,11 +47,17 @@ const LoginScreen = ({ signedIn, setSignedIn, setTest, backendURL }) => {
         setUser(user);
         console.log("user", user);
         setSignedIn(true);
-      } else {
+      } else if (result.type == "cancel") {
+        // If the user closed the web browser, the Promise resolves with { type: 'cancel' }.
+        // If the user does not permit the application to authenticate with the given url, the Promise resolved with { type: 'cancel' }.
         console.log("User Cancelled.");
+      } else if (result.type == "dismiss") {
+        // If the browser is closed using dismissBrowser, the Promise resolves with { type: 'dismiss' }.
+        console.log("User used dismiss.");
       }
     } catch (error) {
       console.log(error);
+      setError(error); // This needs to be finetuned, to send something more specific. We do not wish to hand everything to the User.
     }
   };
 
@@ -61,12 +73,24 @@ const LoginScreen = ({ signedIn, setSignedIn, setTest, backendURL }) => {
     const res = await fetch(`${backendURL}/auth/jwt?`, request).then((res) =>
       res.json()
     );
-    user.email = res.useremail;
-    user.token = res.token;
-    await SecureStore.setItemAsync(secureStoreKey, res.token);
-    setUser(user);
-    console.log(res);
-    setSignedIn(true);
+    if (
+      res.userEmail &&
+      res.token &&
+      (typeof res.token === String || res.token instanceof String)
+    ) {
+      user.email = res.useremail;
+      user.token = res.token;
+      await SecureStore.setItemAsync(secureStoreKey, res.token);
+      setUser(user);
+      console.log(res);
+      setSignedIn(true);
+    } else {
+      console.log(
+        "Something went wrong while logging in:\n",
+        JSON.stringify({ res }, null, 4)
+      );
+      setError("Wrong username or password!");
+    }
   };
 
   return (

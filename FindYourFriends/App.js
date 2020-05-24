@@ -37,20 +37,21 @@ export default function App() {
    * Errorhandling Alert.
    * Tapping any button will fire the respective onPress callback and dismiss the alert.
    * @param {string} error Text describing the error that occurred.
-   * @param {string} title The Title for the Error Alert.
+   * @param {string} title The Title for the Error Alert. Default "An Error Occurred"
+   * @param {string} buttonText The text on the button. Default "OK"
    */
-  const MyAlert = (error, title = "An Error Occurred") =>
+  const MyAlert = (error, title = "An Error Occurred", buttonText = "OK") =>
     // static alert(title, message?, buttons?, options?)
     Alert.alert(
       title,
       error,
       [
         {
-          text: "OK",
+          text: buttonText,
           onPress: () => {
             console.log(JSON.stringify({ error }), null, 4);
             setError(null);
-            console.log("OK Pressed in Error Alert.");
+            console.log(`${buttonText} pressed on Error Alert.`);
           },
         },
       ],
@@ -62,6 +63,7 @@ export default function App() {
     //content = <MapScreen test={test} />
     content = (
       <LoginScreen
+        setError={setError}
         backendURL={backendUri}
         signedIn={signedIn}
         setSignedIn={setSignedIn}
