@@ -13,7 +13,15 @@ const CreateUser = (props) => {
   }
 
   function confirmCreate() {
-    addUser(newUser);
+    addUser({
+      variables: {
+        input: {
+          username: newUser.username,
+          email: newUser.email,
+          password: newUser.password
+        }
+      }
+    });
     console.log("Created new user");
   }
 

@@ -26,9 +26,8 @@ export default function App() {
   //   // cache: new InMemoryCache(), // automatic caching of requests of the same data // https://www.apollographql.com/docs/angular/basics/caching/
   // });
   // const backendUri = "http://f94dc486.ngrok.io";
-  const backendUri = "https://da356804.ngrok.io/";
-  const httpLink = createHttpLink({ uri: backendUri });
-  // const httpLink = createHttpLink({ uri: backendUri + "/graphql" });
+  const backendUri = "https://712e1546.ngrok.io";
+  const httpLink = createHttpLink({ uri: backendUri + "/graphql" });
   const client = new ApolloClient({
     uri: backendUri,
     // httpLink and cache are requirements as of Apollo 2
