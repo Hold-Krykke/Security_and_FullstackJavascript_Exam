@@ -57,7 +57,7 @@ const LoginScreen = ({
       }
     } catch (error) {
       console.log(error);
-      setError(error); // This needs to be finetuned, to send something more specific. We do not wish to hand everything to the User.
+      setError({ message: error, title: "An Error Occurred" }); // This needs to be finetuned, to send something more specific. We do not wish to hand everything to the User.
     }
   };
 
