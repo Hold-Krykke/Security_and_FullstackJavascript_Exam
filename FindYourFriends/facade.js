@@ -1,4 +1,5 @@
 import { SERVER_URL } from './constants/settings';
+import { gql } from "apollo-boost"
 
 facade = () => {
 
@@ -13,4 +14,17 @@ facade = () => {
     }
 }
 
+
+
+
+const ADD_USER = gql`
+    mutation addUser($input: UserInput!) {
+        addUser(input: $input) {
+            username
+            email
+        }
+    }
+`;
+
 export default facade();
+export {ADD_USER};

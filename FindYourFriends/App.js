@@ -4,6 +4,7 @@ import Header from "./components/Header";
 import HomeScreen from "./screens/HomeScreen";
 import MapScreen from "./screens/MapScreen";
 import LoginScreen from "./screens/LoginScreen";
+import CreateUserScreen from "./screens/CreateUserScreen";
 import ChatScreen from "./screens/ChatScreen";
 import { ApolloClient } from "apollo-client";
 import { InMemoryCache } from "apollo-cache-inmemory";
@@ -13,18 +14,29 @@ import { createHttpLink } from "apollo-link-http";
 
 export default function App() {
   // USE SCREENS LIKE THIS
-  const [test, setTest] = useState(true);
+  const [test, setTest] = useState(false);
   const [signedIn, setSignedIn] = useState(false);
 
-  const backendUri = "https://localhost:3000/graphql";
+  // const backendUri = "https://localhost:3000/graphql";
+  // const httpLink = createHttpLink({ uri: backendUri });
+  // const client = new ApolloClient({
+  //   uri: backendUri,
+    
+  //   // link: errorLink.concat(authLink.concat(httpLink)), // Add in when links are made properly // Some kinda apollo middleware. See ./utils/links // https://www.apollographql.com/docs/link/links/error/
+  //   // cache: new InMemoryCache(), // automatic caching of requests of the same data // https://www.apollographql.com/docs/angular/basics/caching/
+  // });
+  // const backendUri = "http://f94dc486.ngrok.io";
+  const backendUri = "https://da356804.ngrok.io/";
   const httpLink = createHttpLink({ uri: backendUri });
+  // const httpLink = createHttpLink({ uri: backendUri + "/graphql" });
   const client = new ApolloClient({
     uri: backendUri,
-    // link: errorLink.concat(authLink.concat(httpLink)), // Add in when links are made properly // Some kinda apollo middleware. See ./utils/links // https://www.apollographql.com/docs/link/links/error/
-    // cache: new InMemoryCache(), // automatic caching of requests of the same data // https://www.apollographql.com/docs/angular/basics/caching/
+    // httpLink and cache are requirements as of Apollo 2
+    link: errorLink.concat(authLink.concat(httpLink)), // Add in when links are made properly // Some kinda apollo middleware. See ./utils/links // https://www.apollographql.com/docs/link/links/error/
+    cache: new InMemoryCache(), // automatic caching of requests of the same data // https://www.apollographql.com/docs/angular/basics/caching/
   });
 
-  let content = <HomeScreen setTest={setTest} />;
+  let content = <CreateUserScreen />;
   if (test) {
     //content = <MapScreen test={test} />
     content = <LoginScreen signedIn={signedIn} setSignedIn={setSignedIn} />;

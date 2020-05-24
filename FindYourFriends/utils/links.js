@@ -1,4 +1,5 @@
 import { onError } from "apollo-link-error";
+import { setContext } from "apollo-link-context";
 
 const getToken = () => {
   return "FAKE TOKEN";
