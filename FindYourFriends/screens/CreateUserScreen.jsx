@@ -12,6 +12,10 @@ const CreateUser = (props) => {
   });
   const [addUser, { data }] = useMutation(facade.ADD_USER);
 
+  // Sadly the value passed to the function in onChangeText is only the value of the element (what the user typed)
+  // and not an event with more data than just a string. This means that you can't a generic handler
+  // that can handle the input of all the input fields since we can't access any id or anything from the event
+  // If you find a smarter way to do this, please do optimize it!
   function handleUsernameInput(value) {
     newUser.username = value;
     setNewUser({ ...newUser });
@@ -30,10 +34,17 @@ const CreateUser = (props) => {
   }
 
   async function confirmCreate() {
+    if (newUser.password == "") {
+      Alert.alert("Please type a password");
+      return;
+    }
     if (newUser.password != newUser.password2) {
-      Alert.alert("You're actually a retard");
-      newUser.password = "xyz";
-      newUser.password2 = "abc";
+      Alert.alert("The passwords don't match");
+      // We reset the passwords after failed attempts of creating a user
+      // One is set to null and one is set to an empty string so the password input fields get cleared
+      // but still don't have the same value
+      newUser.password = "";
+      newUser.password2 = null;
       setNewUser({ ...newUser });
       return;
     }
@@ -48,11 +59,14 @@ const CreateUser = (props) => {
     });
     console.log("Created new user");
     setNewUser({});
+    Alert.alert("User successfully created");
   }
 
   return (
     <ScrollView>
       <View style={styles.inputContainer}>
+        <View style={{paddingBottom: "7%"}}></View>
+        <Text style={{fontSize: 24}}>Create User</Text>
         <View style={{paddingBottom: "17%"}}></View>
         <Text>USERNAME</Text>
         <Input style={{ width: "60%" }} onChangeText={handleUsernameInput} name="username" value={newUser.username}></Input>
@@ -63,7 +77,7 @@ const CreateUser = (props) => {
         <Text>RETYPE PASSWORD</Text>
         <Input style={{ width: "60%" }} onChangeText={handlePassword2Input} name="password2" secureTextEntry={true} value={newUser.password2}></Input>
         <Button onPress={confirmCreate} title="CREATE" />
-        <View style={{paddingBottom: "100%"}}></View>
+        <View style={{paddingBottom: "70%"}}></View>
       </View>
     </ScrollView>
   );
@@ -74,11 +88,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-  },
-  buttons: {
-    flexDirection: "row",
-    padding: 5,
-    justifyContent: "center",
   },
 });
 
