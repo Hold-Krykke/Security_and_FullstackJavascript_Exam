@@ -53,7 +53,7 @@ const LoginScreen = ({
         console.log("User Cancelled.");
       } else if (result.type == "dismiss") {
         // If the browser is closed using dismissBrowser, the Promise resolves with { type: 'dismiss' }.
-        console.log("User used dismiss.");
+        console.log("User dismissed the browser.");
       }
     } catch (error) {
       console.log(error);
