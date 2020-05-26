@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   View,
@@ -35,8 +35,9 @@ const LoginScreen = ({ signedIn, setSignedIn, setTest, backendURL }) => {
       const token = await SecureStore.getItemAsync(secureStoreKey);
       if (token) {
         const decoded = jwt_decode(token);
-        setUser({ email: decoded.useremail });
-        console.log(JSON.stringify({ user }, null, 4));
+        const temp_user = { email: decoded.useremail };
+        setUser({ ...temp_user });
+        console.log(JSON.stringify({ temp_user }, null, 4));
         setSignedIn(true);
       }
     };

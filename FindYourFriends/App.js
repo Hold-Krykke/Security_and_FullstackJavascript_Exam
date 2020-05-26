@@ -16,7 +16,7 @@ export default function App() {
   const [test, setTest] = useState(true);
   const [signedIn, setSignedIn] = useState(false);
 
-  const backendUri = "http://c4c25ff2.ngrok.io";
+  const backendUri = "https://28570388.ngrok.io";
   // the URI key is a string endpoint or function resolving to an endpoint -- will default to "/graphql" if not specified
   const httpLink = createHttpLink({ uri: backendUri + "/graphql" });
   /** httpLink and cache are requirements as of Apollo 2 https://www.apollographql.com/docs/react/api/apollo-client/#required-fields
