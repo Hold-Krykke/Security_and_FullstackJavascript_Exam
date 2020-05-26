@@ -25,7 +25,6 @@ app.use(passport.initialize());
 
 app.use(requestLogger);
 //The regular logger needs to be before the router
-app.use(requestLogger);
 
 app.post("/auth/jwt", (req, res) => {
   passport.authenticate(
