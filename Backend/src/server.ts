@@ -10,11 +10,19 @@ import { ApiError } from "./customErrors/apiError";
 import initPassport from "./middlewares/passportSetup";
 import passport from "passport";
 import { requestLogger, errorLogger } from "./middlewares/logger";
+import BruteForceDetector from "./util/bruteForceDetector";
+import eventEmitter from "./util/CustomEmitter";
 const jwt = require("jsonwebtoken");
 const bodyParser = require("body-parser");
 const app = express();
 const path = require("path");
 require("dotenv").config({ path: path.join(process.cwd(), ".env") });
+
+const BFD = new BruteForceDetector(1000);
+// milliseconds
+const banTime = 5000;
+// List of temporarily banned IP addresses
+const addressList = new Map();
 
 initPassport();
 
@@ -23,11 +31,26 @@ app.use(bodyParser.json());
 
 app.use(passport.initialize());
 
-app.use(requestLogger);
 //The regular logger needs to be before the router
-app.use(requestLogger);
+// app.use(requestLogger);
 
 app.post("/auth/jwt", (req, res) => {
+  // DoS/BruteForce blocking code:
+  // Check if IP is in list of banned IPs
+  let time = addressList.get(req.connection.remoteAddress)
+  if (time) {
+    // If IP is in the list then we check the time delta
+    let delta = (new Date().getTime() - time);
+    if (delta < banTime) {
+      // If the time delta i smaller than the ban time then the client still has to wait
+      console.log("Delta: ", delta);
+      res.status(401).json({ message: "Please wait before you try to log in again" });
+      return;
+    }
+  }
+  const remoteAddress: string | any = req.connection.remoteAddress;
+  BFD.addUrl(remoteAddress);
+
   passport.authenticate(
     "local",
     { session: false },
@@ -57,6 +80,17 @@ app.post("/auth/jwt", (req, res) => {
     }
   )(req, res);
 });
+
+// Event emitter listening for brute force warnings:
+// The event passed to the function contains the properties the BFD added when emitting the event
+eventEmitter.on("Brute Force Attack Detected", (event: any) => {
+  console.log("\n");
+  console.log("Brute Force attack detected!");
+  console.log("Attacker URL:", event.url);
+  console.log("Time since last request:", event.timeBetweenCalls);
+  // We add the url / address of the attacker to our map to keep track of them
+  addressList.set(event.url, new Date().getTime());
+})
 
 app.get("/auth/google", (req, res) => {
   console.log("redirecturlquery", req.query.redirecturl);
@@ -136,7 +170,7 @@ const server = new ApolloServer({
         const token = jwt.verify(encryptedToken, process.env.SECRET);
         // Maybe we should ALSO check here, if the user exists in our database?
         // Add the token to the context, so resolvers can get it.
-        console.log("TOKEN WAS VALID:", { token });
+        // console.log("TOKEN WAS VALID:", { token });
         return { valid: true, token };
       } catch (err) {
         // Token was Expired, or simply invalid.
