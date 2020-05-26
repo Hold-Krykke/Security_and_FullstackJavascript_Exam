@@ -82,7 +82,7 @@ const LoginScreen = ({
       user.token = res.token;
       await SecureStore.setItemAsync(secureStoreKey, res.token);
       setUser(user);
-      console.log(res);
+      console.log(JSON.stringify({ res }, null, 4));
       setSignedIn(true);
     } else {
       console.log(
