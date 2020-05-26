@@ -1,5 +1,14 @@
 import React, { useState } from "react";
-import { View, Button, StyleSheet, Modal, Text, Alert, ScrollView, KeyboardAvoidingView } from "react-native";
+import {
+  View,
+  Button,
+  StyleSheet,
+  Modal,
+  Text,
+  Alert,
+  ScrollView,
+  KeyboardAvoidingView,
+} from "react-native";
 import Input from "../components/Input";
 import facade from "../facade";
 import { useMutation } from "@apollo/react-hooks";
@@ -8,7 +17,7 @@ const CreateUser = (props) => {
   const [newUser, setNewUser] = useState({
     username: "",
     email: "",
-    password: ""
+    password: "",
   });
   const [addUser, { data }] = useMutation(facade.ADD_USER);
 
@@ -33,9 +42,32 @@ const CreateUser = (props) => {
     setNewUser({ ...newUser });
   }
 
+  // Thanks to this dude for the regex: https://stackoverflow.com/questions/7844359/password-regex-with-min-6-chars-at-least-one-letter-and-one-number-and-may-cont
+  function checkPwd(str) {
+    if (str.length < 10) {
+      return "Your password is too short";
+    } else if (str.length > 30) {
+      return "Your password is too long";
+    } else if (str.search(/\d/) == -1) {
+      return "Your password must contain a number";
+    } else if (str.search(/[a-zA-Z]/) == -1) {
+      return "Your password must contain a letter";
+    } else if (str.search(/[\!\@\#\$\%\^\&\*\(\)\_\+\-]/) == -1) {
+      return "Your password must contain a symbol";
+    } else if (str.search(/[^a-zA-Z0-9\!\@\#\$\%\^\&\*\(\)\_\+\-]/) != -1) {
+      return "Your password has invalid characters in it";
+    }
+    return "ok";
+  }
+
   async function confirmCreate() {
     if (newUser.password == "") {
       Alert.alert("Please type a password");
+      return;
+    }
+    const passwordCheck = checkPwd(newUser.password);
+    if (passwordCheck != "ok") {
+      Alert.alert(passwordCheck);
       return;
     }
     if (newUser.password != newUser.password2) {
@@ -65,19 +97,42 @@ const CreateUser = (props) => {
   return (
     <ScrollView>
       <View style={styles.inputContainer}>
-        <View style={{paddingBottom: "7%"}}></View>
-        <Text style={{fontSize: 24}}>Create User</Text>
-        <View style={{paddingBottom: "17%"}}></View>
+        <View style={{ paddingBottom: "7%" }}></View>
+        <Text style={{ fontSize: 24 }}>Create User</Text>
+        <View style={{ paddingBottom: "17%" }}></View>
         <Text>USERNAME</Text>
-        <Input style={{ width: "60%" }} onChangeText={handleUsernameInput} name="username" value={newUser.username}></Input>
+        <Input
+          style={{ width: "60%" }}
+          onChangeText={handleUsernameInput}
+          name="username"
+          value={newUser.username}
+        ></Input>
         <Text>EMAIL</Text>
-        <Input style={{ width: "60%" }} onChangeText={handleEmailInput} name="email" keyboardType="email-address" value={newUser.email}></Input>
+        <Input
+          style={{ width: "60%" }}
+          onChangeText={handleEmailInput}
+          name="email"
+          keyboardType="email-address"
+          value={newUser.email}
+        ></Input>
         <Text>PASSWORD</Text>
-        <Input style={{ width: "60%" }} onChangeText={handlePasswordInput} name="password" secureTextEntry={true} value={newUser.password}></Input>
+        <Input
+          style={{ width: "60%" }}
+          onChangeText={handlePasswordInput}
+          name="password"
+          secureTextEntry={true}
+          value={newUser.password}
+        ></Input>
         <Text>RETYPE PASSWORD</Text>
-        <Input style={{ width: "60%" }} onChangeText={handlePassword2Input} name="password2" secureTextEntry={true} value={newUser.password2}></Input>
+        <Input
+          style={{ width: "60%" }}
+          onChangeText={handlePassword2Input}
+          name="password2"
+          secureTextEntry={true}
+          value={newUser.password2}
+        ></Input>
         <Button onPress={confirmCreate} title="CREATE" />
-        <View style={{paddingBottom: "70%"}}></View>
+        <View style={{ paddingBottom: "70%" }}></View>
       </View>
     </ScrollView>
   );
