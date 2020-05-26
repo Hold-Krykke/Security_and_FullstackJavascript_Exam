@@ -20,7 +20,7 @@ import * as SecureStore from "expo-secure-store";
 const secureStoreKey = "token";
 
 const LoginScreen = ({ signedIn, setSignedIn, setTest, backendURL }) => {
-  const [user, setUser] = useState({ email: "", token: "" }); // Maybe Token should be removed from here, since we now have token in SecureStore?
+  const [user, setUser] = useState({ email: "" });
   const [userEmail, setUserEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -35,7 +35,7 @@ const LoginScreen = ({ signedIn, setSignedIn, setTest, backendURL }) => {
       const token = await SecureStore.getItemAsync(secureStoreKey);
       if (token) {
         const decoded = jwt_decode(token);
-        setUser({ email: decoded.useremail, token });
+        setUser({ email: decoded.useremail });
         console.log(JSON.stringify({ user }, null, 4));
         setSignedIn(true);
       }
@@ -56,7 +56,6 @@ const LoginScreen = ({ signedIn, setSignedIn, setTest, backendURL }) => {
         await SecureStore.setItemAsync(secureStoreKey, token);
         const decoded = jwt_decode(token);
         user.email = decoded.useremail;
-        user.token = token;
         setUser(user);
         console.log("user", user);
         setSignedIn(true);
@@ -81,7 +80,6 @@ const LoginScreen = ({ signedIn, setSignedIn, setTest, backendURL }) => {
       res.json()
     );
     user.email = res.useremail;
-    user.token = res.token;
     await SecureStore.setItemAsync(secureStoreKey, res.token);
     setUser(user);
     console.log(res);
