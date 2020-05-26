@@ -11,7 +11,6 @@ import { ApolloProvider } from "@apollo/react-hooks";
 import authLink from "./utils/links";
 import { createHttpLink } from "apollo-link-http";
 import { onError } from "apollo-link-error";
-import MyAlert from "./utils/MyAlert";
 
 export default function App() {
   // USE SCREENS LIKE THIS
@@ -22,7 +21,7 @@ export default function App() {
     title: "An Error Occurred",
   });
 
-  const backendUri = "http://c4c25ff2.ngrok.io";
+  const backendUri = "https://28570388.ngrok.io";
   /**
    * Put logic here, on how to handle errors.
    * This handles all GraphQL errors.
@@ -92,7 +91,7 @@ export default function App() {
         {
           text: buttonText,
           onPress: () => {
-            console.log(JSON.stringify({ error }), null, 4);
+            console.log(JSON.stringify({ error }, null, 4));
             setError({ message: null, title: "An Error Occurred" });
             console.log(`${buttonText} pressed on Error Alert.`);
           },
