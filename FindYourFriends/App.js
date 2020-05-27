@@ -21,7 +21,7 @@ export default function App() {
     title: "An Error Occurred",
   });
 
-  const backendUri = "https://28570388.ngrok.io";
+  const backendUri = "http://cdccc558.ngrok.io";
   /**
    * Put logic here, on how to handle errors.
    * This handles all GraphQL errors.

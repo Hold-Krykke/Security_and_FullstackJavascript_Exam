@@ -26,6 +26,14 @@ app.use(passport.initialize());
 app.use(requestLogger);
 //The regular logger needs to be before the router
 
+const makePayload = (useremail: string) => {
+  const tokenExpiration = 60000; // 3600000 = 1 hour
+  return {
+    useremail,
+    expiresIn: Date.now() + tokenExpiration,
+  };
+};
+
 app.post("/auth/jwt", (req, res) => {
   passport.authenticate(
     "local",
@@ -36,10 +44,7 @@ app.post("/auth/jwt", (req, res) => {
         return;
       }
 
-      const payload = {
-        useremail: user.email,
-        expires: Date.now() + 3600000,
-      };
+      const payload = makePayload(user.email);
 
       req.login(payload, { session: false }, (error) => {
         if (error) {
@@ -81,10 +86,7 @@ app.get("/auth/google/callback", (req, res) => {
         return;
       }
       const state = JSON.parse(req.query.state.toString());
-      const payload = {
-        useremail: user.profile.emails[0].value,
-        expires: Date.now() + 3600000,
-      };
+      const payload = makePayload(user.profile.emails[0].value);
 
       req.login(payload, { session: false }, (error) => {
         if (error) {
