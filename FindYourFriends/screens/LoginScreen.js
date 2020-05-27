@@ -15,6 +15,7 @@ import { Linking } from "expo";
 import * as WebBrowser from "expo-web-browser";
 import jwt_decode from "jwt-decode"; // https://www.npmjs.com/package/jwt-decode
 import * as SecureStore from "expo-secure-store";
+import MyAlert from "../utils/MakeAlert";
 
 // The key for Secure Store. Use this key, to fetch token again.
 const secureStoreKey = "token";
@@ -76,7 +77,7 @@ const LoginScreen = ({
       }
     } catch (error) {
       console.log(error);
-      setError({ message: error, title: "An Error Occurred" }); // This needs to be finetuned, to send something more specific. We do not wish to hand everything to the User.
+      MyAlert(error); // This needs to be finetuned, to send something more specific. We do not wish to hand everything to the User.
     }
   };
 
@@ -107,10 +108,7 @@ const LoginScreen = ({
         "Something went wrong while logging in:\n",
         JSON.stringify({ res }, null, 4)
       );
-      setError({
-        message: "Wrong username or password!",
-        title: "Login Error!",
-      });
+      MyAlert("Wrong username or password!", "Login Error!");
     }
   };
 
@@ -150,9 +148,9 @@ const LoggedInPage = (props) => {
         */}
         <Button
           title="Log out"
-          onPress={() => {
+          onPress={async () => {
             props.setSignedIn(false);
-            SecureStore.deleteItemAsync(secureStoreKey);
+            await SecureStore.deleteItemAsync(secureStoreKey);
           }}
         />
         <Text style={styles.title}>Welcome!</Text>

@@ -5,30 +5,20 @@ import HomeScreen from "./screens/HomeScreen";
 import MapScreen from "./screens/MapScreen";
 import LoginScreen from "./screens/LoginScreen";
 import ChatScreen from "./screens/ChatScreen";
-import { ApolloClient } from "apollo-client";
-import { InMemoryCache } from "apollo-cache-inmemory";
 import { ApolloProvider } from "@apollo/react-hooks";
 import client from "./utils/ApolloClientProvider";
-import { createHttpLink } from "apollo-link-http";
-import { onError } from "apollo-link-error";
-import MakeAlert from "./utils/MakeAlert";
 import { backendUri } from "./settings";
 
 export default function App() {
   // USE SCREENS LIKE THIS
   const [test, setTest] = useState(true);
   const [signedIn, setSignedIn] = useState(false);
-  const [error, setError] = useState({
-    message: "",
-    title: "An Error Occurred",
-  });
 
-  let content = <HomeScreen setTest={setTest} setError={setError} />;
+  let content = <HomeScreen setTest={setTest} />;
   if (test) {
     //content = <MapScreen test={test} />
     content = (
       <LoginScreen
-        setError={setError}
         backendURL={backendUri}
         signedIn={signedIn}
         setSignedIn={setSignedIn}
@@ -40,7 +30,6 @@ export default function App() {
   return (
     <ApolloProvider client={client}>
       <View style={styles.screen}>
-        <MakeAlert error={error} setError={setError} />
         <Header title="Find Your Friends" />
         {content}
       </View>
