@@ -26,6 +26,8 @@ app.use(passport.initialize());
 app.use(requestLogger);
 //The regular logger needs to be before the router
 
+const tokenExpirationInSeconds = 3600;
+
 app.post("/auth/jwt", (req, res) => {
   passport.authenticate(
     "local",
@@ -36,16 +38,14 @@ app.post("/auth/jwt", (req, res) => {
         return;
       }
 
-      const payload = {
-        useremail: user.email,
-        expires: Date.now() + 3600000,
-      };
-
+      const payload = { useremail: user.email };
       req.login(payload, { session: false }, (error) => {
         if (error) {
           res.status(400).send({ error });
         }
-        const token = jwt.sign(JSON.stringify(payload), process.env.SECRET);
+        const token = jwt.sign(payload, process.env.SECRET, {
+          expiresIn: tokenExpirationInSeconds,
+        });
         res.cookie("jwt", jwt, { httpOnly: true, secure: true });
         res.status(200).send({
           token: token,
@@ -81,16 +81,15 @@ app.get("/auth/google/callback", (req, res) => {
         return;
       }
       const state = JSON.parse(req.query.state.toString());
-      const payload = {
-        useremail: user.profile.emails[0].value,
-        expires: Date.now() + 3600000,
-      };
+      const payload = { useremail: user.profile.emails[0].value };
 
       req.login(payload, { session: false }, (error) => {
         if (error) {
           res.status(400).send({ error });
         }
-        const token = jwt.sign(JSON.stringify(payload), process.env.SECRET);
+        const token = jwt.sign(payload, process.env.SECRET, {
+          expiresIn: tokenExpirationInSeconds,
+        });
         res.cookie("jwt", jwt, { httpOnly: true, secure: false });
         res.redirect(`${state.redirectUrl}?token=${token}`);
       });
@@ -101,11 +100,6 @@ app.get("/auth/google/callback", (req, res) => {
 //The errorlogger needs to be added AFTER the express router and BEFORE any custom error handlers.
 app.use(errorLogger);
 
-// let debug = true;
-// if (process.env.NODE_ENV !== "production") {
-//   debug = false;
-// }
-//process.env.NODE_ENV = "production";
 const server = new ApolloServer({
   schema,
   validationRules: [depthLimit(7)], // https://www.npmjs.com/package/graphql-depth-limit
@@ -133,14 +127,11 @@ const server = new ApolloServer({
       try {
         // If token is valid and not expired
         const token = jwt.verify(encryptedToken, process.env.SECRET);
-        // Maybe we should ALSO check here, if the user exists in our database?
         // Add the token to the context, so resolvers can get it.
-        console.log("TOKEN WAS VALID:", { token });
+        console.log("TOKEN WAS VALID:", JSON.stringify({ token }, null, 4));
         return { valid: true, token };
       } catch (err) {
-        // Token was Expired, or simply invalid.
-        // A token can be valid, but just expired.
-        // We have to handle that somehow.
+        // Token was Expired, or signature invalid.
         console.log("TOKEN WAS INVALID");
         return { valid: false };
       }

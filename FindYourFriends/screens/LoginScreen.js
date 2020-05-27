@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   View,
@@ -15,6 +15,7 @@ import { Linking } from "expo";
 import * as WebBrowser from "expo-web-browser";
 import jwt_decode from "jwt-decode"; // https://www.npmjs.com/package/jwt-decode
 import * as SecureStore from "expo-secure-store";
+import MyAlert from "../utils/MakeAlert";
 
 // The key for Secure Store. Use this key, to fetch token again.
 const secureStoreKey = "token";
@@ -26,9 +27,29 @@ const LoginScreen = ({
   backendURL,
   setError,
 }) => {
-  const [user, setUser] = useState({ email: "", token: "" });
+  const [user, setUser] = useState({ email: "" });
   const [userEmail, setUserEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  /**
+   * If there is a JWT in SecureStore from previous login and app-use.
+   * Maybe implement something similar in App.js?
+   * Right now this is only run on mount of LoginScreen,
+   * but that's not a problem, if this is the first screen user sees.
+   */
+  useEffect(() => {
+    const checkIfLoggedIn = async () => {
+      const token = await SecureStore.getItemAsync(secureStoreKey);
+      if (token) {
+        const decoded = jwt_decode(token);
+        const temp_user = { email: decoded.useremail };
+        setUser({ ...temp_user });
+        console.log(JSON.stringify({ temp_user }, null, 4));
+        setSignedIn(true);
+      }
+    };
+    checkIfLoggedIn();
+  }, []);
 
   const handleGoogleLogin = async () => {
     try {
@@ -43,7 +64,6 @@ const LoginScreen = ({
         await SecureStore.setItemAsync(secureStoreKey, token);
         const decoded = jwt_decode(token);
         user.email = decoded.useremail;
-        user.token = token;
         setUser(user);
         console.log("user", user);
         setSignedIn(true);
@@ -57,7 +77,7 @@ const LoginScreen = ({
       }
     } catch (error) {
       console.log(error);
-      setError({ message: error, title: "An Error Occurred" }); // This needs to be finetuned, to send something more specific. We do not wish to hand everything to the User.
+      MyAlert(error); // This needs to be finetuned, to send something more specific. We do not wish to hand everything to the User.
     }
   };
 
@@ -74,12 +94,11 @@ const LoginScreen = ({
       res.json()
     );
     if (
-      res.userEmail &&
-      res.token &&
-      (typeof res.token === String || res.token instanceof String)
+      res.useremail &&
+      res.token
+      // && (typeof res.token === String || res.token instanceof String)
     ) {
       user.email = res.useremail;
-      user.token = res.token;
       await SecureStore.setItemAsync(secureStoreKey, res.token);
       setUser(user);
       console.log(JSON.stringify({ res }, null, 4));
@@ -89,10 +108,7 @@ const LoginScreen = ({
         "Something went wrong while logging in:\n",
         JSON.stringify({ res }, null, 4)
       );
-      setError({
-        message: "Wrong username or password!",
-        title: "Login Error!",
-      });
+      MyAlert("Wrong username or password!", "Login Error!");
     }
   };
 
@@ -132,9 +148,9 @@ const LoggedInPage = (props) => {
         */}
         <Button
           title="Log out"
-          onPress={() => {
+          onPress={async () => {
             props.setSignedIn(false);
-            SecureStore.deleteItemAsync("token");
+            await SecureStore.deleteItemAsync(secureStoreKey);
           }}
         />
         <Text style={styles.title}>Welcome!</Text>

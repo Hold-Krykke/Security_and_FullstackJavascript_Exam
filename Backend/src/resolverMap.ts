@@ -48,10 +48,10 @@ const resolverMap: IResolvers = {
     // },
     getUser(_: void, args: any, context): any {
       console.log(context);
-      // This is an Authorization Guard.
+      // This is an Authentication Guard.
       // Protect GraphQL mutations like this.
       if (!context.valid) {
-        throw new ForbiddenError("You need to be logged in.");
+        throw new AuthenticationError("You need to be logged in to do that.");
       }
       return userFacade.getUserByUsername(args.username);
     },
