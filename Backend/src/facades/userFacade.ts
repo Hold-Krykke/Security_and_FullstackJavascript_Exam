@@ -89,7 +89,7 @@ export default class UserFacade {
     async checkUser(email: string, plainTextPassword: string): Promise<boolean> {
         let result = false;
         const user = await this.getUserByEmail(email);
-        if (!user) throw new ApiError(`User with email: ${email} not found`, 404);
+        if (!user) return new Promise((resolve) => {resolve(false)});
 
         await new Promise((resolve, reject) => {
             bcrypt.compare(plainTextPassword, user.password, (err: Error, res: boolean) => {
@@ -97,7 +97,6 @@ export default class UserFacade {
                     console.log('ERROR')
                     reject(err);
                 } else {
-                    console.log('SUCCES')
                     result = res;
                     resolve(res);
                 }

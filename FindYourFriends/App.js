@@ -4,6 +4,7 @@ import Header from "./components/Header";
 import HomeScreen from "./screens/HomeScreen";
 import MapScreen from "./screens/MapScreen";
 import LoginScreen from "./screens/LoginScreen";
+import CreateUserScreen from "./screens/CreateUserScreen";
 import ChatScreen from "./screens/ChatScreen";
 import { ApolloProvider } from "@apollo/react-hooks";
 import client from "./utils/ApolloClientProvider";
@@ -11,10 +12,11 @@ import { backendUri } from "./settings";
 
 export default function App() {
   // USE SCREENS LIKE THIS
-  const [test, setTest] = useState(true);
+  const [test, setTest] = useState(false);
   const [signedIn, setSignedIn] = useState(false);
 
   let content = <HomeScreen setTest={setTest} />;
+  // let content = <CreateUserScreen />;
   if (test) {
     //content = <MapScreen test={test} />
     content = (

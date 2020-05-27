@@ -48,7 +48,7 @@ const resolverMap: IResolvers = {
     // },
     getUser(_: void, args: any, context): any {
       console.log(context);
-      // This is an Authentication Guard.
+      // This is an Authorization Guard.
       // Protect GraphQL mutations like this.
       if (!context.valid) {
         throw new AuthenticationError("You need to be logged in to do that.");
@@ -59,11 +59,11 @@ const resolverMap: IResolvers = {
   Mutation: {
     addUser: (_, { input }) => {
       const email: string = input.email;
-      if (!validateEmail(email)) {
-        throw new UserInputError("Email Argument invalid", {
-          invalidArgs: "email",
-        });
-      }
+      // if (!validateEmail(email)) {
+      //   throw new UserInputError("Email Argument invalid", {
+      //     invalidArgs: "email",
+      //   });
+      // }
       const username: string = input.username;
       const password: string = input.password;
       const isOAuth: boolean = false;
