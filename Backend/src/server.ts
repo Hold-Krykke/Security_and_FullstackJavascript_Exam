@@ -100,11 +100,6 @@ app.get("/auth/google/callback", (req, res) => {
 //The errorlogger needs to be added AFTER the express router and BEFORE any custom error handlers.
 app.use(errorLogger);
 
-// let debug = true;
-// if (process.env.NODE_ENV !== "production") {
-//   debug = false;
-// }
-//process.env.NODE_ENV = "production";
 const server = new ApolloServer({
   schema,
   validationRules: [depthLimit(7)], // https://www.npmjs.com/package/graphql-depth-limit
@@ -132,14 +127,11 @@ const server = new ApolloServer({
       try {
         // If token is valid and not expired
         const token = jwt.verify(encryptedToken, process.env.SECRET);
-        // Maybe we should ALSO check here, if the user exists in our database?
         // Add the token to the context, so resolvers can get it.
         console.log("TOKEN WAS VALID:", JSON.stringify({ token }, null, 4));
         return { valid: true, token };
       } catch (err) {
-        // Token was Expired, or simply invalid.
-        // A token can be valid, but just expired.
-        // We have to handle that somehow.
+        // Token was Expired, or signature invalid.
         console.log("TOKEN WAS INVALID");
         return { valid: false };
       }
