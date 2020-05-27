@@ -2,10 +2,7 @@
  * Takes A runtime error with graphQLErrors and networkError properties
  */
 const handleError = ({ graphQLErrors, networkError }) => {
-  let errorMessage = {
-    title: "An Error Occurred",
-    message: "",
-  };
+  let errorMessage;
   if (graphQLErrors) {
     graphQLErrors.map((err, index) => {
       console.log(
@@ -15,31 +12,31 @@ const handleError = ({ graphQLErrors, networkError }) => {
       );
       const { message, locations, path } = err;
       const code = err.extensions.code;
-      switch (code) {
-        case "UNAUTHENTICATED":
-          errorMessage = {
+      const errorMap = (code) => {
+        const _errorMap = {
+          UNAUTHENTICATED: {
             message,
             title: "Unauthenticated",
-          };
-          break;
-        case "FORBIDDEN":
-          errorMessage = {
+          },
+          FORBIDDEN: {
             message,
             title: "Unauthorized action",
-          };
-          break;
-        case "BAD_USER_INPUT":
-          errorMessage = {
+          },
+          BAD_USER_INPUT: {
             message: `Following fields were wrong: 
                   ${err.extensions.exception.invalidArgs}
-                  \n${message}\n`,
+                  \n${message}`,
             title: "Bad user input",
-          };
-          break;
-        default:
-          errorMessage.message = message + "\n";
-          break;
-      }
+          },
+        };
+        return (
+          _errorMap[code] || {
+            title: "An Error Occurred",
+            message,
+          }
+        );
+      };
+      errorMessage = errorMap(code);
     });
   }
   if (networkError) console.log(`[Network error]: ${networkError}`);
