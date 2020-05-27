@@ -32,7 +32,7 @@ app.use(bodyParser.json());
 app.use(passport.initialize());
 
 //The regular logger needs to be before the router
-// app.use(requestLogger);
+app.use(requestLogger);
 
 app.post("/auth/jwt", (req, res) => {
   /* ---------------------------------- */
