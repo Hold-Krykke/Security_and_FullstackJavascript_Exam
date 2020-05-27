@@ -7,7 +7,6 @@ const handleError = ({ graphQLErrors, networkError }) => {
     message: "",
   };
   if (graphQLErrors) {
-    // console.log("HANDLE ERROR:", JSON.stringify({ graphQLErrors }, null, 4));
     graphQLErrors.map((err, index) => {
       console.log(
         "ERROR IN HANDLE-ERROR",
@@ -18,18 +17,12 @@ const handleError = ({ graphQLErrors, networkError }) => {
       const code = err.extensions.code;
       switch (code) {
         case "UNAUTHENTICATED":
-          // Unauthenticated Error from backend.
-          // Add logic here like "If not authenticated, send to login-page"
-          // And set errorMessage to user via setError,
-          // that they tried something that required login, but they weren't logged in
           errorMessage = {
             message,
             title: "Unauthenticated",
           };
           break;
         case "FORBIDDEN":
-          // ForbiddenError from backend.
-          // Should probably also send to login.
           errorMessage = {
             message,
             title: "Unauthorized action",
@@ -44,7 +37,6 @@ const handleError = ({ graphQLErrors, networkError }) => {
           };
           break;
         default:
-          // Open Alert box with message.
           errorMessage.message = message + "\n";
           break;
       }
