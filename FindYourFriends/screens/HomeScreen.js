@@ -12,6 +12,7 @@ import colors from "../constants/colors";
 import Input from "../components/Input";
 import facade from "../facade";
 import { useQuery, useLazyQuery } from "@apollo/react-hooks"; // https://www.apollographql.com/docs/react/api/react-hooks/
+import handleError from "../utils/ErrorHandler";
 
 const HomeScreen = (props) => {
   return (
@@ -24,23 +25,21 @@ const HomeScreen = (props) => {
         <Card style={styles.container}>
           <Text style={styles.title}>This is HomeScreen</Text>
           <Input style={styles.input} placeholder="Placeholder" />
-          <UserInfo setTest={props.setTest} />
+          <UserInfo setTest={props.setTest} setError={props.setError} />
         </Card>
       </View>
     </TouchableWithoutFeedback>
   );
 };
 
-const UserInfo = ({ setTest }) => {
+const UserInfo = ({ setTest, setError }) => {
   //const [username, setUsername] = useState("");
   // This is keeping state for us. Just look at truthy values on these 3, and its fine.
-  const [User, { loading, error, data }] = useLazyQuery(facade.GET_USER); // https://www.apollographql.com/docs/react/api/react-hooks/#uselazyquery
+  const [User, { loading, error, data, called }] = useLazyQuery(
+    facade.GET_USER
+  ); // https://www.apollographql.com/docs/react/api/react-hooks/#uselazyquery
 
-  let content = (
-    <View>
-      <Text>ass</Text>
-    </View>
-  );
+  let content = <View></View>;
 
   if (loading)
     content = (
@@ -48,12 +47,7 @@ const UserInfo = ({ setTest }) => {
         <Text>Loading...</Text>
       </View>
     );
-  if (error)
-    content = (
-      <View>
-        <Text>Error! {JSON.stringify(error, null, 4)}</Text>
-      </View>
-    );
+  if (error) setError(handleError(error));
   if (data) {
     console.log(JSON.stringify({ data }, null, 4));
     content = (
@@ -72,7 +66,7 @@ const UserInfo = ({ setTest }) => {
       <Button
         title="Click me to fetch Johnny!"
         onPress={() => {
-          User({ variables: { username: "Johnny" } });
+          !called && User({ variables: { username: "Johnny" } });
         }}
       ></Button>
     </View>
