@@ -1,37 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, Alert, Button } from "react-native";
 import Header from "./components/Header";
 import HomeScreen from "./screens/HomeScreen";
 import MapScreen from "./screens/MapScreen";
 import LoginScreen from "./screens/LoginScreen";
 import CreateUserScreen from "./screens/CreateUserScreen";
 import ChatScreen from "./screens/ChatScreen";
-import { ApolloClient } from "apollo-client";
-import { InMemoryCache } from "apollo-cache-inmemory";
 import { ApolloProvider } from "@apollo/react-hooks";
-import { authLink, errorLink, httpLink } from "./utils/links";
-import { createHttpLink } from "apollo-link-http";
+import client from "./utils/ApolloClientProvider";
+import { backendUri } from "./settings";
 
 export default function App() {
   // USE SCREENS LIKE THIS
   const [test, setTest] = useState(false);
   const [signedIn, setSignedIn] = useState(false);
-
-  const backendUri = "https://bccb444e.ngrok.io";
-  // the URI key is a string endpoint or function resolving to an endpoint -- will default to "/graphql" if not specified
-  const httpLink = createHttpLink({ uri: backendUri + "/graphql" });
-  /** httpLink and cache are requirements as of Apollo 2 https://www.apollographql.com/docs/react/api/apollo-client/#required-fields
-   * - Error link - https://www.apollographql.com/docs/link/links/error/
-   * - In Memory Cache - https://www.apollographql.com/docs/angular/basics/caching/
-   * Whenever Apollo Client fetches query results from your server,
-   * it automatically caches those results locally.
-   * This makes subsequent executions of the same query extremely fast.
-   */
-  const client = new ApolloClient({
-    uri: backendUri,
-    link: errorLink.concat(authLink.concat(httpLink)),
-    cache: new InMemoryCache(), // automatic caching
-  });
 
   let content = <HomeScreen setTest={setTest} />;
   // let content = <CreateUserScreen />;

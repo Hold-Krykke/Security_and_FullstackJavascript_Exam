@@ -12,6 +12,8 @@ import colors from "../constants/colors";
 import Input from "../components/Input";
 import facade from "../facade";
 import { useQuery, useLazyQuery } from "@apollo/react-hooks"; // https://www.apollographql.com/docs/react/api/react-hooks/
+import handleError from "../utils/ErrorHandler";
+import MyAlert from "../utils/MakeAlert";
 
 const HomeScreen = (props) => {
   return (
@@ -32,15 +34,26 @@ const HomeScreen = (props) => {
 };
 
 const UserInfo = ({ setTest }) => {
-  //const [username, setUsername] = useState("");
-  // This is keeping state for us. Just look at truthy values on these 3, and its fine.
-  const [User, { loading, error, data }] = useLazyQuery(facade.GET_USER); // https://www.apollographql.com/docs/react/api/react-hooks/#uselazyquery
+  // This is keeping state for us.
+  // https://www.apollographql.com/docs/react/api/react-hooks/#uselazyquery
+  const [User, { loading, error, data, called }] = useLazyQuery(
+    facade.GET_USER,
+    {
+      fetchPolicy: "network-only",
+    }
+  ); // https://www.apollographql.com/docs/react/api/react-hooks/#uselazyquery
 
   let content = (
     <View>
-      <Text>ass</Text>
+      <Text>Buffer</Text>
     </View>
   );
+
+  if (called && error) {
+    const errorMsg = handleError(error);
+    console.log(JSON.stringify({ errorMsg }, null, 4));
+    MyAlert(errorMsg.message, errorMsg.title);
+  }
 
   if (loading)
     content = (
@@ -48,12 +61,7 @@ const UserInfo = ({ setTest }) => {
         <Text>Loading...</Text>
       </View>
     );
-  if (error)
-    content = (
-      <View>
-        <Text>Error! {JSON.stringify(error, null, 4)}</Text>
-      </View>
-    );
+
   if (data) {
     console.log(JSON.stringify({ data }, null, 4));
     content = (
@@ -71,9 +79,7 @@ const UserInfo = ({ setTest }) => {
       {content}
       <Button
         title="Click me to fetch Johnny!"
-        onPress={() => {
-          User({ variables: { username: "Johnny" } });
-        }}
+        onPress={() => User({ variables: { username: "Johnny" } })}
       ></Button>
     </View>
   );
