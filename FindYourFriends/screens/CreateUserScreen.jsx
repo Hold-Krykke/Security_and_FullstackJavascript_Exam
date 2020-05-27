@@ -13,7 +13,7 @@ import Input from "../components/Input";
 import facade from "../facade";
 import { useMutation } from "@apollo/react-hooks";
 import badPasswords from "../utils/badPasswords";
-const badPasswordsArray = badPasswords.split("\n");
+let badPasswordsArray = badPasswords.split("\n");
 
 const CreateUser = (props) => {
   const [newUser, setNewUser] = useState({
@@ -54,9 +54,9 @@ const CreateUser = (props) => {
       return "Your password must contain a number";
     } else if (str.search(/[a-zA-Z]/) == -1) {
       return "Your password must contain a letter";
-    } else if (str.search(/[\!\@\#\$\%\^\&\*\(\)\_\+\-]/) == -1) {
+    } else if (str.search(/[\!\@\#\$\%\^\=\&\*\(\)\_\+\-]/) == -1) {
       return "Your password must contain a symbol";
-    } else if (str.search(/[^a-zA-Z0-9\!\@\#\$\%\^\&\*\(\)\_\+\-]/) != -1) {
+    } else if (str.search(/[^a-zA-Z0-9\!\@\#\$\%\^\=\&\*\(\)\_\+\-]/) != -1) {
       return "Your password has invalid characters in it";
     }
     return "ok";
@@ -86,13 +86,14 @@ const CreateUser = (props) => {
       return;
     }
     // Check if password is on the list of well known bad passwords
-    const isBadPassword = false;
-    badPasswordsArray.forEach(password => {
-      if (newUser.password == password) {
+    let isBadPassword = false;
+    for (let index = 0; index < badPasswordsArray.length; index++) {
+      const password = badPasswordsArray[index];
+      if (newUser.password.includes(password)) {
         isBadPassword = true;
         break;
       }
-    });
+    }
     if (isBadPassword) {
       Alert.alert("Your password is too weak");
       return;
