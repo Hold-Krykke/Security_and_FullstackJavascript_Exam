@@ -26,14 +26,14 @@ const HomeScreen = (props) => {
         <Card style={styles.container}>
           <Text style={styles.title}>This is HomeScreen</Text>
           <Input style={styles.input} placeholder="Placeholder" />
-          <UserInfo setTest={props.setTest} setError={props.setError} />
+          <UserInfo setTest={props.setTest} />
         </Card>
       </View>
     </TouchableWithoutFeedback>
   );
 };
 
-const UserInfo = ({ setTest, setError }) => {
+const UserInfo = ({ setTest }) => {
   // This is keeping state for us.
   // https://www.apollographql.com/docs/react/api/react-hooks/#uselazyquery
   const [User, { loading, error, data, called }] = useLazyQuery(
