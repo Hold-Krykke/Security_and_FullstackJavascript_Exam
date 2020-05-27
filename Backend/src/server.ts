@@ -35,7 +35,9 @@ app.use(passport.initialize());
 // app.use(requestLogger);
 
 app.post("/auth/jwt", (req, res) => {
-  // DoS/BruteForce blocking code:
+  /* ---------------------------------- */
+  /* DoS/BruteForce blocking code start */
+  /* ---------------------------------- */
   // Check if IP is in list of banned IPs
   let time = addressList.get(req.connection.remoteAddress)
   if (time) {
@@ -50,6 +52,9 @@ app.post("/auth/jwt", (req, res) => {
   }
   const remoteAddress: string | any = req.connection.remoteAddress;
   BFD.addUrl(remoteAddress);
+  /*  --------------------------------  */
+  /*  DoS/BruteForce blocking code end  */
+  /*  --------------------------------  */
 
   passport.authenticate(
     "local",
