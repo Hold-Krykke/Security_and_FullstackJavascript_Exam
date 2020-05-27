@@ -39,29 +39,30 @@ export default function App() {
           Path: ${path}, 
           \nFull Error: ${JSON.stringify(err, null, 4)}\n\n`
         );
-        if (err.extensions.code == "UNAUTHENTICATED") {
-          // Unauthenticated Error from backend.
-          // Add logic here like "If not authenticated, send to login-page"
-          // And set errorMessage to user via setError,
-          // that they tried something that required login, but they weren't logged in
-          setError({ message, title: "Unauthenticated." });
-        } else if (err.extensions.code == "FORBIDDEN") {
-          // ForbiddenError from backend.
-          // Should probably also send to login.
-          setError({
-            message,
-            title: "Unauthorized action.",
-          });
-        } else if (err.extensions.code == "BAD_USER_INPUT") {
-          setError({
-            message: `Following fields were wrong: 
-            ${err.extensions.exception.invalidArgs}
-            \n${message}`,
-            title: "Bad user input.",
-          });
-        } else {
-          // Open Alert box with message.
-          setError({ ...error, message });
+        switch (err.extensions.code) {
+          case "UNAUTHENTICATED":
+            // Unauthenticated Error from backend.
+            // Add logic here like "If not authenticated, send to login-page"
+            // And set errorMessage to user via setError,
+            // that they tried something that required login, but they weren't logged in
+            setError({ message, title: "Unauthenticated." });
+          case "FORBIDDEN":
+            // ForbiddenError from backend.
+            // Should probably also send to login.
+            setError({
+              message,
+              title: "Unauthorized action.",
+            });
+          case "BAD_USER_INPUT":
+            setError({
+              message: `Following fields were wrong: 
+                ${err.extensions.exception.invalidArgs}
+                \n${message}`,
+              title: "Bad user input.",
+            });
+          default:
+            // Open Alert box with message.
+            setError({ ...error, message });
         }
       });
     }
