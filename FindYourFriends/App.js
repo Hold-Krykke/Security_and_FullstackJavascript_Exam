@@ -35,9 +35,9 @@ export default function App() {
         console.log(
           `[GraphQL error]: 
           Message: ${message}, 
-          Location: ${locations}, 
+          Location: ${JSON.stringify(locations, null, 4)}, 
           Path: ${path}, 
-          \n\nFull Error: ${err}`
+          \nFull Error: ${JSON.stringify(err, null, 4)}\n\n`
         );
         if (err.extensions.code == "UNAUTHENTICATED") {
           // Unauthenticated Error from backend.
@@ -51,6 +51,13 @@ export default function App() {
           setError({
             message,
             title: "Unauthorized action.",
+          });
+        } else if (err.extensions.code == "BAD_USER_INPUT") {
+          setError({
+            message: `Following fields were wrong: 
+            ${err.extensions.exception.invalidArgs}
+            \n${message}`,
+            title: "Bad user input.",
           });
         } else {
           // Open Alert box with message.
