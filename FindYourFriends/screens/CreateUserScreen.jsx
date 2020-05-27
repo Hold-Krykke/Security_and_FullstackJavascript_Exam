@@ -12,6 +12,8 @@ import {
 import Input from "../components/Input";
 import facade from "../facade";
 import { useMutation } from "@apollo/react-hooks";
+import badPasswords from "../utils/badPasswords";
+const badPasswordsArray = badPasswords.split("\n");
 
 const CreateUser = (props) => {
   const [newUser, setNewUser] = useState({
@@ -61,15 +63,18 @@ const CreateUser = (props) => {
   }
 
   async function confirmCreate() {
+    // Check if password is empty
     if (newUser.password == "") {
       Alert.alert("Please type a password");
       return;
     }
+    // Check if password follows the basic rules
     const passwordCheck = checkPwd(newUser.password);
     if (passwordCheck != "ok") {
       Alert.alert(passwordCheck);
       return;
     }
+    // Check if user has typed the same password twice
     if (newUser.password != newUser.password2) {
       Alert.alert("The passwords don't match");
       // We reset the passwords after failed attempts of creating a user
@@ -80,6 +85,19 @@ const CreateUser = (props) => {
       setNewUser({ ...newUser });
       return;
     }
+    // Check if password is on the list of well known bad passwords
+    const isBadPassword = false;
+    badPasswordsArray.forEach(password => {
+      if (newUser.password == password) {
+        isBadPassword = true;
+        break;
+      }
+    });
+    if (isBadPassword) {
+      Alert.alert("Your password is too weak");
+      return;
+    }
+    // If everything is okay then we add the user
     await addUser({
       variables: {
         input: {
