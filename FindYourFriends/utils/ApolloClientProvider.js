@@ -25,12 +25,6 @@ const authLink = setContext(async (request, previousContext) => {
   };
 });
 
-/**
- * Put logic here, on how to handle errors.
- * This handles all GraphQL errors.
- * It was not my intention to put this here. I wanted it to be in utils/links.
- * But I couldn't figure out how to get setError to utils/links.
- */
 const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (graphQLErrors) {
     console.log("ALL THE ERRORS: ", JSON.stringify(graphQLErrors, null, 4));
