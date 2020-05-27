@@ -11,7 +11,8 @@ import { ApolloProvider } from "@apollo/react-hooks";
 import client from "./utils/ApolloClientProvider";
 import { createHttpLink } from "apollo-link-http";
 import { onError } from "apollo-link-error";
-import MakeAlert from "./utils/ErrorHandler";
+import MakeAlert from "./utils/MakeAlert";
+import { backendUri } from "./settings";
 
 export default function App() {
   // USE SCREENS LIKE THIS

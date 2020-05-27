@@ -4,6 +4,7 @@ import { ApolloClient } from "apollo-client";
 import { InMemoryCache } from "apollo-cache-inmemory";
 import { createHttpLink } from "apollo-link-http";
 import { onError } from "apollo-link-error";
+import { backendUri } from "../settings";
 
 /**
 The setContext function takes a function that returns either an object or a promise that returns an object to set the new context of a request.
@@ -23,7 +24,7 @@ const authLink = setContext(async (request, previousContext) => {
     },
   };
 });
-const backendUri = "http://cdccc558.ngrok.io";
+
 /**
  * Put logic here, on how to handle errors.
  * This handles all GraphQL errors.
@@ -31,9 +32,6 @@ const backendUri = "http://cdccc558.ngrok.io";
  * But I couldn't figure out how to get setError to utils/links.
  */
 const errorLink = onError(({ graphQLErrors, networkError }) => {
-  let errorMessage = {
-    ...error,
-  };
   if (graphQLErrors) {
     console.log("ALL THE ERRORS: ", JSON.stringify(graphQLErrors, null, 4));
     graphQLErrors.map((err) => {
@@ -45,38 +43,9 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
           Path: ${path}, 
           \nFull Error: ${JSON.stringify(err, null, 4)}\n\n`
       );
-      switch (err.extensions.code) {
-        case "UNAUTHENTICATED":
-          // Unauthenticated Error from backend.
-          // Add logic here like "If not authenticated, send to login-page"
-          // And set errorMessage to user via setError,
-          // that they tried something that required login, but they weren't logged in
-          errorMessage = {
-            message: errorMessage.message.concat(message + "\n"),
-            title: "Unauthenticated.",
-          };
-        case "FORBIDDEN":
-          // ForbiddenError from backend.
-          // Should probably also send to login.
-          errorMessage = {
-            message: errorMessage.message.concat(message + "\n"),
-            title: "Unauthorized action.",
-          };
-        case "BAD_USER_INPUT":
-          errorMessage = {
-            message: errorMessage.message.concat(`Following fields were wrong: 
-                ${err.extensions.exception.invalidArgs}
-                \n${message}\n`),
-            title: "Bad user input.",
-          };
-        default:
-          // Open Alert box with message.
-          errorMessage.message = errorMessage.message.concat(message + "\n");
-      }
     });
   }
   if (networkError) console.log(`[Network error]: ${networkError}`);
-  setError({ ...errorMessage });
 });
 // the URI key is a string endpoint or function resolving to an endpoint -- will default to "/graphql" if not specified
 const httpLink = createHttpLink({ uri: backendUri + "/graphql" });
