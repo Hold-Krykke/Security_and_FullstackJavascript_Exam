@@ -17,7 +17,7 @@ export default function App() {
   const [test, setTest] = useState(true);
   const [signedIn, setSignedIn] = useState(false);
   const [error, setError] = useState({
-    message: null,
+    message: "",
     title: "An Error Occurred",
   });
 
@@ -30,6 +30,9 @@ export default function App() {
    */
   const errorLink = onError(({ graphQLErrors, networkError }) => {
     if (graphQLErrors) {
+      let errorMessage = {
+        ...error,
+      };
       graphQLErrors.map((err) => {
         const { message, locations, path } = err;
         console.log(
@@ -45,28 +48,33 @@ export default function App() {
             // Add logic here like "If not authenticated, send to login-page"
             // And set errorMessage to user via setError,
             // that they tried something that required login, but they weren't logged in
-            setError({ message, title: "Unauthenticated." });
+            errorMessage = {
+              message: errorMessage.message.concat(message + "\n"),
+              title: "Unauthenticated.",
+            };
           case "FORBIDDEN":
             // ForbiddenError from backend.
             // Should probably also send to login.
-            setError({
-              message,
+            errorMessage = {
+              message: errorMessage.message.concat(message + "\n"),
               title: "Unauthorized action.",
-            });
+            };
           case "BAD_USER_INPUT":
-            setError({
-              message: `Following fields were wrong: 
+            errorMessage = {
+              message: errorMessage.message
+                .concat(`Following fields were wrong: 
                 ${err.extensions.exception.invalidArgs}
-                \n${message}`,
+                \n${message}\n`),
               title: "Bad user input.",
-            });
+            };
           default:
             // Open Alert box with message.
-            setError({ ...error, message });
+            errorMessage.message = errorMessage.message.concat(message + "\n");
         }
       });
     }
     if (networkError) console.log(`[Network error]: ${networkError}`);
+    setError({ ...errorMessage });
   });
   // the URI key is a string endpoint or function resolving to an endpoint -- will default to "/graphql" if not specified
   const httpLink = createHttpLink({ uri: backendUri + "/graphql" });
