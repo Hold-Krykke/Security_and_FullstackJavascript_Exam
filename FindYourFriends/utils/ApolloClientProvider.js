@@ -27,16 +27,16 @@ const authLink = setContext(async (request, previousContext) => {
 
 const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (graphQLErrors) {
-    console.log("ALL THE ERRORS: ", JSON.stringify(graphQLErrors, null, 4));
+    // console.log("ALL THE ERRORS: ", JSON.stringify(graphQLErrors, null, 4));
     graphQLErrors.map((err) => {
       const { message, locations, path } = err;
-      console.log(
-        `[GraphQL error]: 
-          Message: ${message}, 
-          Location: ${JSON.stringify(locations, null, 4)}, 
-          Path: ${path}, 
-          \nFull Error: ${JSON.stringify(err, null, 4)}\n\n`
-      );
+      // console.log(
+      //   `[GraphQL error]:
+      //     Message: ${message},
+      //     Location: ${JSON.stringify(locations, null, 4)},
+      //     Path: ${path},
+      //     \nFull Error: ${JSON.stringify(err, null, 4)}\n\n`
+      // );
     });
   }
   if (networkError) console.log(`[Network error]: ${networkError}`);

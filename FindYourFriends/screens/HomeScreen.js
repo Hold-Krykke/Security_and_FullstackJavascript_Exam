@@ -51,6 +51,7 @@ const UserInfo = ({ setTest }) => {
 
   if (called && error) {
     const errorMsg = handleError(error);
+    console.log(JSON.stringify({ errorMsg }, null, 4));
     MyAlert(errorMsg.message, errorMsg.title);
   }
 
