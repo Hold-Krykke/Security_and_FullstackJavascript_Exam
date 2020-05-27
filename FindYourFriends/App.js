@@ -49,7 +49,7 @@ export default function App() {
           // ForbiddenError from backend.
           // Should probably also send to login.
           setError({
-            message: `You have to be logged in to do that.\n${message}`,
+            message,
             title: "Unauthorized action.",
           });
         } else {

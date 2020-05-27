@@ -93,9 +93,9 @@ const LoginScreen = ({
       res.json()
     );
     if (
-      res.userEmail &&
-      res.token &&
-      (typeof res.token === String || res.token instanceof String)
+      res.useremail &&
+      res.token
+      // && (typeof res.token === String || res.token instanceof String)
     ) {
       user.email = res.useremail;
       await SecureStore.setItemAsync(secureStoreKey, res.token);
