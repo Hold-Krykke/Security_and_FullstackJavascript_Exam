@@ -36,6 +36,23 @@
 ##### Refleksion & Konklusion
 ##### Security relevante funktionaliteter der ikke er implementeret endnu
 
+### Introduktion
+Vi ønsker at udvikle en mobil app med konceptet “Find your Friends” hvor brugerens lokation deles med andre. Efter lokationen er delt kan man finde venner i nærheden af sig. Udover det vil vi gerne give brugerne mulighed for at chatte - her kunne det enten være i plenum eller privat mellem hver bruger. 
+
+Vi har valgt at kombinere fagene Security og Fullstack JS, fordi vi godt kunne tænke os at anvende vores security læring i et større projekt, og få alle brikkerne til at spille sammen. En udfordring med læringsmaterialet, er at disse to fag ikke nødvendigvis har været kombineret, så derfor ønsker vi at lave best practice implementationer udover læringsmaterialet, der dækker begge fag. 
+
+**Oversigt over konceptet**
+* Mobil-app udviklet i React Native 
+* Konstant opdatering af egen position, også i baggrunden 
+* Forhindre dvale af appen 
+* Kryptering af chatbeskeder 
+* **Sikkerhed i fokus**
+  * OAuth 2.0 login (Google Sign In)
+  * “Traditionelt” login uden om OAuth 2.0 med sikker transport, hashing.
+  * Sikker brug af både MongoDB og MySQL. Her vil vi bl.a. gå i dybden med brugen af NoSQL databaser og undersøge emner såsom injections.
+
+Vi har valgt dette projekt for at få dækket nogle af de OWASP-praksisser vi har hørt om, men ikke implementeret, eller ikke før har implementeret i en JavaScript-sammenhæng. Udover det, vil vi også gerne lære mere om konceptet single sign-on (OAuth 2.0) og sikkerheds overvejelserne dertil, da det er noget der bliver brugt i stor stil ude i den virkelige verden. 
+
 ### OWASP
 Når sværhedsgraden af potentielle sikkerhedsfejl vurderes, er der altid flere aspekter, man tager i betragtning. OWASP vurderer i denne sammenhæng 4 forskellige faktorer:
 * **Exploitability**: How easy is it for threat agents to exploit a given weakness
