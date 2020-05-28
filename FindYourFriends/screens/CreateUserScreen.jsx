@@ -1,16 +1,10 @@
 import React, { useState } from "react";
-import {
-  View,
-  Button,
-  StyleSheet,
-  Text,
-  Alert,
-  ScrollView
-} from "react-native";
+import { View, Button, StyleSheet, Text, ScrollView } from "react-native";
 import Input from "../components/Input";
 import facade from "../facade";
 import { useMutation } from "@apollo/react-hooks";
 import badPasswords from "../utils/badPasswords";
+import Alert from "../utils/MakeAlert";
 let badPasswordsArray = badPasswords.split("\n");
 
 const CreateUser = (props) => {
@@ -19,8 +13,13 @@ const CreateUser = (props) => {
     email: "",
     password: "",
   });
-  const [addUser, { }] = useMutation(facade.ADD_USER);
-
+  const [addUser, { loading, error, data, called }] = useMutation(
+    facade.ADD_USER
+  );
+  if (called && error) {
+    const errorMsg = handleError(error);
+    Alert(errorMsg.message, errorMsg.title);
+  }
   // Sadly the value passed to the function in onChangeText is only the value of the element (what the user typed)
   // and not an event with more data than just a string. This means that you can't a generic handler
   // that can handle the input of all the input fields since we can't access any id or anything from the event
@@ -59,32 +58,35 @@ const CreateUser = (props) => {
     }
     return "ok";
   }
-  
+
   async function confirmCreate() {
+    const NoInputAlert = (input) => {
+      Alert(`Please provide a ${input}.`, `Missing ${input}`);
+    };
     // Check if user has provided a username
     if (newUser.username == "") {
-      Alert.alert("Please provide a username");
+      NoInputAlert("username");
       return;
     }
     // Check if user has provided an email
     if (newUser.email == "") {
-      Alert.alert("Please provide an email");
+      NoInputAlert("email");
       return;
     }
     // Check if password is empty
     if (newUser.password == "") {
-      Alert.alert("Please type a password");
+      NoInputAlert("password");
       return;
     }
     // Check if password follows the basic rules
     const passwordCheck = checkPwd(newUser.password);
     if (passwordCheck != "ok") {
-      Alert.alert(passwordCheck);
+      Alert(passwordCheck);
       return;
     }
     // Check if user has typed the same password twice
     if (newUser.password != newUser.password2) {
-      Alert.alert("The passwords don't match");
+      Alert("The passwords don't match");
       // We reset the passwords after failed attempts of creating a user
       // One is set to null and one is set to an empty string so the password input fields get cleared
       // but still don't have the same value
@@ -103,7 +105,7 @@ const CreateUser = (props) => {
       }
     }
     if (isBadPassword) {
-      Alert.alert("Your password is too weak");
+      Alert("Your password is too weak");
       return;
     }
     // If everything is okay then we add the user
@@ -118,7 +120,7 @@ const CreateUser = (props) => {
     });
     console.log("Created new user");
     setNewUser({});
-    Alert.alert("User successfully created");
+    Alert("User successfully created", "Success!");
   }
 
   return (

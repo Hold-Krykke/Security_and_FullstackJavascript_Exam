@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { StyleSheet, View, Alert, Button } from "react-native";
+import React from "react";
+import { Alert } from "react-native";
 
 /**
  * Errorhandling Alert.
@@ -18,7 +18,6 @@ const MyAlert = (error, title = "An Error Occurred", buttonText = "OK") =>
         text: buttonText,
         onPress: () => {
           console.log(JSON.stringify({ error }, null, 4));
-          //setError({ message: "", title: "An Error Occurred" });
           console.log(`${buttonText} pressed on Error Alert.`);
         },
       },
