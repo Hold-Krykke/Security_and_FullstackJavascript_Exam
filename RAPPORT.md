@@ -13,7 +13,6 @@ Da vores projekt er en kombination af valgfagene Security og Fullstack Javascrip
 ---
 
 ### Indholdsfortegnelse
-### Indholdsfortegnelse
 * [Introduktion](#introduktion)
 * [OWASP](#owasp)
   * [Broken Authentication](#broken-authentication)
