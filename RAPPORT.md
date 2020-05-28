@@ -36,6 +36,8 @@
 ##### Refleksion & Konklusion
 ##### Security relevante funktionaliteter der ikke er implementeret endnu
 
+---
+
 ### Introduktion
 Vi ønsker at udvikle en mobil app med konceptet “Find your Friends” hvor brugerens lokation deles med andre. Efter lokationen er delt kan man finde venner i nærheden af sig. Udover det vil vi gerne give brugerne mulighed for at chatte - her kunne det enten være i plenum eller privat mellem hver bruger. 
 
@@ -52,6 +54,8 @@ Vi har valgt at kombinere fagene Security og Fullstack JS, fordi vi godt kunne t
   * Sikker brug af både MongoDB og MySQL. Her vil vi bl.a. gå i dybden med brugen af NoSQL databaser og undersøge emner såsom injections.
 
 Vi har valgt dette projekt for at få dækket nogle af de OWASP-praksisser vi har hørt om, men ikke implementeret, eller ikke før har implementeret i en JavaScript-sammenhæng. Udover det, vil vi også gerne lære mere om konceptet single sign-on (OAuth 2.0) og sikkerheds overvejelserne dertil, da det er noget der bliver brugt i stor stil ude i den virkelige verden. 
+
+---
 
 ### OWASP
 Når sværhedsgraden af potentielle sikkerhedsfejl vurderes, er der altid flere aspekter, man tager i betragtning. OWASP vurderer i denne sammenhæng 4 forskellige faktorer:
@@ -130,6 +134,7 @@ Derfor har vi gjort følgende:
 * Vi logger ikke bestemte exceptions, noget vi kunne have gjort i forbindelse med brugen af Apollo Links.
 * Vi logger ikke ekstra-ordinært i forbindelse med brute-force detection
 
+---
 
 ### Servere og Databaser
 Vi har valgt at have 2 databaser i dette projekt. En MySQL database til opbevaring af vores brugeres login informationer (de brugere, der ikke logger ind med OAuth 2.0) og bl.a. refresh tokens for OAuth 2.0 brugere. Den anden database er en NoSQL MongoDB der er hosted online hos Atlas. I denne database ligger geo lokationer og chatbeskeder (hvis denne funktion når at blive implementeret). Den data er forbundet med et brugernavn, som brugere selv vælger (OAuth brugere kan undlade at vælge et brugernavn, men så vil deres mail blive vist som brugernavn i applikationen i stedet for). Lokationsdata er naturligvis personlig, men denne data ligger uden referencer til brugerens mail (hvis brugeren har angivet et brugernavn) eller anden personlig information, der er er gemt om brugeren. 
@@ -177,6 +182,8 @@ I større applikationer med mere varierende data end det, vi har, ville systemet
 Som standard bliver logfiler gemt til mappen logs, og hvis programmet kører i udviklings-tilstand vil der også blive logget i konsollen. Til dette brugte vi [express-winston](https://www.npmjs.com/package/express-winston) med en opsætning skræddersyet til vores behov. Vi har fokus på maskinlæsbart output som samtidig kan granskes af mennesker, derfor har vi valgt et output i JSON-format. 
 Vi logger alle indgående requests til applikation, bortset fra /graphql som ville overfylde logs med overvejende ligegyldig data. 
 Vi logger alle fejl som opstår i applikationen.
+
+---
 
 ### Login
 I dette afsnit beskriver vi hvordan vi har valgt at håndtere hele vores login strategi i forhold til real world security risks. 
@@ -293,6 +300,8 @@ For at kunne sende besked tilbage til vores react native app, som beskrevet i OA
 Vi har valgt at bruge Expo’s egen anbefalede løsning. Det vil sige vi bruger Expos scheme `exp://exp.host/@yourname/yourAppName`, da det er den eneste måde vi kan linke tilbage til vores app på. 
 Vi undersøgte muligheden for at lave en embedded browser i app’en så vi i stedet for et custom scheme, ville kunne lytte på et specifikt endpoint i backenden og trække JWT ud fra den request. Vi fik dette til at virke, men fandt derefter ud af at Google har lukket ned for muligheden for at bruge OAuth 2.0/OpenID 2.0 gennem embedded browsers i 2017, da det er for usikkert. [docs.expo](https://docs.expo.io/workflow/linking/#example-linking-back-to-your-app-from) 
 
+---
+
 ### Authentication & Authorization med Apollo
 Når man bygger et API, vil man formentlig på et tidspunkt i processen, gerne kunne styre hvem der kan se og ændre i ens data. Der er to vigtige principper i dette, som man skal kunne holde styr på; authentication og authorization. Authentication er at vide om en bruger er logget ind i systemet, og at vide hvem de er. Authorization er så at beslutte hvad den bruger har adgang til at se og ændre i ens system. 
 Til dette har vi brugt Apollo Link, som er en form for middleware. 
@@ -352,6 +361,8 @@ Der findes Authorization i den forstand, at vi skal give en bruger adgang til vo
 
 Når en bruger logger ind med Google, føres de til Googles loginside, og bliver så spurgt om app'en skal have lov til at se deres e-mail, profilbillede osv. Når en bruger så gerne vil bruge vores map-feature, så bliver de spurgt om lov til at bruge deres lokation. 
 Dette er Incremental Authorization. At man ikke spørger brugeren om tilladelse til at bruge f.eks kameraet, lokationen, osv., før man rent faktisk har brug for det. Man kan risikere at overvælde brugeren med en consent screen, hvis alt der skal gives consent til præsenteres på en gang når de logger ind. Derfor kan man risikere at miste brugere, fordi de så trykker nej. Desuden kan de anvende alle de features af app'en der ikke kræver consent, selv hvis de trykker nej til f.eks lokation. De har stadig sagt ja til e-mail osv. da de loggede ind. Derfor kan man få flere permissions fra brugerne igennem, uden at skræmme dem væk.
+
+---
 
 ### Refleksion & Konklusion
 Der er utroligt mange ting, man skal tage højde for, når man laver en applikation, hvor man fokuserer på at gøre systemet så sikkert som muligt. OWASPs top 10 liste fra 2017 er et godt sted at begynde, men listen af ting, man skal overveje er naturligvis meget længere. For os har det været en god øvelse at prøve at kode et samlet projekt, hvor vi kombinerer mange af de ting, vi har lært i løbet af semesteret. 
