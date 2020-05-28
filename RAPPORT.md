@@ -1,40 +1,44 @@
 # 4. Semester Security Eksamens Rapport
-### Indholdsfortegnelse
-- [Introduktion](#introduktion)
-- [Servere og Databaser](https://github.com/Hold-Krykke/Security_and_FullstackJavascript_Exam/RAPPORT.md#servere-og-databaser)
-  - [Sikkerhed ift. Injection](#sikkerhed-ift-injection)
-  - [Logging](#logging)
 
-##### Introduktion
-##### OWASP
-##### Broken Authentication
-##### Kryptering af data
-##### Broken Access Control
-##### Injection
-##### Security Misconfiguration
-##### Insufficient Logging & Monitoring
-##### Servere og Databaser
-##### Sikkerhed og Struktur
-##### Sikkerhed ift. Injection
-##### Logging
-##### Login
-##### Bcrypt
-##### JWT
-##### Anti Brute Force
-##### Kontrol af passwords
-##### Endpoints
-##### Passport
-##### OAuth 2.0/OpenID 2.0
-##### Authorizationcode flow vs. Implicit flow
-##### Kort beskrivelse af OAuth 2.0 flows
-##### Brugen af Expo, deep linking og URL schemes
-##### Authentication & Authorization med Apollo
-##### Apollo Links
-##### Apollo Error Handling
-##### JWT sikkerhed i App
-##### Incremental Authorization
-##### Refleksion & Konklusion
-##### Security relevante funktionaliteter der ikke er implementeret endnu
+Dette projekt er programmeret og skrevet af:
+* **Cph-mh748 - Malte Hviid-Magnussen**
+* **Cph-rn118 - Rúni Vedel Niclasen**
+* **Cph-ab363 - Asger Bjarup**
+* **Cph-cs340 - Camilla Staunstrup**
+
+---
+
+### Indholdsfortegnelse
+##### [Introduktion](#introduktion-1)
+##### [OWASP](#owasp-1)
+##### [Broken Authentication](#broken-authentication-1)
+##### [Kryptering af data](#kryptering-af-data-1)
+##### [Broken Access Control](#broken-access-control-1)
+##### [Injection](#injection-1)
+##### [Security Misconfiguration](#security-misconfiguration-1)
+##### [Insufficient Logging & Monitoring](#insufficient-logging--monitoring-1)
+##### [Servere og Databaser](#servere-og-databaser-1)
+##### [Struktur og Sikkerhed](#struktur-og-sikkerhed)
+##### [Sikkerhed ift. Injection](#sikkerhed-ift-injection-1)
+##### [Logging](#logging-1)
+##### [Login](#login-1)
+##### [Bcrypt](#bcrypt-1)
+##### [JWT](#jwt-1)
+##### [Anti Brute Force](#anti-brute-force-1)
+##### [Kontrol af passwords](#kontrol-af-passwords-1)
+##### [Endpoints](#endpoints-1)
+##### [Passport](#passport-1)
+##### [OAuth 2.0/OpenID 2.0](#oauth-20openid-20-1)
+##### [Authorizationcode flow vs. Implicit flow](#authorizationcode-flow-vs-implicit-flow-1)
+##### [Kort beskrivelse af OAuth 2.0 flows](#kort-beskrivelse-af--oauth-20-flows)
+##### [Brugen af Expo, deep linking og URL schemes](#brugen-af-expo-deep-linking-og-url-schemes-1)
+##### [Authentication & Authorization med Apollo](#authentication--authorization-med-apollo-1)
+##### [Apollo Links](#apollo-links-1)
+##### [Apollo Error Handling](#apollo-error-handling-1)
+##### [JWT sikkerhed i App](#jwt-sikkerhed-i-app-1)
+##### [Incremental Authorization](#incremental-authorization-1)
+##### [Refleksion & Konklusion](#refleksion--konklusion-1)
+##### [Security relevante funktionaliteter der ikke er implementeret endnu](#security-relevante-funktionaliteter-der-ikke-er-implementeret-endnu-1)
 
 ---
 
@@ -393,3 +397,5 @@ PKCE løser dette problem ved at tilsætte følgende til flowet ([kilde](https:/
   * Hvis den matcher den udleverede, er applikationen hvem den udgiver sig for.
 
   Vi har ikke [implementeret](https://medium.com/passportjs/pkce-support-for-oauth-2-0-e3a77013b278) PKCE, men vores backend udleverer kun et JWT til app’en med en expiryTime på 60 minutter, hvilket gør vores løsning væsentlig bedre end traditionelle apps hvor access token kan opfanges. Samtidig sørger expo for et ekstra lag sikkerhed ved at linke direkte ind i app’en ved at formatere links sådan her: `exp://exp.host/@yourname/yourAppName`
+
+  ---
