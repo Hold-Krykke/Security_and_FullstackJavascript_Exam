@@ -1,10 +1,10 @@
 # 4. Semester Security Eksamens Rapport
 
 ### Dette projekt er programmeret og skrevet af:
-* **Cph-mh748 - Malte Hviid-Magnussen**
-* **Cph-rn118 - Rúni Vedel Niclasen**
-* **Cph-ab363 - Asger Bjarup**
-* **Cph-cs340 - Camilla Staunstrup**
+* **Cph-mh748 - [Malte Hviid-Magnussen](https://github.com/MalteMagnussen)**
+* **Cph-rn118 - [Rúni Vedel Niclasen](https://github.com/Runi-VN)**
+* **Cph-ab363 - [Asger Bjarup](https://github.com/HrBjarup)**
+* **Cph-cs340 - [Camilla Staunstrup](https://github.com/Castau)**
 
 ---
 Da vores projekt er en kombination af valgfagene Security og Fullstack Javascript er vores kode ikke deployet endnu og vi vil fortsætte med få funktionaliter der mangler frem til eksamen i Fullstack Javascript. Disse funktionaliter er ikke relevante i forhold til Security. Droplets og servere er sat op og klar til at programmet deployes, se mere om det i rapporten.  
