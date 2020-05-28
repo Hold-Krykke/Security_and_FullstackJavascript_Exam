@@ -1,11 +1,5 @@
 import React, { useState } from "react";
-import {
-  View,
-  Button,
-  StyleSheet,
-  Text,
-  ScrollView,
-} from "react-native";
+import { View, Button, StyleSheet, Text, ScrollView } from "react-native";
 import Input from "../components/Input";
 import facade from "../facade";
 import { useMutation } from "@apollo/react-hooks";
@@ -64,21 +58,24 @@ const CreateUser = (props) => {
     }
     return "ok";
   }
-  
+
   async function confirmCreate() {
+    const NoInputAlert = (input) => {
+      Alert(`Please provide a ${input}.`, `Missing ${input}`);
+    };
     // Check if user has provided a username
     if (newUser.username == "") {
-      Alert.alert("Please provide a username");
+      NoInputAlert("username");
       return;
     }
     // Check if user has provided an email
     if (newUser.email == "") {
-      Alert.alert("Please provide an email");
+      NoInputAlert("email");
       return;
     }
     // Check if password is empty
     if (newUser.password == "") {
-      Alert("Please type a password", "No password was provided");
+      NoInputAlert("password");
       return;
     }
     // Check if password follows the basic rules
