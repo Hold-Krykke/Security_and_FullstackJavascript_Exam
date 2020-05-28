@@ -14,27 +14,34 @@ const handleError = ({ graphQLErrors, networkError }) => {
       const code = err.extensions.code;
       const errorMap = (code) => {
         const _errorMap = {
-          UNAUTHENTICATED: {
-            message,
-            title: "Unauthenticated",
+          UNAUTHENTICATED: () => {
+            return {
+              message,
+              title: "Unauthenticated",
+            };
           },
-          FORBIDDEN: {
-            message,
-            title: "Unauthorized action",
+          FORBIDDEN: () => {
+            return {
+              message,
+              title: "Unauthorized action",
+            };
           },
-          BAD_USER_INPUT: {
-            message: `Following fields were wrong: 
+          BAD_USER_INPUT: () => {
+            return {
+              message: `Following fields were wrong: 
                   ${err.extensions.exception.invalidArgs}
                   \n${message}`,
-            title: "Bad user input",
+              title: "Bad user input",
+            };
+          },
+          DEFAULT: () => {
+            return {
+              title: "An Error Occurred",
+              message,
+            };
           },
         };
-        return (
-          _errorMap[code] || {
-            title: "An Error Occurred",
-            message,
-          }
-        );
+        return (_errorMap[code] || _errorMap["DEFAULT"])();
       };
       errorMessage = errorMap(code);
     });
