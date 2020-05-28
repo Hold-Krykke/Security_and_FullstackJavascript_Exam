@@ -3,10 +3,8 @@ import {
   View,
   Button,
   StyleSheet,
-  Modal,
   Text,
   ScrollView,
-  KeyboardAvoidingView,
 } from "react-native";
 import Input from "../components/Input";
 import facade from "../facade";
@@ -66,8 +64,18 @@ const CreateUser = (props) => {
     }
     return "ok";
   }
-
+  
   async function confirmCreate() {
+    // Check if user has provided a username
+    if (newUser.username == "") {
+      Alert.alert("Please provide a username");
+      return;
+    }
+    // Check if user has provided an email
+    if (newUser.email == "") {
+      Alert.alert("Please provide an email");
+      return;
+    }
     // Check if password is empty
     if (newUser.password == "") {
       Alert("Please type a password", "No password was provided");
