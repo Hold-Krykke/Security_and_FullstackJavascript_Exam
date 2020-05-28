@@ -220,12 +220,12 @@ Jo flere rounds, jo længere tid tager hele operationen, hvilket betyder at når
 #### JWT
 JSON Web Token indeholder JSON-formater der bruges som bevis for authentication. JWT har følgende struktur:
 
-**Header** - indeholder information om hvilken algoritme der er brugt til kryptering, i vores tilfælde er det default algoritmen HS256 (HMAC med SHA256). 
-**Payload** - indeholder den information der er relevant for ens applikation. Vores payload består af et expiresIn objekt og et user e-mail objekt. 
-**Signatur** - JWT validering. Formålet med signaturen er at kunne validere afsenderen. Signaturen er beregnet ved at encode header og payload med base64url encoding og herefter sammenkæde dem med et punktum imellem. Denne string krypteres herefter med den algoritme der er specificeret i headeren og vores secret.
-* HMAC (HMAC med SHA256) er en Message Authentication Code (MAC) baseret på en hash funktion, der basalt set går ud på at sammenkæde en secret og en message og hash’e dem sammen. Valideringen består i at modtageren kender både message og secret og ved at foretage samme beregning, vil der nås frem til den samme MAC. 
+**Header** - indeholder information om hvilken algoritme der er brugt til kryptering, i vores tilfælde er det default algoritmen HS256 (HMAC med SHA256).  
+**Payload** - indeholder den information der er relevant for ens applikation. Vores payload består af et expiresIn objekt og et user e-mail objekt.  
+**Signatur** - JWT validering. Formålet med signaturen er at kunne validere afsenderen. Signaturen er beregnet ved at encode header og payload med base64url encoding og herefter sammenkæde dem med et punktum imellem. Denne string krypteres herefter med den algoritme der er specificeret i headeren og vores secret.  
+* HMAC (HMAC med SHA256) er en Message Authentication Code (MAC) baseret på en hash funktion, der basalt set går ud på at sammenkæde en secret og en message og hash’e dem sammen. Valideringen består i at modtageren kender både message og secret og ved at foretage samme beregning, vil der nås frem til den samme MAC.  
 	
-At JWT header og payload er encoded, mens selve signaturen er krypteret giver mulighed for at læse header og payload ud af JWT i client applikationen og bruge de værdier der er sat, mens signaturen kun kan læses af dem der har adgang til den secret der bliver brugt til signering.
+At JWT header og payload er encoded, mens selve signaturen er krypteret giver mulighed for at læse header og payload ud af JWT i client applikationen og bruge de værdier der er sat, mens signaturen kun kan læses af dem der har adgang til den secret der bliver brugt til signering.  
 I praksis betyder det at for at ændre i et JWT (angive sig selv som admin eller en anden bruger), eller lave et falsk JWT, er det nødvendigt at kende den secret der er brugt af krypteringsalgoritmen. I vores program er det kun vores server der kender vores secret, så der skal skaffes adgang til den før tredjepart får fat i den. I vores JWT er expiresIn sat til 60 minutter for at mindske sandsynligheden for at det kan misbruges i tilfælde af at tredjepart får fat i det pågældende token.    
 
 De fleste JWT biblioteker har følgende tre funktioner, som er nødvendige for at kunne bruge JWT.
