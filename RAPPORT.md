@@ -1,6 +1,6 @@
 # 4. Semester Security Eksamens Rapport
 
-Dette projekt er programmeret og skrevet af:
+### Dette projekt er programmeret og skrevet af:
 * **Cph-mh748 - Malte Hviid-Magnussen**
 * **Cph-rn118 - Rúni Vedel Niclasen**
 * **Cph-ab363 - Asger Bjarup**
