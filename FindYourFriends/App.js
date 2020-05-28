@@ -15,8 +15,8 @@ export default function App() {
   const [test, setTest] = useState(false);
   const [signedIn, setSignedIn] = useState(false);
 
-  let content = <HomeScreen setTest={setTest} />;
-  // let content = <CreateUserScreen />;
+  // let content = <HomeScreen setTest={setTest} />;
+  let content = <CreateUserScreen />;
   if (test) {
     //content = <MapScreen test={test} />
     content = (
