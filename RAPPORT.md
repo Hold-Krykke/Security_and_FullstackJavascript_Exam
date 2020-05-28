@@ -274,9 +274,9 @@ Brugeren trykker på Google-knappen for at logge ind, hvorefter der bliver åbne
 ![image](https://user-images.githubusercontent.com/35559774/83127234-32928800-a0da-11ea-8195-3b62006fe523.png)  
 Den request backenden sender til Google indeholder de Oauth 2.0 parametre vi er interesserede i, `scope`, `accessType`, `prompt` og `state`.   
 ![image](https://user-images.githubusercontent.com/35559774/83127277-41793a80-a0da-11ea-9317-1810fe9e413f.png)  
-`scope` er det brugerdata vi er interesserede i og her specificerer vi at det er brugerens OpenID 2.0 data samt deres e-mail vi gerne vil have adgang til (også kaldet profile data). 
-`accessType` er den parameter der fortæller brugeren at vi gerne vil have offline access til deres data, hvilket vil sige at Google giver os et refresh token med tilbage, sammen med access token og profile data. 
-`promt` med value `“consent”` er påkrævet af Google for at vi kan få lov til at sende `accessType: "offline"` med. 
+`scope` er det brugerdata vi er interesserede i og her specificerer vi at det er brugerens OpenID 2.0 data samt deres e-mail vi gerne vil have adgang til (også kaldet profile data).   
+`accessType` er den parameter der fortæller brugeren at vi gerne vil have offline access til deres data, hvilket vil sige at Google giver os et refresh token med tilbage, sammen med access token og profile data.   
+`promt` med value `“consent”` er påkrævet af Google for at vi kan få lov til at sende `accessType: "offline"` med.   
 `state` er data som Google sender uændret tilbage til os igen. Vi skal bruge indholdet af vores state for at kunne lave et redirect tilbage til vores react native app.  
 
 Det passport sender afsted til Google med ovenstående parametre ser nogenlunde ud på følgende måde   
