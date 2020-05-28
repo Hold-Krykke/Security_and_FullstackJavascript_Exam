@@ -73,8 +73,11 @@ Når sværhedsgraden af potentielle sikkerhedsfejl vurderes, er der altid flere 
 * **Prevalence**: How well known is the weakness
 * **Detectability**: How easy is it to detect the weakness
 * **Technical**: How severe is the technical impact if the weakness is exploited
-De fire vurderinger får en score mellem 1 og 3 og en samlet score bliver derefter udregnet som vist på figuren:
-![image](https://user-images.githubusercontent.com/35559774/83125263-97001800-a0d7-11ea-8c78-f3336d566bc5.png)
+De fire vurderinger får en score mellem 1 og 3 og en samlet score bliver derefter udregnet som vist på figuren:  
+
+<p align="center">
+<img src="https://user-images.githubusercontent.com/35559774/83125263-97001800-a0d7-11ea-8c78-f3336d566bc5.png"/>
+</p>  
 
 Indvirkning den lækkede/mistede data har på os og vores brugere samt den tekniske destruktion en tredjepart ville kunne lave i vores backend bliver vurderet som den faktor der vejer tungest. Top 2 på OWASPs liste er Broken Authentication og den ligger netop så højt, fordi den scorer højst i “impact”.
 
@@ -159,8 +162,12 @@ På samme måde ville det være muligt at læse al informationen omkring brugern
 I den forbindelse har vi gjort os nogle overvejelser (se afsnit om kryptering af data)
 
 #### Struktur og Sikkerhed
-Vores initielle ide af systemets design kan ses på nedenstående figur.
-![image](https://user-images.githubusercontent.com/44898491/83128064-2fe46280-a0db-11ea-8feb-dae77c422c5e.png)
+Vores initielle ide af systemets design kan ses på nedenstående figur.  
+
+<p align="center">
+<img src="https://user-images.githubusercontent.com/44898491/83128064-2fe46280-a0db-11ea-8feb-dae77c422c5e.png"/>
+</p>  
+
 
 Det endelige design endte med at følge skitsen nogenlunde. Vi har to servere og vi kommunikerer med to cloud services; Google og Atlas.
 
@@ -202,7 +209,11 @@ I dette afsnit beskriver vi hvordan vi har valgt at håndtere hele vores login s
 Bcrypt er en hashing algoritme der er udviklet specifikt til hashing af passwords. Den er derfor designet til at være langsom. Grunden til at en hashing algoritme bør være langsom er, at det vil tage lige så lang tid at brute force hvert password-gæt, som når det hashes. Ved også at inkorporere et salt, er der beskyttelse mod rainbow-table angreb, da to ens passwords vil resultere i 2 forskellige hash. Herudover kan antallet af rounds justeres, hvilket gør processen mere langsommelig. 
 
 Forsimplet diagram over hvordan bcrypt virker:  
-![image](https://user-images.githubusercontent.com/35559774/83121674-ed1e8c80-a0d2-11ea-9b62-89a5b169bd48.png)  
+
+<p align="center">
+<img src="https://user-images.githubusercontent.com/35559774/83121674-ed1e8c80-a0d2-11ea-9b62-89a5b169bd48.png"/>
+</p>  
+
 Rounds er antallet af gange hashingalgoritmen bliver udført. Første gang med password som key. I efterfølgende rounds er det skiftevis salt’et eller password’et der sættes som key, mens der bliver hash’et med den foregående value. 
 Jo flere rounds, jo længere tid tager hele operationen, hvilket betyder at når computer hardware i fremtiden bliver bedre vil denne algoritme stadig kunne benyttes, ved at sætte antallet af rounds op. Dette medfører også at hvis ens applikation indeholder meget sensitiv data, så er det muligt at sætte et højt antal af rounds for at optimere sikkerheden - det betyder selvfølgelig også at brugeren vil opleve en betydelig længere “ventetid” når de logger ind. 
 
@@ -252,14 +263,25 @@ Dette endpoint eksekverer også passport strategien `google`. Ved succesfuldt lo
 
 #### Passport
 Passport er en authentication middleware hvis formål er at authenticate requests. Frameworket indeholder en masse predefinerede strategier for login med diverse OAuth 2.0/OpenID 2.0 providers, samt andre BasicAuth, JWT og deslige. På definerede endpoints kaldes `passport.authenticate()`, der tager navnet på den ønskede strategi ind som herefter eksekveres.  
-![image](https://user-images.githubusercontent.com/35559774/83126575-4be70480-a0d9-11ea-9c41-1641bf900705.png)  
-Passport sikrer den korrekte struktur på URL'en til OAuth 2.0/OpenID 2.0 provider, og sørger for at client id og client secret bliver checket. Desuden håndterer passport svar fra provideren og behandler det for os. Ved brug af passport sikrer vi stabilitet og pålidelighed, da det er et gennemtestet og udbredt framework
-* **Google Strategi**
-Denne strategi authenticater brugere via deres Google account som også er en OpenID 2.0 identifier.   
-![image](https://user-images.githubusercontent.com/35559774/83126652-6d47f080-a0d9-11ea-96a4-461d79ca5dbf.png)  
-* **Local Strategi**
+
+<p align="center">
+<img src="https://user-images.githubusercontent.com/35559774/83126575-4be70480-a0d9-11ea-9c41-1641bf900705.png"/>
+</p>  
+
+Passport sikrer den korrekte struktur på URL'en til OAuth 2.0/OpenID 2.0 provider, og sørger for at client id og client secret bliver checket. Desuden håndterer passport svar fra provideren og behandler det for os. Ved brug af passport sikrer vi stabilitet og pålidelighed, da det er et gennemtestet og udbredt framework  
+* **Google Strategi**  
+Denne strategi authenticater brugere via deres Google account som også er en OpenID 2.0 identifier.  
+
+<p align="center">
+<img src="https://user-images.githubusercontent.com/35559774/83126652-6d47f080-a0d9-11ea-96a4-461d79ca5dbf.png"/>
+</p>   
+
+* **Local Strategi**  
 Denne strategi gør det muligt at authenticate brugere med username og password.   
-![image](https://user-images.githubusercontent.com/35559774/83126729-8a7cbf00-a0d9-11ea-9940-91f56138f0d7.png)  
+
+<p align="center">
+<img src="https://user-images.githubusercontent.com/35559774/83126729-8a7cbf00-a0d9-11ea-9940-91f56138f0d7.png"/>
+</p>  
 
 #### Oauth 2.0/OpenID 2.0
 Vi valgte at vores primære login strategi skulle være gennem OAuth 2.0/OpenID 2.0. da vi var interesserede i at prøve at implementere et så tæt på real-world scenarie som muligt i forhold til vores valgfag Security. 
@@ -268,25 +290,53 @@ Det er en meget udbredt måde at håndtere login på og det abstraherer hele hå
 Det der skal beskyttes ved denne strategi, udover sensitiv brugerinformation som f.eks. e-mails, er den client secret vi får udleveret af vores provider, som i vores tilfælde er Google. 
 Denne client secret gemmes hos os i en .env fil, som aldrig kommer med i versionsstyringen. Når projektet bliver endeligt deployet på vores server, kort før Fullstack Javascript eksamen, bliver filen manuelt lagt over på serveren. Hvis en tredjepart får fat i disse oplysninger (ved at skaffe sig adgang til vores server - håndtering af dette er beskrevet under afsnittet [Servere og Databaser](#servere-og-databaser)) vil de kunne udgive sig for at være os over for Google og eventuelt få fat i brugerinformation, requeste adgang til bruger e-mails med mere. Dog vil en tredjepart også skulle kunne komme ind på vores konto på [Google Cloud Platform](https://console.developers.google.com/) for at kunne sende data’en et andet sted hen end det endpoint vi der har specificeret - `serverIPaddress/auth/google/callback`.
 
-Vores OAuth 2.0/OpenID 2.0. flow er et authorizationcode flow og virker på følgende måde.   
-![image](https://user-images.githubusercontent.com/35559774/83127121-1393f600-a0da-11ea-969c-2eb67357fe69.png)  
+Vores OAuth 2.0/OpenID 2.0. flow er et authorizationcode flow og virker på følgende måde.  
+
+<p align="center">
+<img src="https://user-images.githubusercontent.com/35559774/83127121-1393f600-a0da-11ea-969c-2eb67357fe69.png"/>
+</p>  
+
 Brugeren trykker på Google-knappen for at logge ind, hvorefter der bliver åbnet en webbrowser hvorfra endpointet `/auth/google` kaldes og eksekverer passports `google` strategi. Denne strategi redirecter til Googles authentication servere, som resulterer i at Google beder brugeren om at logge ind.  
-![image](https://user-images.githubusercontent.com/35559774/83127234-32928800-a0da-11ea-8195-3b62006fe523.png)  
+
+<p align="center">
+<img src="https://user-images.githubusercontent.com/35559774/83127234-32928800-a0da-11ea-8195-3b62006fe523.png"/>
+</p>  
+
 Den request backenden sender til Google indeholder de Oauth 2.0 parametre vi er interesserede i, `scope`, `accessType`, `prompt` og `state`.   
-![image](https://user-images.githubusercontent.com/35559774/83127277-41793a80-a0da-11ea-9317-1810fe9e413f.png)  
+
+<p align="center">
+<img src="https://user-images.githubusercontent.com/35559774/83127277-41793a80-a0da-11ea-9317-1810fe9e413f.png"/>
+</p>  
+
 `scope` er det brugerdata vi er interesserede i og her specificerer vi at det er brugerens OpenID 2.0 data samt deres e-mail vi gerne vil have adgang til (også kaldet profile data).   
 `accessType` er den parameter der fortæller brugeren at vi gerne vil have offline access til deres data, hvilket vil sige at Google giver os et refresh token med tilbage, sammen med access token og profile data.   
 `promt` med value `“consent”` er påkrævet af Google for at vi kan få lov til at sende `accessType: "offline"` med.   
 `state` er data som Google sender uændret tilbage til os igen. Vi skal bruge indholdet af vores state for at kunne lave et redirect tilbage til vores react native app.  
 
 Det passport sender afsted til Google med ovenstående parametre ser nogenlunde ud på følgende måde   
-![image](https://user-images.githubusercontent.com/35559774/83127911-0297b480-a0db-11ea-92d2-8c08a6e2bdc1.png)  
+
+<p align="center">
+<img src="https://user-images.githubusercontent.com/35559774/83127911-0297b480-a0db-11ea-92d2-8c08a6e2bdc1.png"/>
+</p>  
+
 Når brugeren er logget ind sender Google et svar tilbage til endpointet `/auth/google/callback` med en authorizationcode. Den vil se ud som her   
-![image](https://user-images.githubusercontent.com/35559774/83127974-16431b00-a0db-11ea-9598-fabc6800d507.png)  
+
+<p align="center">
+<img src="https://user-images.githubusercontent.com/35559774/83127974-16431b00-a0db-11ea-9598-fabc6800d507.png"/>
+</p>  
+
 Denne authorizationcode bruger backenden til at spørge Google om access token, refresh token og brugerens profile data (som blandt andet indeholder deres e-mail)   
-![image](https://user-images.githubusercontent.com/35559774/83128031-265afa80-a0db-11ea-9b4a-a8ff5248e48c.png)  
+
+<p align="center">
+<img src="https://user-images.githubusercontent.com/35559774/83128031-265afa80-a0db-11ea-9b4a-a8ff5248e48c.png"/>
+</p>  
+
 Som så kommer tilbage nogenlunde sådan her  
-![image](https://user-images.githubusercontent.com/35559774/83128071-3377e980-a0db-11ea-9ffe-5faba7262a6c.png)  
+
+<p align="center">
+<img src="https://user-images.githubusercontent.com/35559774/83128071-3377e980-a0db-11ea-9ffe-5faba7262a6c.png"/>
+</p>  
+
 Backenden genererer et Json Web Token (se mere i afsnittet JWT) og redirecter til react native app’ens custom scheme (Brugen af Expo, deep linking og URL schemes). Dette lukker den browser der var åbnet op og herefter tager App’en over og sørger videre for håndteringen af JWT. 
 
 ##### Authorizationcode flow vs. Implicit flow
@@ -318,11 +368,19 @@ Til dette har vi brugt Apollo Link, som er en form for middleware.
 
 #### Apollo Links
 Et link beskriver, hvordan man vil modtage resultatet af et GraphQL kald, og hvad man vil gøre med resultaterne. Det er et abstraktionslag der bl.a. kan løse detaljerne omkring fejlhåndtering, authentication og authorization. Med denne løsning skal man ikke lave ændringer i hver resolver, men det er samlet i et lag højere oppe. Resolveres opgaver holdes derfor adskilt, hvilket samtidigt giver et bedre overblik. Man kan kæde mange links sammen, så når der affyres et GraphQL request, bliver hvert links funktionalitet anvendt i rækkefølge.   
-![image](https://user-images.githubusercontent.com/35559774/83138869-c3259400-a0eb-11ea-8d07-ebec22628df4.png)  
+
+<p align="center">
+<img src="https://user-images.githubusercontent.com/35559774/83138869-c3259400-a0eb-11ea-8d07-ebec22628df4.png"/>
+</p>  
+
 Når en bruger logger ind på vores app via telefonen, så kan de enten logge ind via Google eller via vores eget login-system. I begge tilfælde opretter backenden et JWT der er signed med en secret, og sender med til frontenden ved et login. 
 
 I vores tilfælde bruger vi Apollo Link Context, hvor der på hvert request fra frontenden til backend serveren bliver sat et JWT på headers i form af `Authorization: <token string>`  
-![image](https://user-images.githubusercontent.com/35559774/83138945-dd5f7200-a0eb-11ea-87c2-c0670eeef006.png)  
+
+<p align="center">
+<img src="https://user-images.githubusercontent.com/35559774/83138945-dd5f7200-a0eb-11ea-87c2-c0670eeef006.png"/>
+</p>  
+
 Derved kan backend serveren, for hvert incoming request, tjekke om denne header findes. 
 Hvis denne header er sat, så kan vi med et JWT bibliotek verificere dette token. 
 For at verificere et token, så skal det være signet med den secret vi bruger, og tokens udløbsdato skal ikke være overskredet. 
@@ -334,7 +392,11 @@ Hvis token er verificeret, så kan vi give brugeren adgang til beskyttet data. H
 I vores backend smider vi kun Apollos egne errors udadtil. Det gør det nemmere at håndtere dem i frontend, fordi vi ved at fejlens struktur vil være ens, uanset hvilken type fejl der opstår. Samtidig sørger vi for at der ikke bliver delt mere data om fejlen end vi ønsker.
 
 Når vi opretter vores Server, kan man sætte et stykke middleware ind, der omformer alle errors smidt i koden, til en af Apollos egne. I vores kode smider vi enten en af Apollos egne errors, eller en ApiError. Hvis der kommer en ApiError så omformer vi den til en ApolloError, som så nemt kan læses i GraphQL og frontenden.  
-![image](https://user-images.githubusercontent.com/35559774/83139227-4d6df800-a0ec-11ea-9fef-ac6ad0b1d135.png)  
+
+<p align="center">
+<img src="https://user-images.githubusercontent.com/35559774/83139227-4d6df800-a0ec-11ea-9fef-ac6ad0b1d135.png"/>
+</p>  
+
 Hvis vi er i et udviklermiljø, så sendes hele stacktracen med ved hver fejl, så det gøres nemmere at debugge de fejl der opstår undervejs. Men hvis vi er i et produktionsmiljø, så sender vi ikke stacktracen med, da vi ikke vil afsløre for meget information om vores interne struktur. 
 
 Der findes 4 kategorier af fejl i Apollos struktur. 
@@ -345,13 +407,25 @@ Der findes 4 kategorier af fejl i Apollos struktur.
   
   
 **AuthenticationError** kan bruges hvis en user ikke er logget ind, men prøver at tilgå ressourcer.   
-![image](https://user-images.githubusercontent.com/35559774/83139548-da18b600-a0ec-11ea-8351-13a9de7f656a.png)  
+
+<p align="center">
+<img src="https://user-images.githubusercontent.com/35559774/83139548-da18b600-a0ec-11ea-8351-13a9de7f656a.png"/>
+</p>  
+
 **ForbiddenError** kan bruges i forbindelse med authorization. Hvis en user er authenticated, men ikke har tilladelse til at tilgå en bestemt ressource, så kan man smide en ForbiddenError. 
 
 **UserInputError** er til at verificere input som GraphQLs typer ikke selv kan klare. For eksempel, hvis bruger bedes skrive deres e-mail når de skal oprette en bruger, og der ikke er noget `@` i deres input, så kan vi smide en UserInputError med `“e-mail”` som `invalidArg`, og en custom besked. Denne error gør det muligt at specificere hvilken inputdata der ikke levede op til vores krav. Det gør vi ved hjælp af et custom `invalidArgs` felt.   
-![image](https://user-images.githubusercontent.com/35559774/83139697-0fbd9f00-a0ed-11ea-8da1-196066715e27.png)  
-Eller f.eks. et koordinatsæt, som i GraphQL bare er integers  
-![image](https://user-images.githubusercontent.com/35559774/83139747-24019c00-a0ed-11ea-9245-8e992855fffc.png)  
+
+<p align="center">
+<img src="https://user-images.githubusercontent.com/35559774/83139697-0fbd9f00-a0ed-11ea-8da1-196066715e27.png"/>
+</p>  
+
+Eller f.eks. et koordinatsæt, som i GraphQL bare er integers.  
+
+<p align="center">
+<img src="https://user-images.githubusercontent.com/35559774/83139747-24019c00-a0ed-11ea-9245-8e992855fffc.png"/>
+</p>  
+
 Man kan også tjekke i frontend for den slags, men det ville ikke være sikkert, fordi brugeren ville kunne sende en request til vores backend uden om frontend mobilappen. Derfor skal den slags også tjekkes i backenden. Vi tjekker for fejl så “højt” oppe som muligt i koden, så serveren ikke skal lave for meget arbejde, før den afviser requesten. Desto før man kan validere input'et, desto bedre.
 
 **Frontend**
@@ -378,7 +452,7 @@ Dette er Incremental Authorization. At man ikke spørger brugeren om tilladelse 
 Der er utroligt mange ting, man skal tage højde for, når man laver en applikation, hvor man fokuserer på at gøre systemet så sikkert som muligt. OWASPs top 10 liste fra 2017 er et godt sted at begynde, men listen af ting, man skal overveje er naturligvis meget længere. For os har det været en god øvelse at prøve at kode et samlet projekt, hvor vi kombinerer mange af de ting, vi har lært i løbet af semesteret. 
 Da app’en først bliver deployet kort før Fullstack Javascript eksamen (vi mangler nogle funktionaliteter der ikke er relevante for Security valgfaget), har vi ikke mulighed for at vise det helt færdige produkt før eksaminerne, men vi er selv på nuværende stadie er vi meget tilfredse med den udvikling vi har været igennem, specielt i forhold til Oauth 2.0/OpenID 2.0, der for os virkede meget kompleks inden vi gik i gang med projektet. Det har ligeledes været en øjenåbner at finde ud af hvor mange forskellige frameworks og libraries der er udviklet til at håndtere de mange forskellige aspekter af Security-risici, når man udvikler et projekt efter real world standarder. Passport er en af de frameworks vi valgte at bruge, men som på trods af den simple opgave det løser, har været mere end svær at forstå præcis hvad gør. Vi har haft mange debatter om hvorvidt det ville være bedre at prøve at løse en given opgave selv, fremfor at bruge et tredjeparts framework, men er oftest kommet frem til den konklusion, at sålænge det er et velbrugt framework som er anbefalet af mange andre og løser et givent problem, så er det nok bedre at vi bruger det, fremfor at prøve at løse det selv. 
 
-#### Security relevante funktionaliteter der ikke er implementeret endnu
+#### Security relevante funktionaliteter der ikke er implementeret endnu  
 * **Brute Force admin alerts** - Vi holder styr på, hvilke IP adresser der forsøger at lave brute force angreb, men vi gør ikke andet ved det, end at afvise de IP adresser hvor angrebene kommer fra. Hvis vi havde tid og vores applikation skulle blive til et større, mere virkeligt eksempel, ville vi have implementeret et system, der kunne advare en admin, hvis vores applikation blev angrebet. I denne sammenhæng ville vi have udvidet vores event emitter-system, så der var kontrol af requests til alle vores ressourcer, så vi ikke kun ville kunne stoppe brute force angreb ifm login, men også DoS angreb i det hele taget.
 
 * **Refresh token skal gemmes** i databasen - Sammen med brugeres info vil vi gerne gemme refresh token for herefter at kunne bruge det til at re-authenticate brugeren uden at brugeren behøver at logge ind igen. Planen er at når JWT expires (efter 60 minutter) at gøre ovenstående. Refresh token bør fjernes helt fra databasen hvis brugerne manuelt logger ud. Hvis brugeren går ind og revoker deres consent til offline access (som vi har bedt dem om) så vil deres refresh token blive invalidatet af Google og vi skal bede om et nyt næste gang de bruger app’en. Vi håber på at nå at implementere denne funktionalitet inden Fullstack Javascript eksamen. 
@@ -392,7 +466,11 @@ Da app’en først bliver deployet kort før Fullstack Javascript eksamen (vi ma
 
 * **PKCE (Proof Key for Code Exchange)** - Som beskrevet i Brugen af [Brugen af Expo, deep linking og URL schemes](#brugen-af-expo,-deep-linking-og-url-schemes) kan der med brugen af app-links opstå sikkerhedsangreb. I forbindelse med OAauth 2.0 Authorization Code-flowet kan der opstå et Authorization Code Interception Attack.
 PKCE (udtales Pixie) - Proof Key for Code Exchange - [blev inkluderet i OAauth 2.0 standarden](https://tools.ietf.org/html/rfc7636) efter sådanne angreb, hvor man ved hjælp af en verifyer kan verificere hvilken app der har ret til den pågældende authorization code.  
-![image](https://user-images.githubusercontent.com/35559774/83181265-ed477800-a124-11ea-9636-f8a67592ac15.png)  
+
+<p align="center">
+<img src="https://user-images.githubusercontent.com/35559774/83181265-ed477800-a124-11ea-9636-f8a67592ac15.png"/>
+</p>  
+
 To apps bruger samme URL-skema. Styresystemet tillader uden forbehold begge apps at modtage authorization code gennem URL-skemaet og derved kan man risikere at access token bliver udleveret til tredjepart.
 PKCE løser dette problem ved at tilsætte følgende til flowet ([kilde](https://www.oauth.com/oauth2-servers/pkce/)):
   * Applikationen genererer en String: code_verifier
