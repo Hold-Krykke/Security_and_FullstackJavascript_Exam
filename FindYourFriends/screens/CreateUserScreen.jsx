@@ -3,11 +3,9 @@ import {
   View,
   Button,
   StyleSheet,
-  Modal,
   Text,
   Alert,
-  ScrollView,
-  KeyboardAvoidingView,
+  ScrollView
 } from "react-native";
 import Input from "../components/Input";
 import facade from "../facade";
@@ -21,7 +19,7 @@ const CreateUser = (props) => {
     email: "",
     password: "",
   });
-  const [addUser, { data }] = useMutation(facade.ADD_USER);
+  const [addUser, { }] = useMutation(facade.ADD_USER);
 
   // Sadly the value passed to the function in onChangeText is only the value of the element (what the user typed)
   // and not an event with more data than just a string. This means that you can't a generic handler
@@ -61,8 +59,18 @@ const CreateUser = (props) => {
     }
     return "ok";
   }
-
+  
   async function confirmCreate() {
+    // Check if user has provided a username
+    if (newUser.username == "") {
+      Alert.alert("Please provide a username");
+      return;
+    }
+    // Check if user has provided an email
+    if (newUser.email == "") {
+      Alert.alert("Please provide an email");
+      return;
+    }
     // Check if password is empty
     if (newUser.password == "") {
       Alert.alert("Please type a password");
