@@ -45,6 +45,8 @@ Da vores projekt er en kombination af valgfagene Security og Fullstack Javascrip
 ###### [Security relevante funktionaliteter der ikke er implementeret endnu](#security-relevante-funktionaliteter-der-ikke-er-implementeret-endnu-1)
 
 ---
+###### 46.409 tegn, svarende til 19.34 normalsider af 2400 tegn per side
+---
 
 ### Introduktion
 Vi ønsker at udvikle en mobil app med konceptet “Find your Friends” hvor brugerens lokation deles med andre. Efter lokationen er delt kan man finde venner i nærheden af sig. Udover det vil vi gerne give brugerne mulighed for at chatte - her kunne det enten være i plenum eller privat mellem hver bruger. 
