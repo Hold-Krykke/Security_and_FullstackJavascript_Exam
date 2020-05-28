@@ -7,6 +7,10 @@
 * **Cph-cs340 - Camilla Staunstrup**
 
 ---
+Da vores projekt er en kombination af valgfagene Security og Fullstack Javascript er vores kode ikke deployet endnu og vi vil fortsætte med få funktionaliter der mangler. Disse funktionaliter er ikke relevante i forhold til Security. Droplest og servere er sat op og klar til at programmet deployes, se mere om det i rapporten.  
+* [Backend kode](https://github.com/Hold-Krykke/Security_and_FullstackJavascript_Exam/tree/master/Backend)
+* [Frontend App kode](https://github.com/Hold-Krykke/Security_and_FullstackJavascript_Exam/tree/master/FindYourFriends)
+---
 
 ### Indholdsfortegnelse
 ###### [Introduktion](#introduktion-1)
@@ -40,10 +44,6 @@
 ###### [Refleksion & Konklusion](#refleksion--konklusion-1)
 ###### [Security relevante funktionaliteter der ikke er implementeret endnu](#security-relevante-funktionaliteter-der-ikke-er-implementeret-endnu-1)
 
----
-Da vores projekt er en kombination af valgfagene Security og Fullstack Javascript er vores kode ikke deployet endnu og vi vil fortsætte med få funktionaliter der mangler. Disse funktionaliter er ikke relevante i forhold til Security. Droplest og servere er sat op og klar til at programmet deployes, se mere om det i rapporten.  
-* [Backend kode](https://github.com/Hold-Krykke/Security_and_FullstackJavascript_Exam/tree/master/Backend)
-* [Frontend App kode](https://github.com/Hold-Krykke/Security_and_FullstackJavascript_Exam/tree/master/FindYourFriends)
 ---
 
 ### Introduktion
