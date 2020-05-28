@@ -18,7 +18,7 @@
 ###### [Security Misconfiguration](#security-misconfiguration-1)
 ###### [Insufficient Logging & Monitoring](#insufficient-logging--monitoring-1)
 ###### [Servere og Databaser](#servere-og-databaser-1)
-###### [Struktur og Sikkerhed](#struktur-og-sikkerhed)
+###### [Struktur og Sikkerhed](#struktur-og-sikkerhed-1)
 ###### [Sikkerhed ift. Injection](#sikkerhed-ift-injection-1)
 ###### [Logging](#logging-1)
 ###### [Login](#login-1)
