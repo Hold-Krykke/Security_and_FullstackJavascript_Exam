@@ -2,10 +2,7 @@
  * Takes A runtime error with graphQLErrors and networkError properties
  */
 const handleError = ({ graphQLErrors, networkError }) => {
-  let errorMessage = {
-    title: "An Error Occurred",
-    message: "",
-  };
+  let errorMessage;
   if (graphQLErrors) {
     graphQLErrors.map((err, index) => {
       console.log(
@@ -15,31 +12,38 @@ const handleError = ({ graphQLErrors, networkError }) => {
       );
       const { message, locations, path } = err;
       const code = err.extensions.code;
-      switch (code) {
-        case "UNAUTHENTICATED":
-          errorMessage = {
-            message,
-            title: "Unauthenticated",
-          };
-          break;
-        case "FORBIDDEN":
-          errorMessage = {
-            message,
-            title: "Unauthorized action",
-          };
-          break;
-        case "BAD_USER_INPUT":
-          errorMessage = {
-            message: `Following fields were wrong: 
+      const errorMap = (code) => {
+        const _errorMap = {
+          UNAUTHENTICATED: () => {
+            return {
+              message,
+              title: "Unauthenticated",
+            };
+          },
+          FORBIDDEN: () => {
+            return {
+              message,
+              title: "Unauthorized action",
+            };
+          },
+          BAD_USER_INPUT: () => {
+            return {
+              message: `Following fields were wrong: 
                   ${err.extensions.exception.invalidArgs}
-                  \n${message}\n`,
-            title: "Bad user input",
-          };
-          break;
-        default:
-          errorMessage.message = message + "\n";
-          break;
-      }
+                  \n${message}`,
+              title: "Bad user input",
+            };
+          },
+          DEFAULT: () => {
+            return {
+              title: "An Error Occurred",
+              message,
+            };
+          },
+        };
+        return (_errorMap[code] || _errorMap["DEFAULT"])();
+      };
+      errorMessage = errorMap(code);
     });
   }
   if (networkError) console.log(`[Network error]: ${networkError}`);
