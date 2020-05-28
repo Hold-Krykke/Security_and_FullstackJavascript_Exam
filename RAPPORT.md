@@ -9,9 +9,9 @@
 ---
 
 ### Indholdsfortegnelse
-##### [Introduktion](#introduktion-1)
-##### [OWASP](#owasp-1)
-##### [Broken Authentication](#broken-authentication-1)
+###### [Introduktion](#introduktion-1)
+###### [OWASP](#owasp-1)
+###### [Broken Authentication](#broken-authentication-1)
 ##### [Kryptering af data](#kryptering-af-data-1)
 ##### [Broken Access Control](#broken-access-control-1)
 ##### [Injection](#injection-1)
