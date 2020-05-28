@@ -319,7 +319,8 @@ Det passport sender afsted til Google med ovenstående parametre ser nogenlunde 
 <img src="https://user-images.githubusercontent.com/35559774/83127911-0297b480-a0db-11ea-92d2-8c08a6e2bdc1.png"/>
 </p>  
 
-Når brugeren er logget ind sender Google et svar tilbage til endpointet `/auth/google/callback` med en authorizationcode. Den vil se ud som her   
+Når brugeren er logget ind sender Google et svar tilbage til endpointet `/auth/google/callback` med en authorizationcode.  
+Den vil se ud som her:  
 
 <p align="center">
 <img src="https://user-images.githubusercontent.com/35559774/83127974-16431b00-a0db-11ea-9598-fabc6800d507.png"/>
@@ -353,12 +354,13 @@ Der findes fire typer af flows, eller grant types som det også kaldes, for en c
 * **Client credentials** - dette flow er ment til server-til-server authentication hvor applikationen agerer på vegne af sig selv, fremfor på vegne af en individuel bruger. 
 
 #### Brugen af Expo, deep linking og URL schemes
-Brugen af custom URL schemes, såsom appname:// til at linke internt i app’en er ikke altid lige sikkert. Hvis to applikationer bruger samme skema, er det for iOS ikke garanteret hvilken app skemaet henvender sig til. For Android har man mulighed for at benytte sig af [Intents](https://developer.android.com/guide/components/intents-filters) og samtidig giver styresystemet per standard en valgmulighed mellem de apps der har registreret brug af skemaet.
-[Denne artikel fra Nowsecure.com](https://www.nowsecure.com/blog/2019/04/05/how-to-guard-against-mobile-app-deep-link-abuse/) beskriver hvordan at at såkaldt deep link abuse virker i praksis, og hvordan man også kan beskytte sig ved brug af en [ekstern link-liste](https://developer.android.com/training/app-links/verify-site-associations) som indeholder en checksum. Sådan et angreb afhænger dog af mange faktorer. Typisk skal appen reverse engineeres og en lignende eller tilhørende (understøttende) app skal udvikles, fungerende som en trojansk hest. Dette er givetvis nemmere på Android, hvor man frit kan installere .apk-filer udenom App Store.
+Brugen af custom URL schemes, såsom appname:// til at linke internt i app’en er ikke altid lige sikkert. Hvis to applikationer bruger samme skema, er det for iOS ikke garanteret hvilken app skemaet henvender sig til.  
+For Android har man mulighed for at benytte sig af [Intents](https://developer.android.com/guide/components/intents-filters) og samtidig giver styresystemet per standard en valgmulighed mellem de apps der har registreret brug af skemaet.  
+[Denne artikel fra Nowsecure.com](https://www.nowsecure.com/blog/2019/04/05/how-to-guard-against-mobile-app-deep-link-abuse/) beskriver hvordan at at såkaldt *deep link abuse* virker i praksis, og hvordan man også kan beskytte sig ved brug af en [ekstern link-liste](https://developer.android.com/training/app-links/verify-site-associations) som indeholder en checksum. Sådan et angreb afhænger dog af mange faktorer. Typisk skal appen reverse engineeres og en lignende eller tilhørende (understøttende) app skal udvikles, fungerende som en trojansk hest. Dette er givetvis nemmere på Android, hvor man frit kan installere .apk-filer udenom App Store.  
 
-For at kunne sende besked tilbage til vores react native app, som beskrevet i OAuth 2.0/OpenID 2.0, er vi nødt til at redirecte tilbage app’en når Google kalder vores `/auth/google/callback` endpoint. Da vores app er en Expo app og vi ikke ender med at ejecte Expo, er vi begrænsede i de muligheder vi har. 
-Vi har valgt at bruge Expo’s egen anbefalede løsning. Det vil sige vi bruger Expos scheme `exp://exp.host/@yourname/yourAppName`, da det er den eneste måde vi kan linke tilbage til vores app på. 
-Vi undersøgte muligheden for at lave en embedded browser i app’en så vi i stedet for et custom scheme, ville kunne lytte på et specifikt endpoint i backenden og trække JWT ud fra den request. Vi fik dette til at virke, men fandt derefter ud af at Google har lukket ned for muligheden for at bruge OAuth 2.0/OpenID 2.0 gennem embedded browsers i 2017, da det er for usikkert. [docs.expo](https://docs.expo.io/workflow/linking/#example-linking-back-to-your-app-from) 
+For at kunne sende besked tilbage til vores react native app, som beskrevet i OAuth 2.0/OpenID 2.0, er vi nødt til at redirecte tilbage app’en når Google kalder vores `/auth/google/callback` endpoint. Da vores app er en Expo app og vi ikke ender med at ejecte Expo, er vi begrænsede i de muligheder vi har.  
+Vi har valgt at bruge Expo’s egen anbefalede løsning. Det vil sige vi bruger Expos scheme `exp://exp.host/@yourname/yourAppName`, da det er den eneste måde vi kan linke tilbage til vores app på.  
+Vi undersøgte muligheden for at lave en embedded browser i app’en så vi i stedet for et custom scheme, ville kunne lytte på et specifikt endpoint i backenden og trække JWT ud fra den request. Vi fik dette til at virke, men fandt derefter ud af at Google har lukket ned for muligheden for at bruge OAuth 2.0/OpenID 2.0 gennem embedded browsers i 2017, da det er for usikkert. [docs.expo](https://docs.expo.io/workflow/linking/#example-linking-back-to-your-app-from)  
 
 ---
 
