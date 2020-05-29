@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Button, StyleSheet, Text, ScrollView, TouchableWithoutFeedback, Keyboard } from "react-native";
+import { View, Button, StyleSheet, Text, TouchableWithoutFeedback, Keyboard } from "react-native";
 import Input from "../components/Input";
 import facade from "../facade";
 import { useMutation } from "@apollo/react-hooks";
