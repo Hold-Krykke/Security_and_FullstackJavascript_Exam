@@ -260,7 +260,7 @@ Når man laver en ny bruger, (hvor man altså ikke logger ind med OAuth 2.0/Open
 * Skal indeholde både et bogstav, et tal og et tegn
 * Må ikke indeholde kendte svage passwords
 
-De fleste kendte svage passwords er kortere end 10 tegn. Vi kræver et password, der indeholder mindst 10 karakterer, men hvis brugeren nu ville have brugt qwer1! som password, men får at vide, det er for kort, så kunne brugeren bare tilføje flere tal: qwer123456! og så ville passwordet være langt nok. Derfor siger vi at ens password slet ikke må indeholde sekvenser, der passer på et allerede kendt svagt password. Passwordet qwer123456! ville altså blive afvist, da det indeholder qwer1234, som er et kendt svagt password.
+De fleste kendte svage passwords er kortere end 10 tegn. Vi kræver et password, der indeholder mindst 10 karakterer, men hvis brugeren nu ville have brugt `qwer1!` som password, men får at vide, det er for kort, så kunne brugeren bare tilføje flere tal: `qwer123456!` og så ville passwordet være langt nok, men stadig usikkert. Derfor siger vi at ens password slet ikke må indeholde sekvenser, der passer på et allerede kendt svagt password. Passwordet `qwer123456!` ville altså blive afvist, da det indeholder `qwer1234`, som er et kendt svagt password.
 
 #### Endpoints
 `/auth/jwt`
