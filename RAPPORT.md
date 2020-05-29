@@ -162,7 +162,7 @@ MySQL databasen kan kun tilgås af vores backend server. Databasen kan altså ik
 
 For at tilgå databasen bruger backenden en MySQL non-root bruger. Denne bruger har tilladelse til at gøre alt på de tables, der har med applikationens brugere at gøre. Dvs. at hvis backenden skulle blive kompromitteret, ville tredjeparten trods alt kun få adgang til de tables der har med brugere for denne applikation at gøre, og ikke andre tables og anden data, der kunne ligge i databasen. Dette kan selvfølgelig i sig selv været slemt nok - det optimale er derfor at give MySQL brugeren så få rettigheder som overhovedet muligt. For at have en fungerende applikation er man dog nødt til at have en vis mængde rettigheder på MySQL brugeren. I og med MySQL brugeren kan læse al dataen i tabellen, så ville en tredjepart kunne lække al denne information.
 På samme måde ville det være muligt at læse al informationen omkring brugernes lokation og deres chatbeskeder, der ligger i MongoDB, hvilket naturligvis ville være et kæmpe brud på brugernes privatliv. 
-I den forbindelse har vi gjort os nogle overvejelser (se afsnit om kryptering af data)
+I den forbindelse har vi gjort os nogle overvejelser (nærmere beskrevet i afsnittet [kryptering af data](#kryptering-af-data))
 
 #### Struktur og Sikkerhed
 Vores initielle ide af systemets design kan ses på nedenstående figur.  
