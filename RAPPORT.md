@@ -94,7 +94,7 @@ Følgende problemer i en applikation kan føre til Broken Authentication:
 * Gør ikke brug af multi factor authentication 
 * Ukorrekt brug af session (viser session ID i URL, roterer ikke session ID efter login, ugyldiggør ikke session ID efter logout)
 
-Vi ønskede i vores applikation at minimere Broken Authentication ved udelukkende at bruge OAuth 2.0/OpenID 2.0 til login. Herved skal en bruger aldrig indtaste et password direkte i vores applikation, men kun gennem vores identity provider, og vi ville ikke skulle gemme bruger passwords eller kunne genskabe dem. 
+Vi ønskede i vores applikation at minimere Broken Authentication ved udelukkende at bruge OAuth 2.0/OpenID 2.0 til login. Herved skal en bruger aldrig indtaste et password direkte i vores applikation, men kun gennem vores identity provider, og vi ville ikke skulle gemme brugerpasswords eller kunne genskabe dem. 
 Vi valgte også at implementere et traditionelt login sideløbende med, for at skabe et mere realistisk billede af virkeligheden, hvor ikke alle brugere nødvendigvis har en konto hos f.eks. Google. I dette login har vi ønsket at komme så mange af de punkter der nævnes i OWASP som usikre til livs. 
 * Vi bruger ikke session, men JWTs. Vores applikation er stateless.
 * Vi krypterer passwords med Bcrypt
@@ -102,10 +102,10 @@ Vi valgte også at implementere et traditionelt login sideløbende med, for at s
 * Kontrol af valgt password
 
 #### Kryptering af data
-Som tidligere nævnt har “Impacts” den største vægt i OWASPs vurdering. For at få så lille en indvirkning som muligt i OWASPs udregning og for at skabe en forsikring af privatliv i vores service, har vi snakket om at kryptere brugernes data på samme måde som ens forbindelse over internettet krypteres med SSL, eller i hvert fald tilbyde det som en service.
+Som tidligere nævnt har “Technical” den største vægt i OWASPs vurdering. For at få så lille en indvirkning som muligt i OWASPs udregning og for at skabe en sikring af brugerdata i vores service, har vi snakket om at kryptere brugernes data på samme måde som ens forbindelse over internettet krypteres med SSL, eller i hvert fald tilbyde det som en service.
 Hos hver enkelt bruger ville vi generere et asymmetrisk nøglepar, ligesom vi selv har og bruger, når vi skal tilgå vores droplets. Med denne strategi ville brugerne naturligvis være begrænsede af, at kun de har deres private key, og at deres data derfor i princippet ville gå tabt, hvis de skiftede telefon eller de mistede deres private key. 
-For at løse dette problem ville vi involvere iCloud og Google og diktere, at brugere skulle gemme deres private keys i den cloud service, deres telefon er bundet op på. Med denne opsætning ville en tredjepart både skulle kende brugerens password til vores service og passwordet til brugerens cloud service eller mobil for at skaffe deres private key, for så at kunne stjæle deres data i vores system. 
-Hvis vores backenden blev overtaget af en tredjepart, ville vedkommende godt nok kunne ødelægge eller slette den data, der ligger i de to databaser, men ville ikke kunne lække noget data da alting er krypteret. Ingen andre end brugerne selv, ikke engang os som udviklere ville kunne læse brugernes data - det ville medvirke til en lavere score for “Impact” i OWASPs vurdering og ville sikre brugerens privatliv.
+For at løse dette problem kunne vi involvere iCloud og Google, og diktere at brugere skulle gemme deres private keys i den cloud service, deres telefon er bundet op på. Med denne opsætning ville en tredjepart både skulle kende brugerens password til vores service og passwordet til brugerens cloud service eller mobil for at skaffe deres private key, for så at kunne stjæle deres data i vores system. 
+Hvis vores backenden blev overtaget af en tredjepart, ville vedkommende kunne ødelægge eller slette den data, der ligger i de to databaser, men ville ikke kunne lække noget data da alting er krypteret. Ingen andre end brugerne selv, ikke engang os som udviklere ville kunne læse brugernes data - det ville medvirke til en lavere score for “Technical” i OWASPs vurdering og ville sikre brugerens privatliv.
 
 #### Broken Access Control
 Access control sørger for at brugere ikke kan agere udover hvad det er meningen de skal kunne i en applikation. OWASP beskriver følgende typiske Access control sikkerhedshuller.
