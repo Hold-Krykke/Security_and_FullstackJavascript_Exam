@@ -45,7 +45,7 @@ Da vores projekt er en kombination af valgfagene Security og Fullstack Javascrip
   * [Security relevante funktionaliteter der ikke er implementeret endnu](#security-relevante-funktionaliteter-der-ikke-er-implementeret-endnu)
 
 ---
-###### 47.765 tegn, svarende til 19,9 normalsider af 2400 tegn per side
+###### 48.225 tegn, svarende til 20,1 normalsider af 2400 tegn per side
 ---
 
 ### Introduktion
