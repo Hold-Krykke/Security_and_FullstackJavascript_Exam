@@ -38,16 +38,9 @@ const positionFacade: PositionFacade = new PositionFacade();
   positionFacade.setDatabase(client, "exam");
 })();
 
-// We need to implement security in the resolvers, JWT etc. when the login system is ready
-
 const resolverMap: IResolvers = {
   Query: {
-    // Do we need this?
-    // allUsers(_: void, args: void): any {
-    //     return UserFacade.getAllUsers();
-    // },
     getUser(_: void, args: any, context): any {
-      console.log(context);
       // This is an Authorization Guard.
       // Protect GraphQL mutations like this.
       requiresLogIn(context);
