@@ -33,8 +33,8 @@ Da vores projekt er en kombination af valgfagene Security og Fullstack Javascrip
   * [Endpoints](#endpoints)
   * [Passport](#passport)
   * [OAuth 2.0/OpenID 2.0](#oauth-20openid-20)
-    * [Authorizationcode flow vs. Implicit flow](#authorizationcode-flow-vs-implicit-flow)
     * [Kort beskrivelse af OAuth 2.0 flows](#kort-beskrivelse-af--oauth-20-flows)
+    * [Authorizationcode flow vs. Implicit flow](#authorizationcode-flow-vs-implicit-flow)
   * [Brugen af Expo, deep linking og URL schemes](#brugen-af-expo-deep-linking-og-url-schemes)
 * [Authentication & Authorization med Apollo](#authentication--authorization-med-apollo)
   * [Apollo Links](#apollo-links)
@@ -207,7 +207,8 @@ Vi logger alle fejl som opstår i applikationen.
 I dette afsnit beskriver vi hvordan vi har valgt at håndtere hele vores login strategi i forhold til real world security risks. 
 
 #### Bcrypt
-Bcrypt er en hashing algoritme der er udviklet specifikt til hashing af passwords. Den er derfor designet til at være langsom. Grunden til at en hashing algoritme bør være langsom er, at det vil tage lige så lang tid at brute force hvert password-gæt, som når det hashes. Ved også at inkorporere et salt, er der beskyttelse mod rainbow-table angreb, da to ens passwords vil resultere i 2 forskellige hash. Herudover kan antallet af rounds justeres, hvilket gør processen mere langsommelig. 
+Vi bruger Bcrypt til at hashe passwords hos de brugere af vores applikation der ikke ønsker at logge ind med deres Google-konto. Vi har valgt Bcrypt da den virker som det bedste valg i forhold til fremtidssikring, samt det er den hashing algoritme der bliver anbefalet mest til hashing af passwords. 
+Bcrypt er som nævnt en hashing algoritme der er udviklet specifikt til hashing af passwords. Den er derfor designet til at være langsom. Grunden til at en hashing algoritme bør være langsom er, at det vil tage lige så lang tid at brute force hvert password-gæt, som når det hashes. Ved også at inkorporere et salt, er der beskyttelse mod rainbow-table angreb, da to ens passwords vil resultere i 2 forskellige hash. Herudover kan antallet af rounds justeres, hvilket gør processen mere langsommelig. 
 
 Forsimplet diagram over hvordan bcrypt virker:  
 
@@ -219,8 +220,8 @@ Rounds er antallet af gange hashingalgoritmen bliver udført. Første gang med p
 Jo flere rounds, jo længere tid tager hele operationen, hvilket betyder at når computer hardware i fremtiden bliver bedre vil denne algoritme stadig kunne benyttes, ved at sætte antallet af rounds op. Dette medfører også at hvis ens applikation indeholder meget sensitiv data, så er det muligt at sætte et højt antal af rounds for at optimere sikkerheden - det betyder selvfølgelig også at brugeren vil opleve en betydelig længere “ventetid” når de logger ind. 
 
 #### JWT
+Når en bruger er logget ind i vores applikation skal vi bruge en måde at kommunikere dette til vores mobile app. Vi ønsker ikke at sende tokens vi får af Google ud til den mobile app og samtidig ønsker vi at kunne behandle brugere ens, efter login, uanset hvilken måde de er logget ind på. For at løse dette, bruger vi JSON web tokens. 
 JSON Web Token indeholder JSON-formater der bruges som bevis for authentication. JWT har følgende struktur:
-
 **Header** - indeholder information om hvilken algoritme der er brugt til kryptering, i vores tilfælde er det default algoritmen HS256 (HMAC med SHA256).  
 **Payload** - indeholder den information der er relevant for ens applikation. Vores payload består af et expiresIn objekt og et user e-mail objekt.  
 **Signatur** - JWT validering. Formålet med signaturen er at kunne validere afsenderen. Signaturen er beregnet ved at encode header og payload med base64url encoding og herefter sammenkæde dem med et punktum imellem. Denne string krypteres herefter med den algoritme der er specificeret i headeren og vores secret.  
@@ -341,18 +342,18 @@ Som så kommer tilbage nogenlunde sådan her
 
 Backenden genererer et Json Web Token (se mere i afsnittet JWT) og redirecter til react native app’ens custom scheme (Brugen af Expo, deep linking og URL schemes). Dette lukker den browser der var åbnet op og herefter tager App’en over og sørger videre for håndteringen af JWT. 
 
-#### Authorizationcode flow vs. Implicit flow
-Det der adskiller authorizationcode flow fra implicit flow er det trin hvor Google afleverer en authorizationcode til backenden og backenden udveksler denne til access token, refresh token og profile data. 
-Det vil sige at implicit flow går direkte fra bruger-login til at få udleveret accesstoken fra Google. Vi startede med at lave et implicit flow direkte i app’en, men dette vurderes som relativt usikkert i forhold til authorizationcode flow af flere grunde. Client secret skal for det første gemmes et sted i app’en, for at blive sendt med til Google. Herudover sendes access token direkte tilbage til app’en gennem browseren og app’en vil selv skulle holde styr på det. Dette vurderes generelt som værende usikkert, både fordi al clientkode ligger frit tilgængeligt, trods eventuel obfuscation, samt at det generelt er nemmere for en tredjepart at få stjålet et accesstoken fra en app eller en SPA, end fra en backend. Dette kan f.eks. ske gennem Cross Site Scripting hvor der injectes client-side scripts. 
- 
-Authorizationcode flow’et hvor det er backenden der står for kommunikationen med Google, udveksling af tokens og opbevaring af tokens er den anbefalede måde at håndtere OAuth 2.0/OpenID 2.0 på. [OAuth 2.0 Flow](https://auth0.com/docs/api-auth/which-oauth-flow-to-use)
-
 #### Kort beskrivelse af  OAuth 2.0 flows
 Der findes fire typer af flows, eller grant types som det også kaldes, for en client at få et access token fra en authorizationserver på. 
 * **Authorizationcode flow** - det vi bruger og som er vist billedligt længere oppe. Bruges i serverside applikationer hvor source koden ikke er offentlig eksponeret. I dette flow foregår der på backenden en udveksling mellem applikationen og 2.0/OpenID 2.0 provideren hvor authorizationcode udveksles for tokens. 
 * **Implicit flow** - clienten henter selv direkte et access token hos provideren. User credentials skal, hvis dette flow bruges, ikke gemmes i client koden. Er oftest brugt i web-, desktop- og mobilapplikationer der ikke har en backend applikation. 
 * **Ressource owner password credentials** - dette flow kræver at der logges ind med username og password og eftersom disse vil være en del af requesten er dette flow kun anbefalet til trusted clients.
 * **Client credentials** - dette flow er ment til server-til-server authentication hvor applikationen agerer på vegne af sig selv, fremfor på vegne af en individuel bruger. 
+
+#### Authorizationcode flow vs. Implicit flow
+Det der adskiller authorizationcode flow fra implicit flow er det trin hvor Google afleverer en authorizationcode til backenden og backenden udveksler denne til access token, refresh token og profile data. 
+Det vil sige at implicit flow går direkte fra bruger-login til at få udleveret accesstoken fra Google. Vi startede med at lave et implicit flow direkte i app’en, men dette vurderes som relativt usikkert i forhold til authorizationcode flow af flere grunde. Client secret skal for det første gemmes et sted i app’en, for at blive sendt med til Google. Herudover sendes access token direkte tilbage til app’en gennem browseren og app’en vil selv skulle holde styr på det. Dette vurderes generelt som værende usikkert, både fordi al clientkode ligger frit tilgængeligt, trods eventuel obfuscation, samt at det generelt er nemmere for en tredjepart at få stjålet et accesstoken fra en app eller en SPA, end fra en backend. Dette kan f.eks. ske gennem Cross Site Scripting hvor der injectes client-side scripts. 
+ 
+Authorizationcode flow’et hvor det er backenden der står for kommunikationen med Google, udveksling af tokens og opbevaring af tokens er den anbefalede måde at håndtere OAuth 2.0/OpenID 2.0 på. [OAuth 2.0 Flow](https://auth0.com/docs/api-auth/which-oauth-flow-to-use)
 
 #### Brugen af Expo, deep linking og URL schemes
 Brugen af custom URL schemes, såsom appname:// til at linke internt i app’en er ikke altid lige sikkert. Hvis to applikationer bruger samme skema, er det for iOS ikke garanteret hvilken app skemaet henvender sig til.  
