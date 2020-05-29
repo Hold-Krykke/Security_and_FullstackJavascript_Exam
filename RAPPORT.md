@@ -63,7 +63,7 @@ Vi har valgt at kombinere fagene Security og Fullstack JS, fordi vi godt kunne t
   * “Traditionelt” login uden om OAuth 2.0 med sikker transport, hashing.
   * Sikker brug af både MongoDB og MySQL. Her vil vi bl.a. gå i dybden med brugen af NoSQL databaser og undersøge emner såsom injections.
 
-Vi har valgt dette projekt for at få dækket nogle af de OWASP-praksisser vi har hørt om, men ikke implementeret, eller ikke før har implementeret i en JavaScript-sammenhæng. Udover det, vil vi også gerne lære mere om konceptet single sign-on (OAuth 2.0) og sikkerheds overvejelserne dertil, da det er noget der bliver brugt i stor stil ude i den virkelige verden. 
+Vi har valgt dette projekt for at få dækket nogle af de OWASP-praksisser vi har hørt om, men ikke implementeret, eller ikke før har implementeret i en JavaScript-sammenhæng. Udover det, vil vi også gerne lære mere om Oauth 2.0/OpenID 2.0 og sikkerheds overvejelserne dertil, da det er noget der bliver brugt i stor stil ude i den virkelige verden. 
 
 ---
 
@@ -72,7 +72,7 @@ Når sværhedsgraden af potentielle sikkerhedsfejl vurderes, er der altid flere 
 * **Exploitability**: How easy is it for threat agents to exploit a given weakness
 * **Prevalence**: How well known is the weakness
 * **Detectability**: How easy is it to detect the weakness
-* **Technical**: How severe is the technical impact if the weakness is exploited
+* **Technical**: How severe is the technical impact if the weakness is exploited  
 De fire vurderinger får en score mellem 1 og 3 og en samlet score bliver derefter udregnet som vist på figuren:  
 
 <p align="center">
@@ -118,7 +118,8 @@ Access control sørger for at brugere ikke kan agere udover hvad det er meningen
 I vores applikation er de ting vi har skulle være opmærksomme på i forhold til Broken Access Control primært været vores JWT, samt vores GraphQL. Vi løser problemet med at en bruger eller tredjepart kan ændre i JWT ved at sørge for at det underskrives, både med hashet af payload og header, samt vores secret. Se mere om dette i [JWT](#jwt) afsnittet. Vores GraphQL er beskyttet ved at bruge [Apollo Links](#apollo-links).
 
 #### Injection
-OWASP vurderer stadig injection som problem nummer 1 i sikkerhedsverden. På trods af hvor velkendt denne slags sikkerhedsrisiko er, er der stadig utroligt mange, der ikke tager højde for det og hvis et system er åbent for injections, kan en tredjepart få adgang til stort set al data. Svagheden er nemt at udnytte, nem at opdage og konsekvenserne er som regel ekstremt store. Vi har gjort vores bedste for at eliminere denne potentielle svaghed ved brug af typekontrol og prepared statements (se afsnit om Sikkerhed ift. Injection).
+OWASP vurderer stadig injection som problem nummer 1 i sikkerhedsverden. På trods af hvor velkendt denne slags sikkerhedsrisiko er, er der stadig utroligt mange, der ikke tager højde for det og hvis et system er åbent for injections, kan en tredjepart få adgang til stort set al data.  
+Svagheden er nem at udnytte, nem at opdage og konsekvenserne er som regel ekstremt store. Vi har gjort vores bedste for at eliminere denne potentielle svaghed ved brug af typekontrol og prepared statements (se afsnit om Sikkerhed ift. Injection).
 
 #### Security Misconfiguration
 OWASP beskriver Security Misconfiguration som f.eks default accounts, offentlig visning af stacktrace, unødvendige features/frameworks/libraries og deslige. Vi har i vores projekt sørget for at eliminere Security Misconfiguration ved:
@@ -443,10 +444,10 @@ Vi gemmer JWT i [SecureStore](https://docs.expo.io/versions/latest/sdk/securesto
 * På Android bruger de [Android Keystore System](https://developer.android.com/training/articles/keystore.html)
 
 #### Incremental Authorization
-Der findes Authorization i den forstand, at vi skal give en bruger adgang til vores data og ressourcer via deres login. Men brugeren skal også give consent til at vores app må tilgå f.eks deres Google account og deres lokation.
+Der findes Authorization i den forstand, at vi skal give en bruger adgang til vores data og ressourcer via deres login. Men brugeren skal også give samtykke til at vores app må tilgå f.eks deres Google account og deres lokation.
 
 Når en bruger logger ind med Google, føres de til Googles loginside, og bliver så spurgt om app'en skal have lov til at se deres e-mail, profilbillede osv. Når en bruger så gerne vil bruge vores map-feature, så bliver de spurgt om lov til at bruge deres lokation. 
-Dette er Incremental Authorization. At man ikke spørger brugeren om tilladelse til at bruge f.eks kameraet, lokationen, osv., før man rent faktisk har brug for det. Man kan risikere at overvælde brugeren med en consent screen, hvis alt der skal gives consent til præsenteres på en gang når de logger ind. Derfor kan man risikere at miste brugere, fordi de så trykker nej. Desuden kan de anvende alle de features af app'en der ikke kræver consent, selv hvis de trykker nej til f.eks lokation. De har stadig sagt ja til e-mail osv. da de loggede ind. Derfor kan man få flere permissions fra brugerne igennem, uden at skræmme dem væk.
+Dette er Incremental Authorization. At man ikke spørger brugeren om tilladelse til at bruge f.eks kameraet, lokationen, osv., før man rent faktisk har brug for det. Man kan risikere at overvælde brugeren med en samtykke screen, hvis alt der skal gives samtykke til præsenteres på en gang når de logger ind. Derfor kan man risikere at miste brugere, fordi de så trykker nej. Desuden kan de anvende alle de features af app'en der ikke kræver samtykke, selv hvis de trykker nej til f.eks lokation. De har stadig sagt ja til e-mail osv. da de loggede ind. Derfor kan man få flere permissions fra brugerne igennem, uden at skræmme dem væk.
 
 ---
 
