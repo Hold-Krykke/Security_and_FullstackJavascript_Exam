@@ -61,6 +61,7 @@ const MapScreen = (props) => {
 		if (error) {
 			console.log('taskError', error);
 			// check `error.message` for more details.
+			//actually handle error with new error system
 			return;
 		}
 		console.log('Received new locations', locations);
@@ -70,7 +71,6 @@ const MapScreen = (props) => {
 			longitude: locations[0].coords.longitude,
 			latitude: locations[0].coords.latitude,
 		});
-		console.log('Not supposed to be in task manager');
 	});
 
 	async () => {
@@ -101,33 +101,14 @@ const MapScreen = (props) => {
 		}
 	}, [settings]);
 
-	// const doStuff = () => {
-	// 	if (changeRegion && settings.latitude && settings.longitude) {
-	// 		setRegion({
-	// 			latitude: settings.latitude,
-	// 			longitude: settings.longitude,
-	// 			latitudeDelta: LATITUDE_DELTA,
-	// 			longitudeDelta: LONGITUDE_DELTA,
-	// 		});
-	// 		setChangeRegion(false)
-	// 		//mapRef.current.animateToRegion(region, 1000);
-	// 	}
-	// }
+
 	useEffect(() => {
 		let timeout;
-		console.log('in useeffect outer, changeRegion:', changeRegion);
 		if (changeRegion && region) {
-			console.log('in useeffect inner', region);
-			//timeout = setTimeout(() => mapRef.current.animateToRegion(region, 1000), 5);
 			setTimeout(() => mapRef.current.animateToRegion(region, 1000), 5);
 			//https://github.com/react-native-community/react-native-maps/issues/1717
-			//timeout()
 		}
-		// return () => {
 		if (timeout) clearTimeout(timeout)
-		// 	setChangeRegion(false)
-		// }
-		//console.log('in useeffect mapRef', mapRef);
 	}, [changeRegion]);
 	useEffect(() => {
 		// setTimeout(() => {
@@ -142,19 +123,11 @@ const MapScreen = (props) => {
 				longitude: location.coords.longitude,
 				latitude: location.coords.latitude,
 			});
-			//setChangeRegion(true);
-			// setRegion({
-			// 	latitude: location.coords.latitude,
-			// 	longitude: location.coords.longitude,
-			// 	latitudeDelta: LATITUDE_DELTA,
-			// 	longitudeDelta: LONGITUDE_DELTA,
-			// });
-			//setRegion(INITIAL_REGION)
+			
 			console.log('happened ' + new Date(Date.now()).toLocaleTimeString());
 		})();
-		//No return as we want user to update in the background
-		// }, 1000);
-	}, []); //will replicate between reloads of component, ffs
+		
+	}, []); 
 
 	// let userMessage = 'Waiting for location...';
 	// if (errorMsg) {
@@ -177,23 +150,13 @@ const MapScreen = (props) => {
 					{/* <Text style={styles.text}>{userMessage}</Text> */}
 
 					<View style={styles.container}>
-						{/* {!region && (<MapView
-								ref={mapRef}
+						{/* {!region && (<MapView //could be useful if long load or user hasn't given permission!!
+								//ref={mapRef}
 								style={styles.mapStyle}
 								region={INITIAL_REGION}
-								showsUserLocation
+								//showsUserLocation
 								loadingEnabled>
-								{settings.latitude && settings.longitude && (
-									<MapView.Marker
-										title={settings.username + ' (YOU)'}
-										pinColor="blue"
-										key={settings.username}
-										coordinate={{
-											longitude: settings.longitude,
-											latitude: settings.latitude,
-										}}
-									/>
-								)}
+								
 							</MapView>
 						)} */}
 						{region && (
@@ -208,10 +171,12 @@ const MapScreen = (props) => {
 								//region={region}
 								//onRegionChangeComplete={(region) => mapRef.current.animateToRegion(region, 1000)}
 								showsUserLocation
-								loadingEnabled
+								loadingEnabled={true}
+								onLongPress= {() => mapRef.current.animateToRegion(region, 1000)}
+								//showsIndoorLevelPicker={true}
 								//followsUserLocation={true}
 							>
-								{/* {settings.latitude && settings.longitude && (
+								{/* {settings.latitude && settings.longitude && ( //legacy, use for mapping others
 									<MapView.Marker
 										title={settings.username + ' (YOU)'}
 										pinColor="blue"
