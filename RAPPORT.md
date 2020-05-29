@@ -274,7 +274,7 @@ Dette er vores OAuth 2.0/OpenID 2.0. endpoint der eksekverer passport strategien
 Dette endpoint eksekverer også passport strategien `google`. Ved succesfuldt login modtager dette endpoint en authorizationcode fra Google. Denne authorizationcode bliver via passport herefter sendt tilbage til Google som sender accesstoken, refreshtoken og profildata tilbage til os. Til sidst genererer dette endpoint et JWT som så sendes tilbage til react native app’en. 
 
 #### Passport
-Passport er en authentication middleware hvis formål er at authenticate requests. Frameworket indeholder en masse predefinerede strategier for login med diverse OAuth 2.0/OpenID 2.0 providers, samt andre BasicAuth, JWT og deslige. På definerede endpoints kaldes `passport.authenticate()`, der tager navnet på den ønskede strategi ind som herefter eksekveres.  
+Passport er en authentication middleware hvis formål er at authenticate requests. Frameworket indeholder en masse predefinerede strategier for login med diverse OAuth 2.0/OpenID 2.0 providers, samt andre såsom BasicAuth, JWT og deslige. På definerede endpoints kaldes `passport.authenticate()`, der tager navnet på den ønskede strategi ind som herefter eksekveres.  
 
 <p align="center">
 <img src="https://user-images.githubusercontent.com/35559774/83126575-4be70480-a0d9-11ea-9c41-1641bf900705.png"/>
