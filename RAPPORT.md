@@ -69,10 +69,10 @@ Vi har valgt dette projekt for at få dækket nogle af de OWASP-praksisser vi ha
 
 ### OWASP
 Når sværhedsgraden af potentielle sikkerhedsfejl vurderes, er der altid flere aspekter, man tager i betragtning. OWASP vurderer i denne sammenhæng 4 forskellige faktorer:
-* **Exploitability**: How easy is it for threat agents to exploit a given weakness
-* **Prevalence**: How well known is the weakness
-* **Detectability**: How easy is it to detect the weakness
-* **Technical**: How severe is the technical impact if the weakness is exploited  
+* **Exploitability**: Hvor nemt er det for threath agents at udnyttet et sikkerhedshul
+* **Prevalence**: Hvor velkendt er sikkerhedshullet
+* **Detectability**: Hvor nemt er det at opdage sikkerhedshullet
+* **Technical**: Hvor alvorlig er den tekniske indvirkning hvis sikkerhedshullet bliver udnyttet
 De fire vurderinger får en score mellem 1 og 3 og en samlet score bliver derefter udregnet som vist på figuren:  
 
 <p align="center">
