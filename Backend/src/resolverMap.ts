@@ -116,10 +116,8 @@ const resolverMap: IResolvers = {
  * @param context
  */
 const mayOnlyModifySelf = async (args: any, context: any) => {
-  const useremail = context.token.useremail;
-  const user = await userFacade.getUserByEmail(useremail);
-  const actualUsername = user.username;
-  if (!(actualUsername == args.username)) {
+  const user = await userFacade.getUserByEmail(context.token.useremail);
+  if (!(user.username == args.username)) {
     throw new ForbiddenError("You don't have permission to do that.");
   }
 };
