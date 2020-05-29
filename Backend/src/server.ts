@@ -66,7 +66,7 @@ app.post("/auth/jwt", (req, res) => {
         return;
       }
 
-      const payload = { useremail: user.email };
+      const payload = { useremail: user.email, username: user.username, isOAuth: false };
       req.login(payload, { session: false }, (error) => {
         if (error) {
           res.status(400).send({ error });
@@ -74,11 +74,10 @@ app.post("/auth/jwt", (req, res) => {
         const token = jwt.sign(payload, process.env.SECRET, {
           expiresIn: tokenExpirationInSeconds,
         });
-        res.cookie("jwt", jwt, { httpOnly: true, secure: true });
         res.status(200).send({
           token: token,
           username: user.username,
-          useremail: user.email,
+          useremail: user.email
         });
       });
     }
@@ -120,16 +119,15 @@ app.get("/auth/google/callback", (req, res) => {
         return;
       }
       const state = JSON.parse(req.query.state.toString());
-      const payload = { useremail: user.profile.emails[0].value };
+      const payload = { useremail: user.profile.emails[0].value, username: user.profile.username, isOAuth: true };
 
       req.login(payload, { session: false }, (error) => {
         if (error) {
           res.status(400).send({ error });
         }
         const token = jwt.sign(payload, process.env.SECRET, {
-          expiresIn: tokenExpirationInSeconds,
+          expiresIn: tokenExpirationInSeconds
         });
-        res.cookie("jwt", jwt, { httpOnly: true, secure: false });
         res.redirect(`${state.redirectUrl}?token=${token}`);
       });
     }

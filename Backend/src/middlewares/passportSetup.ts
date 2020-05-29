@@ -10,11 +10,22 @@ const schema: string = process.env.DATABASE_SCHEMA || '';
 const userFacade: UserFacade = new UserFacade(schema);
 
 const initPassport = () => {
-    const GoogleTokenStrategyCallback = (accessToken: String, refreshToken: String, profile: any, done: Function) => {
-        console.log('\nREFRESH TOKEN\n', refreshToken);
-
+    async function GoogleTokenStrategyCallback(accessToken: string, refreshToken: string, profile: any, done: Function) {
+        // console.log('\nREFRESH TOKEN\n', refreshToken);
+        const email: string = profile.emails[0].value;
+        let user = null;
+        try {
+            user = await userFacade.getUserByEmail(email);
+            const success = await userFacade.updateUserRefreshToken(email, refreshToken, true);
+            if (!success) {
+                console.log("FAILED TO UPDATE REFRESH TOKEN FOR OAUTH USER");
+            }
+        } catch(err){}
+        // We're adding the username to the profile so we can access it in server.ts
+        profile.username = user?.username;
+        
         // Calls for logic or simply logic for storing these tokens goes here
-        done(null, { accessToken, refreshToken, profile, })
+        done(null, { accessToken, refreshToken, profile })
     };
     passport.use(new GoogleStrategy({
         clientID: process.env.CLIENT_ID,
@@ -29,7 +40,7 @@ const initPassport = () => {
                     const user = await userFacade.getUserByEmail(useremail)
                     return done(null, user);
                 } else {
-                    return done('Incorrect useremail / Password');
+                    return done('Incorrect useremail / password');
                 }
             } catch (error) {
                 done(error);

@@ -63,6 +63,7 @@ const LoginScreen = ({
         await SecureStore.setItemAsync(secureStoreKey, token);
         const decoded = jwt_decode(token);
         user.email = decoded.useremail;
+        user.username = decoded.username;
         setUser(user);
         console.log("user", user);
         setSignedIn(true);
@@ -98,9 +99,11 @@ const LoginScreen = ({
       // && (typeof res.token === String || res.token instanceof String)
     ) {
       user.email = res.useremail;
+      user.username = res.username;
+      console.log("User", user);
       await SecureStore.setItemAsync(secureStoreKey, res.token);
       setUser(user);
-      console.log(JSON.stringify({ res }, null, 4));
+      // console.log(JSON.stringify({ res }, null, 4));
       setSignedIn(true);
     } else {
       console.log(
