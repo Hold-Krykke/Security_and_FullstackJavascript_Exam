@@ -167,7 +167,6 @@ const MapScreen = (props) => {
 								//region={INITIAL_REGION}
 								//region={region}
 								//onRegionChangeComplete={(region) => mapRef.current.animateToRegion(region, 1000)}
-								showsMyLocationButton
 								showsUserLocation
 								loadingEnabled={true}
 								onLongPress={() => mapRef.current.animateToRegion(region, 1000)}

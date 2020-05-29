@@ -21,18 +21,18 @@ import colors from '../constants/colors';
 const MapScreenSettings = ({settings, setSettings}) => {
 	console.log(settings);
 	const [modalVisible, setModalVisible] = useState(false);
-	const [distanceInput, setDistanceInput] = useState(settings.distance | 1000)
+	const [distanceInput, setDistanceInput] = useState(settings.distance | 1000);
 	const [inputMsg, setInputMsg] = useState('');
-	let buttonRef = useRef(null);
 
 	const inputHandler = (distance) => {
-		if (Number.isFinite(distance)) {
-			//setInputMsg('');
+		setInputMsg('');
+		distance = distance.replace(',', '.');
+		setDistanceInput(distance);
+		distance = parseFloat(distance);
+		if (distance) {
 			setSettings({...settings, distance});
 		} else {
 			setInputMsg('Input must be a decimal number');
-			setTimeout(() => setInputMsg(''), 3000);
-			//if (buttonRef.current) buttonRef.current.enabled = false;
 		}
 	};
 	return (
@@ -58,7 +58,7 @@ const MapScreenSettings = ({settings, setSettings}) => {
 
 							<View style={styles.settingsContainer}>
 								<Input
-									value={settings.distance.toString()}
+									value={distanceInput.toString()}
 									onChangeText={inputHandler}
 									keyboardType="numeric"
 									autoFocus={true}
@@ -66,12 +66,14 @@ const MapScreenSettings = ({settings, setSettings}) => {
 								<Text style={styles.text}> m</Text>
 							</View>
 							<TouchableOpacity
-								//ref={buttonRef}
 								onPress={() => setModalVisible(false)}
 								activeOpacity={0.7}
-								text="Close"
-								style={{Touchable: styles.touchable, TouchableText: styles.touchableText}}
-								disabled={!inputMsg}
+								text="Return"
+								style={{
+									Touchable: !inputMsg ? styles.touchableEnabled : {backgroundColor: 'red'},
+									TouchableText: styles.touchableText,
+								}}
+								disabled={inputMsg}
 							/>
 							{inputMsg ? <Text style={{...styles.text, color: 'red'}}>{inputMsg}</Text> : null}
 							<Text style={styles.tipText}>Tip: Press the map to return to your location </Text>
@@ -88,7 +90,7 @@ const MapScreenSettings = ({settings, setSettings}) => {
 							onPress={() => setModalVisible(true)}
 							activeOpacity={0.7}
 							text="Settings"
-							style={{Touchable: styles.touchable, TouchableText: styles.touchableText}}
+							style={{Touchable: styles.touchableEnabled, TouchableText: styles.touchableText}}
 						/>
 					</View>
 				</View>
@@ -159,7 +161,7 @@ const styles = StyleSheet.create({
 		justifyContent: 'space-around',
 		//alignItems: 'center'
 	},
-	touchable: {},
+	touchableEnabled: {},
 	touchableText: {
 		letterSpacing: 0.5,
 	},
