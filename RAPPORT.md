@@ -473,8 +473,7 @@ PKCE (udtales Pixie) - Proof Key for Code Exchange - [blev inkluderet i OAauth 2
 <img src="https://user-images.githubusercontent.com/35559774/83181265-ed477800-a124-11ea-9636-f8a67592ac15.png"/>
 </p>  
 
-To apps bruger samme URL-skema. Styresystemet tillader uden forbehold begge apps at modtage authorization code gennem URL-skemaet og derved kan man risikere at access token bliver udleveret til tredjepart.
-PKCE løser dette problem ved at tilsætte følgende til flowet ([kilde](https://www.oauth.com/oauth2-servers/pkce/)):
+  To apps bruger samme URL-skema. Styresystemet tillader uden forbehold begge apps at modtage authorization code gennem URL-skemaet og derved kan man risikere at access token bliver udleveret til tredjepart. PKCE løser dette problem ved at tilsætte følgende til flowet ([kilde](https://www.oauth.com/oauth2-servers/pkce/)):
   * Applikationen genererer en String: code_verifier
   * Applikationen bruger code_verifier til at generere en SHA256-hash code_challenge og sender denne med i authorization-requesten
   * Auth-serveren gemmer code_challenge
