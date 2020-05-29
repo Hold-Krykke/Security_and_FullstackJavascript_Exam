@@ -207,7 +207,7 @@ Vi logger alle fejl som opstår i applikationen.
 I dette afsnit beskriver vi hvordan vi har valgt at håndtere hele vores login strategi i forhold til real world security risks. 
 
 #### Bcrypt
-Vi bruger Bcrypt til at hashe passwords hos de brugere af vores applikation der ikke ønsker at logge ind med deres Google-konto. Vi har valgt Bcrypt da den virker som det bedste valg i forhold til fremtidssikring, samt det er den hashing algoritme der bliver anbefalet mest til hashing af passwords. 
+Vi bruger Bcrypt til at hashe passwords hos de brugere af vores applikation der ikke ønsker at logge ind med deres Google-konto. Vi har valgt Bcrypt da det virker som det bedste valg i forhold til fremtidssikring, samt det er den hashing algoritme der bliver anbefalet mest til hashing af passwords. 
 Bcrypt er som nævnt en hashing algoritme der er udviklet specifikt til hashing af passwords. Den er derfor designet til at være langsom. Grunden til at en hashing algoritme bør være langsom er, at det vil tage lige så lang tid at brute force hvert password-gæt, som når det hashes. Ved også at inkorporere et salt, er der beskyttelse mod rainbow-table angreb, da to ens passwords vil resultere i 2 forskellige hash. Herudover kan antallet af rounds justeres, hvilket gør processen mere langsommelig. 
 
 Forsimplet diagram over hvordan bcrypt virker:  
