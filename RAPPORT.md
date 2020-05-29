@@ -83,7 +83,7 @@ Den indvirkning lækkede/mistede data har på os og vores brugere, samt den tekn
 
 #### Broken Authentication
 Hvis authentication management ikke håndteres korrekt, f.eks. når en session ikke bliver invalideret ved logout, fører det til broken authentication. 
-Broken authentication er relativt nemt for angribere at udnytte og kan have store konsekvenser for både ofre og virksomheder, såsom hvidvaskning, bedrageri og identitetstyveri.
+Broken authentication er relativt nemt for angribere at udnytte og kan have store konsekvenser for både brugere og virksomheder, såsom hvidvaskning, bedrageri og identitetstyveri.
 Problemer i en applikation der kan føre til Broken Authentication
 * Tillader automatiserede login/angreb 
   * credential shuffling og brute force
