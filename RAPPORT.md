@@ -442,7 +442,7 @@ Eller f.eks. et koordinatsæt, som i GraphQL bare er integers.
 
 Man kan også tjekke i frontend for den slags, men det ville ikke være sikkert, fordi brugeren ville kunne sende en request til vores backend uden om frontend mobilappen. Derfor skal den slags også tjekkes i backenden. Vi tjekker for fejl så “højt” oppe som muligt i koden, så serveren ikke skal lave for meget arbejde, før den afviser requesten. Desto før man kan validere input'et, desto bedre.
 
-**Frontend**
+**Frontend**  
 Til Errorhandling i frontenden har vi brugt et link der hedder Apollo-Link-Error.
 Det link fanger alle networkerrors og GraphQL errors, og så kan man ét sted i koden bestemme hvad der skal ske derfra. Det gør det nemt at håndtere, og refaktorere senere. Desuden har vi lavet en custom “ErrorHandler” der kan tage imod en ApolloError. Vi bruger en Alert, som er en slags popup, til at sætte en besked til brugeren, som de ikke kan undgå at se, hvis noget går galt. 
 F.eks. hvis errorcode her er `FORBIDDEN`, ved vi at den stammer fra en ForbiddenError i backenden, og det betyder dermed at brugerens adgangsniveau til API'en ikke er højt nok til det de prøver at tilgå. 
