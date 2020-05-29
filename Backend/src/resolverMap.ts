@@ -69,6 +69,7 @@ const resolverMap: IResolvers = {
     },
     deleteUser: (_, args: any, context) => {
       requiresLogIn(context);
+      mayOnlyModifySelf(args, context);
       return userFacade.deleteUser(args.username);
     },
     getNearbyUsers: (_, args: any, context) => {
@@ -95,7 +96,9 @@ const resolverMap: IResolvers = {
       return nearbyUsers;
     },
     updatePosition: (_, args: any, context) => {
+      // Three guards.
       requiresLogIn(context);
+      mayOnlyModifySelf(args, context);
       isCoordinates(args.coordinates);
       const username: string = args.username;
       const lon: number = args.coordinates.lon;
@@ -106,10 +109,23 @@ const resolverMap: IResolvers = {
   },
 };
 
-export default resolverMap;
+/**
+ * Check if the person requesting something, is actually who they say they are.
+ * For example used for deletion. People may only delete themselves.
+ * @param args
+ * @param context
+ */
+const mayOnlyModifySelf = async (args: any, context: any) => {
+  const useremail = context.token.useremail;
+  const user = await userFacade.getUserByEmail(useremail);
+  const actualUsername = user.username;
+  if (!(actualUsername == args.username)) {
+    throw new ForbiddenError("You don't have permission to do that.");
+  }
+};
 
 const requiresLogIn = (context: any) => {
-  if (!context.valid) {
+  if (!context.valid || !context.token) {
     throw new AuthenticationError("You need to be logged in to do that.");
   }
 };
@@ -126,3 +142,5 @@ function isCoordinates(coordinates: any) {
     );
   }
 }
+
+export default resolverMap;
