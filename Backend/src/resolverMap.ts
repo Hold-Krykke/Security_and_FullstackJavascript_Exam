@@ -50,9 +50,7 @@ const resolverMap: IResolvers = {
       console.log(context);
       // This is an Authorization Guard.
       // Protect GraphQL mutations like this.
-      if (!context.valid) {
-        throw new AuthenticationError("You need to be logged in to do that.");
-      }
+      requiresLogIn(context);
       return userFacade.getUserByUsername(args.username);
     },
   },
@@ -76,10 +74,12 @@ const resolverMap: IResolvers = {
       };
       return userFacade.addNonOAuthUser(user);
     },
-    deleteUser: (_, args: any) => {
+    deleteUser: (_, args: any, context) => {
+      requiresLogIn(context);
       return userFacade.deleteUser(args.username);
     },
-    getNearbyUsers: (_, args: any) => {
+    getNearbyUsers: (_, args: any, context) => {
+      requiresLogIn(context);
       if (args.distance <= 0) {
         throw new UserInputError(
           "Please provide a search distance that is greater than 0",
@@ -101,7 +101,8 @@ const resolverMap: IResolvers = {
       );
       return nearbyUsers;
     },
-    updatePosition: (_, args: any) => {
+    updatePosition: (_, args: any, context) => {
+      requiresLogIn(context);
       isCoordinates(args.coordinates);
       const username: string = args.username;
       const lon: number = args.coordinates.lon;
@@ -113,6 +114,12 @@ const resolverMap: IResolvers = {
 };
 
 export default resolverMap;
+
+const requiresLogIn = (context: any) => {
+  if (!context.valid) {
+    throw new AuthenticationError("You need to be logged in to do that.");
+  }
+};
 
 // This could be placed in utils, but I wanted to keep Apollo Errors thrown in this file.
 function isCoordinates(coordinates: any) {
