@@ -63,7 +63,7 @@ Vi har valgt at kombinere fagene Security og Fullstack JS, fordi vi godt kunne t
   * “Traditionelt” login uden om OAuth 2.0 med sikker transport, hashing.
   * Sikker brug af både MongoDB og MySQL. Her vil vi bl.a. gå i dybden med brugen af NoSQL databaser og undersøge emner såsom injections.
 
-Vi har valgt dette projekt for at få dækket nogle af de OWASP-praksisser vi har hørt om, men ikke implementeret, eller ikke før har implementeret i en JavaScript-sammenhæng. Udover det, vil vi også gerne lære mere om Oauth 2.0/OpenID 2.0 og sikkerheds overvejelserne dertil, da det er noget der bliver brugt i stor stil ude i den virkelige verden. 
+Vi har valgt dette projekt for at få dækket nogle af de OWASP-praksisser vi har hørt om, men ikke implementeret, eller ikke har implementeret i en JavaScript-sammenhæng før. Udover det, vil vi også gerne lære mere om Oauth 2.0/OpenID 2.0 og sikkerheds overvejelserne dertil, da det er noget der bliver brugt i stor stil ude i den virkelige verden. 
 
 ---
 
