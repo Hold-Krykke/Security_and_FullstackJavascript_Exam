@@ -111,7 +111,7 @@ export default class UserFacade {
 
     /**
      * Used to add OAuth type user.
-     * This type of user is saved without a password
+     * This type of user is saved without a password and username
      * @param user 
      */
     async addOAuthUser(user: IUser): Promise<boolean> {
