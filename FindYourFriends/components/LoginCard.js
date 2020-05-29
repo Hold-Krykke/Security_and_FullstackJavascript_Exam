@@ -29,12 +29,15 @@ const LoginCard = props => {
                     value={props.password}
                     secureTextEntry={true}
                 />
-                <Button color={colors.grey} title="Sign in " onPress={props.userLoginHandler} />
-                <Text style={styles.text}>Or sign in with your Google account</Text>
-                <Button color={colors.primary} title="Google" onPress={props.googleLoginHandler} />
-                <Text style={styles.text}>Or create a user</Text>
-                <Button color={colors.secondary} title="CREATE USER" onPress={() => props.navigation.navigate('CreateUser')} />
-
+                <View style={styles.button}>
+                    <Button color={colors.grey} title="Sign in" onPress={props.userLoginHandler} />
+                </View>
+                <View style={styles.button}>
+                    <Button color={colors.primary} title="Sign in with Google" onPress={props.googleLoginHandler} />
+                </View>
+                <View style={styles.button}>
+                    <Button color={colors.secondary} title="CREATE USER" onPress={() => props.navigation.navigate('CreateUserScreen')} />
+                </View>
             </View >
         </Card >
     );
@@ -70,7 +73,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 15,
     },
     button: {
-        width: 80,
+        width: 110,
+        marginVertical: 10
     },
 });
 

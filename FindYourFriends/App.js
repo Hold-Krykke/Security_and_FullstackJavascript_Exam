@@ -13,50 +13,26 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
 export default function App() {
-    // USE SCREENS LIKE THIS
-    //const [test, setTest] = useState(false);
     const [signedIn, setSignedIn] = useState(false);
-    const [create, setCreate] = useState(false);
 
     const Stack = createStackNavigator();
-
-    useEffect(() => {
-
-    }, []);
-
-
-    let content = <LoginScreen
-        backendURL={backendUri}
-        signedIn={signedIn}
-        setSignedIn={setSignedIn}
-    // create={create}
-    // setCreate={setCreate}
-    />;
-    if (create) {
-        //content = <MapScreen test={test} />
-        // content = <CreateUserScreen setCreate={setCreate} />;
-    }
 
     return (
         <ApolloProvider client={client}>
             <View style={styles.screen}>
                 <Header title="Find Your Friends" />
                 <NavigationContainer>
-                    <Stack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }}>
-                        <Stack.Screen name="Login">
+                    <Stack.Navigator initialRouteName="LoginScreen" screenOptions={{ headerShown: false }}>
+                        <Stack.Screen name="LoginScreen">
                             {props => <LoginScreen {...props}
                                 backendURL={backendUri}
                                 signedIn={signedIn}
                                 setSignedIn={setSignedIn}
-                                create={create}
-                                setCreate={setCreate}
                             />}
                         </Stack.Screen>
-                        <Stack.Screen name="CreateUser">{props => <CreateUserScreen {...props} setCreate={setCreate} />}</Stack.Screen>
+                        <Stack.Screen name="CreateUserScreen">{props => <CreateUserScreen {...props} />}</Stack.Screen>
+                        <Stack.Screen name="MapScreen">{props => <CreateUserScreen {...props} />}</Stack.Screen>
                     </Stack.Navigator>
-                    {/* <View style={styles.screen}>
-                    <Header title="Find Your Friends" />
-                    {content} */}
                 </NavigationContainer>
             </View>
         </ApolloProvider>

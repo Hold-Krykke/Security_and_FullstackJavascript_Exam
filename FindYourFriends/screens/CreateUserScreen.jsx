@@ -161,8 +161,12 @@ const CreateUser = (props) => {
                         value={newUser.password2}
                         placeholder='PASSWORD'
                     ></Input>
-                    <Button color={colors.primary} title="CREATE ME" onPress={confirmCreate} />
-                    <Button color={colors.secondary} title="TAKE ME BACK" onPress={() => props.navigation.goBack()} />
+                    <View style={styles.button}>
+                        <Button color={colors.primary} title="CREATE ME" onPress={confirmCreate} />
+                    </View>
+                    <View style={styles.button}>
+                        <Button color={colors.secondary} title="TAKE ME BACK" onPress={() => props.navigation.goBack()} />
+                    </View>
                 </Card>
             </View>
         </TouchableWithoutFeedback>
@@ -210,7 +214,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 15,
     },
     button: {
-        width: 80,
+        width: 110,
+        marginVertical: 10
     },
 });
 
