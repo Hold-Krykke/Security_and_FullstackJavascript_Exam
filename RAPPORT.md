@@ -398,11 +398,11 @@ I vores tilfælde bruger vi Apollo Link Context, hvor der på hvert request fra 
 Derved kan backend serveren, for hvert indgående request, tjekke om denne header findes. 
 Hvis denne header er sat, så kan vi med et JWT bibliotek verificere dette token. 
 For at verificere et token, så skal det være signet med den secret vi bruger, og tokens udløbsdato skal ikke være overskredet. 
-Her placeres token på authorization header, hvilket anses som common practice.
+Her placeres token på authorization header, hvilket anses som best practice.
 Hvis token er verificeret, så kan vi give brugeren adgang til beskyttet data. Hvis ikke, smider vi en AuthenticationError fra serveren. Man kan også returnere null, eller f.eks. et tomt array, men vi vil gerne tydeligt kunne fortælle brugeren, at man skal være logget ind for at se denne data, så der ikke er tvivl fra brugerens side om hvorvidt der er sket en fejl. 
 
 #### Apollo Error Handling
-**Backend**
+**Backend**  
 I vores backend smider vi kun Apollos egne errors udadtil. Det gør det nemmere at håndtere dem i frontend, fordi vi ved at fejlens struktur vil være ens, uanset hvilken type fejl der opstår. Samtidig sørger vi for at der ikke bliver delt mere data om fejlen end vi ønsker.
 
 Når vi opretter vores Server, kan man sætte et stykke middleware ind, der omformer alle errors smidt i koden, til en af Apollos egne. I vores kode smider vi enten en af Apollos egne errors, eller en ApiError. Hvis der kommer en ApiError så omformer vi den til en ApolloError, som så nemt kan læses i GraphQL og frontenden.  
