@@ -192,7 +192,7 @@ Hvis der var tale om SQL, havde tredjeparten selvfølgelig skullet strukturere s
 
 ```SELECT * FROM users WHERE `user` = “patrick”;-- AND `password` = "";```
 
-I dette tilfælde sørger tredjeparten for at udkommentere den del a query’en, der ellers havde tjekket, om man havde angivet det rigtige password.
+I dette tilfælde sørger tredjeparten for at udkommentere den del af query’en, der ellers havde tjekket, om man havde angivet det rigtige password.
 
 I SQL løser man langt hen ad vejen problemet med injection ved at bruge prepared statements, der sørger for, man ikke kan escape strengen, når query’en bliver opbygget i backenden. Det er også det vi bruger i vores backend. Vi tvinger brugerens input til at være en streng, så det ovenstående SQL eksempel ville ende med at se ud som følgende:
 
@@ -208,13 +208,13 @@ I større applikationer med mere varierende data end det, vi har, ville systemet
 
 #### Logging
 Som standard bliver logfiler gemt til mappen logs, og hvis programmet kører i udviklings-tilstand vil der også blive logget i konsollen. Til dette brugte vi [express-winston](https://www.npmjs.com/package/express-winston) med en opsætning skræddersyet til vores behov. Vi har fokus på maskinlæsbart output som samtidig kan granskes af mennesker, derfor har vi valgt et output i JSON-format. 
-Vi logger alle indgående requests til applikation, bortset fra /graphql som ville overfylde logs med overvejende ligegyldig data. 
+Vi logger alle indgående requests til applikation, bortset fra /graphql som ville overfylde logs med overvejende triviel data. 
 Vi logger alle fejl som opstår i applikationen.
 
 ---
 
 ### Login
-I dette afsnit beskriver vi hvordan vi har valgt at håndtere hele vores login strategi. Vores mål med denne applikation har hele tiden været at udvikle den, som var det en applikation der skulle bruges i den virkelige verden og derfor forholder vi os til de sikkerhedsrisici eksisterer og følger de "best practices" der er inden for de forskellige områder vi berører. Angående login er "best pratice" at bruge OAuth 2.0/OpenID 2.0. I en virkelig applikation forestiller vi os, at en virsomhed ikke ønsker at afskære brugere, der ikke ønsker at bruge deres konti hos diverse openID providers. Derfor implementerer vi også et traditionelt login. Her sørger vi igen for at følge de standarder der eksisterer vedrørende opbevaring af passwords. 
+I dette afsnit beskriver vi hvordan vi har valgt at håndtere hele vores login strategi. Vores mål med denne applikation har hele tiden været at udvikle den, som var det en applikation der skulle bruges i den virkelige verden og derfor forholder vi os til de sikkerhedsrisici der eksisterer og følger de "best practices" der er inden for de forskellige områder vi berører. Angående login er "best pratice" at bruge OAuth 2.0/OpenID 2.0. I en virkelig applikation forestiller vi os, at en virsomhed ikke ønsker at afskære brugere, der ikke ønsker at bruge deres konti hos diverse openID providers. Derfor implementerer vi også et traditionelt login. Her sørger vi igen for at følge de standarder der eksisterer vedrørende opbevaring af passwords. 
 
 #### Bcrypt
 Vi bruger Bcrypt til at hashe passwords hos de brugere af vores applikation der ikke ønsker at logge ind med deres Google-konto. Vi har valgt Bcrypt da det virker som det bedste valg i forhold til fremtidssikring, samt det er den hashing algoritme der bliver anbefalet mest til hashing af passwords.   
