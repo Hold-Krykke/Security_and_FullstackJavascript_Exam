@@ -179,15 +179,23 @@ Når vi selv skal håndtere vores servere benytter vi SSH, der sikrer en stærkt
 
 #### Sikkerhed ift. Injection
 Vi har som sagt valgt at bruge både en SQL database og en NoSQL database (MongoDB). Når man snakker om databaser støder man naturligvis på problemstillingen med injection. Vi har gjort flere ting for at beskytte os selv mod injection og har undersøgt eventuelle svagheder i MongoDBs API. Da MongoDB er nyt for os ville vi være sikre på, at det var sikkert at bruge, så vi har undersøgt og testet injection i forhold til MongoDB. 
+
 Der findes forskellige query- og projection “operators” i MongoDBs API som kan bruges til at optimere og forme ens API kald. Blandt andet findes `$not` operatoren, der returnerer alle dokumenter, der ikke passer på den query, der eksekveres på ens collection. En anden operator er `$ne` der match’er alle værdier, der ikke er lig med det, man specificerer efter operatoren.
 Eksempelvis ville man kunne benytte `$ne` til at undgå at skulle skrive en given brugers password: 
+
 `.find({"user": "patrick", "password": {"&ne": ""}});`
+
 I dette tilfælde injecter vi operatoren ind hvor passwordet skulle have stået. Operatoren lader os finde al data om brugeren “patrick”. I eksemplet siger man: Find brugeren, hvis navn er “patrick” og hvis password ikke er lig med en tom streng. Naturligvis går denne query igennem, fordi patrick har et password - og vi har nu fået adgang til patricks data uden at kende til hans password. 
 Hvis der var tale om SQL, havde tredjeparten selvfølgelig skullet strukturere sin injection anderledes. En SQL query svarende til det ovenstående API kald ville se ud som følgende:
+
 ```SELECT * FROM users WHERE `user` = “patrick”;-- AND `password` = "";```
+
 I dette tilfælde sørger tredjeparten for at udkommentere den del a query’en, der ellers havde tjekket, om man havde angivet det rigtige password.
+
 I SQL løser man langt hen ad vejen problemet med injection ved at bruge prepared statements, der sørger for, man ikke kan escape strengen, når query’en bliver opbygget i backenden. Det er også det vi bruger i vores backend. Vi tvinger brugerens input til at være en streng, så det ovenstående SQL eksempel ville ende med at se ud som følgende:
+
 ```SELECT * FROM users WHERE `user` = “patrick;--” AND `password` = "";```
+
 Der er ikke nogen bruger, der hedder “patrick;--” og hvis der var, ville tredjeparten stadig ikke kunne få adgang til hans data, da der ikke er angivet et password. 
 De ovenstående eksempler er forsimplede for at gøre det nemmere at forklare konceptet. 
 
