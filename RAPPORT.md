@@ -121,7 +121,7 @@ I backenden laver Apollo Server en såkaldt `context`, hvor den tjekker validite
 
 #### Injection
 OWASP vurderer stadig injection som problem nummer 1 i sikkerhedsverden. På trods af hvor velkendt denne slags sikkerhedsrisiko er, er der stadig utroligt mange, der ikke tager højde for det og hvis et system er åbent for injections, kan en tredjepart få adgang til stort set al data.  
-Svagheden er nem at udnytte, nem at opdage og konsekvenserne er som regel ekstremt store. Vi har gjort vores bedste for at eliminere denne potentielle svaghed ved brug af typekontrol og prepared statements (se afsnit om Sikkerhed ift. Injection).
+Svagheden er nem at udnytte, nem at opdage og konsekvenserne er som regel ekstremt store. Vi har gjort vores bedste for at eliminere denne potentielle svaghed ved brug af typekontrol og prepared statements (se afsnit om [Sikkerhed ift. Injection](#sikkerhed-ift-injection)).
 
 #### Security Misconfiguration
 OWASP beskriver Security Misconfiguration som f.eks default accounts, offentlig visning af stacktrace, unødvendige features/frameworks/libraries og deslige. Vi har i vores projekt sørget for at eliminere Security Misconfiguration ved:
