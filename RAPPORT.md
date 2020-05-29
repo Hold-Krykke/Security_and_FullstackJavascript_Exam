@@ -405,7 +405,7 @@ Hvis token er verificeret, så kan vi give brugeren adgang til beskyttet data. H
 **Backend**  
 I vores backend smider vi kun Apollos egne errors udadtil. Det gør det nemmere at håndtere dem i frontend, fordi vi ved at fejlens struktur vil være ens, uanset hvilken type fejl der opstår. Samtidig sørger vi for at der ikke bliver delt mere data om fejlen end vi ønsker.
 
-Når vi opretter vores Server, kan man sætte et stykke middleware ind, der omformer alle errors smidt i koden, til en af Apollos egne. I vores kode smider vi enten en af Apollos egne errors, eller en ApiError. Hvis der kommer en ApiError så omformer vi den til en ApolloError, som så nemt kan læses i GraphQL og frontenden.  
+I vores backend har vi brugt Apollos middleware, der omformer alle errors smidt i koden, til en af Apollos egne. I vores kode smider vi enten en af Apollos egne errors, eller en ApiError. Hvis der kommer en ApiError så omformer vi den til en ApolloError, som så nemt kan læses i GraphQL og frontenden.  
 
 <p align="center">
 <img src="https://user-images.githubusercontent.com/35559774/83139227-4d6df800-a0ec-11ea-9fef-ac6ad0b1d135.png"/>
