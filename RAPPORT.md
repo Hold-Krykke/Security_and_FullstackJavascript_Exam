@@ -450,7 +450,7 @@ Eller hvis koden f.eks. er `UNAUTHENTICATED`, kan man slette det lokale token i 
 Og til sidst, hvis koden er `BAD_USER_INPUT` skal brugeren have at vide præcis hvilket felt de har tastet forkert i, og hvorfor. Derfor er `invalidArgs` feltet smart på den error, fordi det kan nu benyttes til en præcis fejlbesked og bedre brugervenlighed. 
 
 #### JWT sikkerhed i App
-Vi gemmer JWT i [SecureStore](https://docs.expo.io/versions/latest/sdk/securestore/) hos brugere. Securestore krypterer og gemmer key-value par 	lokalt på brugerens mobil. Info der er gemt i et Expo-projekt kan ikke tilgås fra andre Expo-projekter. Desuden gør SecureStore det nemt for os at tilgå JWT uanset hvor vi er i vores application. Og hvis brugeren lukker for vores app, logges de ikke af, da vi kan hente JWT op igen fra SecureStore. Alt efter om brugeren er på Android eller IOS har den forskellige implementationer. 
+Vi gemmer [JWT](#jwt) i [SecureStore](https://docs.expo.io/versions/latest/sdk/securestore/) hos brugere. Securestore krypterer og gemmer key-value par 	lokalt på brugerens mobil. Info der er gemt i et Expo-projekt kan ikke tilgås fra andre Expo-projekter. Desuden gør SecureStore det nemt for os at tilgå JWT uanset hvor vi er i vores application. Og hvis brugeren lukker for vores app, logges de ikke af, da vi kan hente JWT op igen fra SecureStore. Alt efter om brugeren er på Android eller IOS har den forskellige implementationer. 
 * På IOS bruger de [Keychain Services](https://developer.apple.com/documentation/security/keychain_services)
 * På Android bruger de [Android Keystore System](https://developer.android.com/training/articles/keystore.html)
 
