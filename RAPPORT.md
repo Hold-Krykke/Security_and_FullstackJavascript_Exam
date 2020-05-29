@@ -308,10 +308,10 @@ Den request backenden sender til Google indeholder de Oauth 2.0 parametre vi er 
 <img src="https://user-images.githubusercontent.com/35559774/83127277-41793a80-a0da-11ea-9317-1810fe9e413f.png"/>
 </p>  
 
-`scope` er det brugerdata vi er interesserede i og her specificerer vi at det er brugerens OpenID 2.0 data samt deres e-mail vi gerne vil have adgang til (også kaldet profile data).   
-`accessType` er den parameter der fortæller brugeren at vi gerne vil have offline access til deres data, hvilket vil sige at Google giver os et refresh token med tilbage, sammen med access token og profile data.   
-`promt` med value `“consent”` er påkrævet af Google for at vi kan få lov til at sende `accessType: "offline"` med.   
-`state` er data som Google sender uændret tilbage til os igen. Vi skal bruge indholdet af vores state for at kunne lave et redirect tilbage til vores react native app.  
+* `scope` er det brugerdata vi er interesserede i og her specificerer vi at det er brugerens OpenID 2.0 data samt deres e-mail vi gerne vil have adgang til (også kaldet profile data).   
+* `accessType` er den parameter der fortæller brugeren at vi gerne vil have offline access til deres data, hvilket vil sige at Google giver os et refresh token med tilbage, sammen med access token og profile data.   
+* `promt` med value `“consent”` er påkrævet af Google for at vi kan få lov til at sende `accessType: "offline"` med.   
+* `state` er data som Google sender uændret tilbage til os igen. Vi skal bruge indholdet af vores state for at kunne lave et redirect tilbage til vores react native app.  
 
 Det passport sender afsted til Google med ovenstående parametre ser nogenlunde ud på følgende måde   
 
@@ -340,13 +340,13 @@ Som så kommer tilbage nogenlunde sådan her
 
 Backenden genererer et Json Web Token (se mere i afsnittet JWT) og redirecter til react native app’ens custom scheme (Brugen af Expo, deep linking og URL schemes). Dette lukker den browser der var åbnet op og herefter tager App’en over og sørger videre for håndteringen af JWT. 
 
-##### Authorizationcode flow vs. Implicit flow
+#### Authorizationcode flow vs. Implicit flow
 Det der adskiller authorizationcode flow fra implicit flow er det trin hvor Google afleverer en authorizationcode til backenden og backenden udveksler denne til access token, refresh token og profile data. 
 Det vil sige at implicit flow går direkte fra bruger-login til at få udleveret accesstoken fra Google. Vi startede med at lave et implicit flow direkte i app’en, men dette vurderes som relativt usikkert i forhold til authorizationcode flow af flere grunde. Client secret skal for det første gemmes et sted i app’en, for at blive sendt med til Google. Herudover sendes access token direkte tilbage til app’en gennem browseren og app’en vil selv skulle holde styr på det. Dette vurderes generelt som værende usikkert, både fordi al clientkode ligger frit tilgængeligt, trods eventuel obfuscation, samt at det generelt er nemmere for en tredjepart at få stjålet et accesstoken fra en app eller en SPA, end fra en backend. Dette kan f.eks. ske gennem Cross Site Scripting hvor der injectes client-side scripts. 
  
 Authorizationcode flow’et hvor det er backenden der står for kommunikationen med Google, udveksling af tokens og opbevaring af tokens er den anbefalede måde at håndtere OAuth 2.0/OpenID 2.0 på. [OAuth 2.0 Flow](https://auth0.com/docs/api-auth/which-oauth-flow-to-use)
 
-##### Kort beskrivelse af  OAuth 2.0 flows
+#### Kort beskrivelse af  OAuth 2.0 flows
 Der findes fire typer af flows, eller grant types som det også kaldes, for en client at få et access token fra en authorizationserver på. 
 * **Authorizationcode flow** - det vi bruger og som er vist billedligt længere oppe. Bruges i serverside applikationer hvor source koden ikke er offentlig eksponeret. I dette flow foregår der på backenden en udveksling mellem applikationen og 2.0/OpenID 2.0 provideren hvor authorizationcode udveksles for tokens. 
 * **Implicit flow** - clienten henter selv direkte et access token hos provideren. User credentials skal, hvis dette flow bruges, ikke gemmes i client koden. Er oftest brugt i web-, desktop- og mobilapplikationer der ikke har en backend applikation. 
