@@ -110,7 +110,7 @@ Hvis vores backenden blev overtaget af en tredjepart, ville vedkommende kunne ø
 #### Broken Access Control
 Access control sørger for at brugere ikke kan agere udover hvad det er meningen de skal kunne i en applikation. OWASP beskriver følgende typiske Access control sikkerhedshuller.
 * Forbigåelse af checks ved at modificere URL, state, HTML eller ved at bruge et API angrebs redskab
-* Tillade at e id kan ændres til en anden brugers, så det er muligt at se eller redigere en andens konto/information. 
+* Tillade at et id kan ændres til en anden brugers, så det er muligt at se eller redigere en andens konto/information. 
 * At kunne tilgå indhold man ikke bør have adgang til (adminrettigheder som almindelig bruger osv)
 * Manipulation af metadata. Eksempelvis, redigering af JWT, access control token eller cookies for at ændre i rettigheder eller lignende. 
 * Forkert CORS konfiguration der gør det muligt at få unauthorized API adgang. 
