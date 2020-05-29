@@ -148,7 +148,7 @@ Derfor har vi gjort følgende:
   * Logs bliver ikke monitoreret (udover manuelt)
   * Applikationen reagerer ikke i forbindelse med logging.
 * Vi logger ikke bestemte exceptions, noget vi kunne have gjort i forbindelse med brugen af Apollo Links.
-* Vi logger ikke ekstra-ordinært i forbindelse med brute-force detection
+* Vi logger ikke ekstraordinært i forbindelse med brute-force detection
 
 ---
 
