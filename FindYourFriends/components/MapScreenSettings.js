@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {
 	StyleSheet,
 	View,
@@ -21,9 +21,19 @@ import colors from '../constants/colors';
 const MapScreenSettings = ({settings, setSettings}) => {
 	console.log(settings);
 	const [modalVisible, setModalVisible] = useState(false);
+	const [distanceInput, setDistanceInput] = useState(settings.distance | 1000)
+	const [inputMsg, setInputMsg] = useState('');
+	let buttonRef = useRef(null);
 
 	const inputHandler = (distance) => {
-		setSettings({...settings, distance});
+		if (Number.isFinite(distance)) {
+			//setInputMsg('');
+			setSettings({...settings, distance});
+		} else {
+			setInputMsg('Input must be a decimal number');
+			setTimeout(() => setInputMsg(''), 3000);
+			//if (buttonRef.current) buttonRef.current.enabled = false;
+		}
 	};
 	return (
 		<TouchableWithoutFeedback
@@ -56,11 +66,14 @@ const MapScreenSettings = ({settings, setSettings}) => {
 								<Text style={styles.text}> m</Text>
 							</View>
 							<TouchableOpacity
+								//ref={buttonRef}
 								onPress={() => setModalVisible(false)}
 								activeOpacity={0.7}
 								text="Close"
 								style={{Touchable: styles.touchable, TouchableText: styles.touchableText}}
+								disabled={!inputMsg}
 							/>
+							{inputMsg ? <Text style={{...styles.text, color: 'red'}}>{inputMsg}</Text> : null}
 							<Text style={styles.tipText}>Tip: Press the map to return to your location </Text>
 							{/* </View> */}
 							{/* </View> */}
@@ -90,7 +103,7 @@ const styles = StyleSheet.create({
 
 		alignItems: 'center',
 		padding: 0,
-		marginTop: 10,
+		//marginTop: '20%',
 		width: Dimensions.get('window').width * 0.7,
 		height: Dimensions.get('window').height * 0.4,
 		backgroundColor: '#fff',
@@ -124,7 +137,7 @@ const styles = StyleSheet.create({
 		color: colors.primary,
 		fontSize: 11,
 		marginTop: '5%',
-		fontStyle:'italic'
+		fontStyle: 'italic',
 	},
 	innerModal: {
 		//width: 300,

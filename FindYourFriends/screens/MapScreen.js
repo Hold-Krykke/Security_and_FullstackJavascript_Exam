@@ -17,9 +17,9 @@ const INITIAL_REGION = {
 	longitudeDelta: 30,
 };
 const TASKMANAGER_TASK_NAME = 'FindYourFriends-background-location';
-const {width, height} = Dimensions.get('window');
-const ASPECT_RATIO = width / height;
-const LATITUDE_DELTA = 0.2;
+const {width: WIDTH, height: HEIGHT} = Dimensions.get('window');
+const ASPECT_RATIO = WIDTH / HEIGHT;
+const LATITUDE_DELTA = 0.06;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
 const MARKER_COLORS = [
@@ -101,17 +101,15 @@ const MapScreen = (props) => {
 		}
 	}, [settings]);
 
-
 	useEffect(() => {
 		let timeout;
 		if (changeRegion && region) {
 			setTimeout(() => mapRef.current.animateToRegion(region, 1000), 5);
 			//https://github.com/react-native-community/react-native-maps/issues/1717
 		}
-		if (timeout) clearTimeout(timeout)
+		if (timeout) clearTimeout(timeout);
 	}, [changeRegion]);
 	useEffect(() => {
-		// setTimeout(() => {
 		(async () => {
 			let {status} = await Location.requestPermissionsAsync();
 			if (status !== 'granted') {
@@ -123,11 +121,10 @@ const MapScreen = (props) => {
 				longitude: location.coords.longitude,
 				latitude: location.coords.latitude,
 			});
-			
+
 			console.log('happened ' + new Date(Date.now()).toLocaleTimeString());
 		})();
-		
-	}, []); 
+	}, []);
 
 	// let userMessage = 'Waiting for location...';
 	// if (errorMsg) {
@@ -170,9 +167,10 @@ const MapScreen = (props) => {
 								//region={INITIAL_REGION}
 								//region={region}
 								//onRegionChangeComplete={(region) => mapRef.current.animateToRegion(region, 1000)}
+								showsMyLocationButton
 								showsUserLocation
 								loadingEnabled={true}
-								onLongPress= {() => mapRef.current.animateToRegion(region, 1000)}
+								onLongPress={() => mapRef.current.animateToRegion(region, 1000)}
 								//showsIndoorLevelPicker={true}
 								//followsUserLocation={true}
 							>
@@ -221,8 +219,8 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 	},
 	mapStyle: {
-		width: Dimensions.get('window').width,
-		height: Dimensions.get('window').height,
+		width: WIDTH,
+		height: '100%'
 	},
 });
 
