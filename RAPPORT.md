@@ -434,7 +434,7 @@ Der findes 4 kategorier af fejl i Apollos struktur.
 <img src="https://user-images.githubusercontent.com/35559774/83139697-0fbd9f00-a0ed-11ea-8da1-196066715e27.png"/>
 </p>  
 
-Eller f.eks. et koordinatsæt, som i GraphQL bare er integers.  
+Eller f.eks. et koordinatsæt bestående af latitude og longitude, som i GraphQL bare er integers.  
 
 <p align="center">
 <img src="https://user-images.githubusercontent.com/35559774/83139747-24019c00-a0ed-11ea-9245-8e992855fffc.png"/>
