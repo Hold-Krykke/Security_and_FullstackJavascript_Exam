@@ -440,7 +440,7 @@ Eller f.eks. et koordinatsæt bestående af latitude og longitude, som i GraphQL
 <img src="https://user-images.githubusercontent.com/35559774/83139747-24019c00-a0ed-11ea-9245-8e992855fffc.png"/>
 </p>  
 
-Man kan også tjekke i frontend for den slags, men det ville ikke være sikkert, fordi brugeren ville kunne sende en request til vores backend uden om frontend mobilappen. Derfor skal den slags også tjekkes i backenden. Vi tjekker for fejl så “højt” oppe som muligt i koden, så serveren ikke skal lave for meget arbejde, før den afviser requesten. Desto før man kan validere input'et, desto bedre.
+Man kan også tjekke i frontend for den slags, men det ville ikke være sikkert kun at validere der, da brugeren ville kunne sende en request til vores backend uden om frontend mobilappen. Derfor skal den slags også tjekkes i backenden. Vi tjekker for fejl så “højt” oppe som muligt i koden, så serveren ikke skal lave for meget arbejde, før den afviser requesten. Desto før man kan validere input'et, desto bedre.
 
 **Frontend**  
 Til Errorhandling i frontenden har vi brugt et link der hedder Apollo-Link-Error.
