@@ -114,7 +114,7 @@ Access control sørger for at brugere ikke kan agere udover hvad det er meningen
 * At kunne tilgå indhold man ikke bør have adgang til (adminrettigheder som almindelig bruger osv)
 * Manipulation af metadata. Eksempelvis, redigering af JWT, access control token eller cookies for at ændre i rettigheder eller lignende. 
 * Forkert CORS konfiguration der gør det muligt at få unauthorized API adgang. 
-* Kunne tilgå sider der kræver authentication som unauthenticated bruger eller adminsider som almindelig bruger. Tilgå API med manglende access control til POST, PUT og DELETE endpoints. 
+* Kunne tilgå sider der kræver authentication som unauthenticated bruger eller adminsider som almindelig bruger. Tilgå API endpoints med manglende access control. 
 
 I vores applikation er de ting vi har skulle være opmærksomme på i forhold til Broken Access Control primært været vores JWT, samt vores GraphQL. Vi løser problemet med at en bruger eller tredjepart kan ændre i JWT ved at sørge for at det underskrives, både med hashet af payload og header, samt vores secret. Se mere om dette i [JWT](#jwt) afsnittet. Vores GraphQL er beskyttet ved at bruge [Apollo Links](#apollo-links). 
 I backenden laver Apollo Server en såkaldt `context`, hvor den tjekker validiteten på den JWT der bliver sendt i requesten. Hvis JWT ikke er valid, bliver `context` sendt videre til vores GraphQL Resolvers med variablen `valid: false`. Hvis JWT er valid, bliver `valid: true` sat på `context` samt det valide `token`. Man kan derefter benytte det `token` til at trække information om brugeren ud, så man sørger for, at brugeren kun kan foretage ændringer i databaserne på sig selv og ikke andre brugere.
