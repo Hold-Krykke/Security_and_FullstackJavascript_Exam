@@ -79,7 +79,7 @@ De fire vurderinger får en score mellem 1 og 3 og en samlet score bliver dereft
 <img src="https://user-images.githubusercontent.com/35559774/83125263-97001800-a0d7-11ea-8c78-f3336d566bc5.png"/>
 </p>  
 
-Den indvirkning lækkede/mistede data har på os og vores brugere, samt den tekniske destruktion en tredjepart ville kunne lave i vores backend, bliver vurderet som den faktor der vejer tungest. Top 2 på OWASPs liste er Broken Authentication og den ligger netop så højt, fordi den scorer højst i “impact”.
+Den indvirkning lækkede/mistede data har på os og vores brugere, samt den tekniske destruktion en tredjepart ville kunne lave i vores backend, bliver vurderet som den faktor der vejer tungest. Nummer 2 på OWASPs liste er Broken Authentication og den ligger netop så højt, fordi den scorer højest i “Technical”.
 
 #### Broken Authentication
 Hvis authentication management ikke håndteres korrekt, f.eks. når en session ikke bliver invalideret ved logout, fører det til broken authentication. 
