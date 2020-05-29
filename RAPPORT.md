@@ -395,7 +395,7 @@ I vores tilfælde bruger vi Apollo Link Context, hvor der på hvert request fra 
 <img src="https://user-images.githubusercontent.com/35559774/83138945-dd5f7200-a0eb-11ea-87c2-c0670eeef006.png"/>
 </p>  
 
-Derved kan backend serveren, for hvert incoming request, tjekke om denne header findes. 
+Derved kan backend serveren, for hvert indgående request, tjekke om denne header findes. 
 Hvis denne header er sat, så kan vi med et JWT bibliotek verificere dette token. 
 For at verificere et token, så skal det være signet med den secret vi bruger, og tokens udløbsdato skal ikke være overskredet. 
 Her placeres token på authorization header, hvilket anses som common practice.
