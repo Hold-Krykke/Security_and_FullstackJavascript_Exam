@@ -208,7 +208,7 @@ I større applikationer med mere varierende data end det, vi har, ville systemet
 
 #### Logging
 Som standard bliver logfiler gemt til mappen logs, og hvis programmet kører i udviklings-tilstand vil der også blive logget i konsollen. Til dette brugte vi [express-winston](https://www.npmjs.com/package/express-winston) med en opsætning skræddersyet til vores behov. Vi har fokus på maskinlæsbart output som samtidig kan granskes af mennesker, derfor har vi valgt et output i JSON-format. 
-Vi logger alle indgående requests til applikation, bortset fra /graphql som ville overfylde logs med overvejende triviel data. 
+Vi logger alle indgående requests til applikation, bortset fra `/graphql` som ville overfylde logs med overvejende triviel data.  
 Vi logger alle fejl som opstår i applikationen.
 
 ---
