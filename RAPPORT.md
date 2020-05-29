@@ -86,11 +86,11 @@ Hvis authentication management ikke håndteres korrekt, f.eks. når en session i
 Broken authentication er relativt nemt for angribere at udnytte og kan have store konsekvenser for både brugere og virksomheder, såsom hvidvaskning, bedrageri og identitetstyveri.  
   
 Følgende problemer i en applikation kan føre til Broken Authentication:
-* Tillader automatiserede login/angreb 
+* Ingen forhindring af automatiserede login/angreb 
   * credential shuffling og brute force
 * Tillader default, svage og velkendte passwords
 * Bruger svage og ineffektive måder for brugeren at generhverve et glemt password
-* Gemmer paswords som plain text, krypterede eller med en svag hash funktion
+* Gemmer passwords i plain text, krypterede eller med en svag hash funktion
 * Gør ikke brug af multi factor authentication 
 * Ukorrekt brug af session (viser session ID i URL, roterer ikke session ID efter login, ugyldiggør ikke session ID efter logout)
 
