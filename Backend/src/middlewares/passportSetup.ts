@@ -23,7 +23,7 @@ const initPassport = () => {
         if (!user) {
             try {
                 let newOAuthUser: IUser = {
-                    username: email,
+                    username: null,
                     password: null,
                     email: email,
                     isOAuth: true,

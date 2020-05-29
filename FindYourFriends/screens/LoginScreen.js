@@ -6,8 +6,11 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   Button,
+  Modal,
+  ActivityIndicator
 } from "react-native";
 import Card from "../components/Card";
+import Input from "../components/Input";
 import LoginCard from "../components/LoginCard";
 import colors from "../constants/colors";
 import { Linking } from "expo";
@@ -15,6 +18,8 @@ import * as WebBrowser from "expo-web-browser";
 import jwt_decode from "jwt-decode"; // https://www.npmjs.com/package/jwt-decode
 import * as SecureStore from "expo-secure-store";
 import MyAlert from "../utils/MakeAlert";
+import facade from "../facade";
+import { useMutation } from "@apollo/react-hooks";
 
 // The key for Secure Store. Use this key, to fetch token again.
 const secureStoreKey = "token";
@@ -26,9 +31,11 @@ const LoginScreen = ({
   backendURL,
   setError,
 }) => {
-  const [user, setUser] = useState({ email: "" });
+  const [user, setUser] = useState({ email: "", username: "" });
   const [userEmail, setUserEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
+  const [firstLogin, setFirstLogin] = useState(false);
 
   /**
    * If there is a JWT in SecureStore from previous login and app-use.
@@ -41,7 +48,10 @@ const LoginScreen = ({
       const token = await SecureStore.getItemAsync(secureStoreKey);
       if (token) {
         const decoded = jwt_decode(token);
-        const temp_user = { email: decoded.useremail };
+        const temp_user = {
+          email: decoded.useremail,
+          username: decoded.username,
+        };
         setUser({ ...temp_user });
         // console.log(JSON.stringify({ temp_user }, null, 4));
         setSignedIn(true);
@@ -49,6 +59,20 @@ const LoginScreen = ({
     };
     checkIfLoggedIn();
   }, []);
+
+  useEffect(() => {
+    // Both checks are necessary
+    if (!user.username) {
+      setFirstLogin(true);
+    };
+    if (user.username) {
+      setFirstLogin(false);
+    }
+  },[user]);
+
+  const userInputHandler = (inputText) => {
+    setUsername(inputText);
+  };
 
   const handleGoogleLogin = async () => {
     try {
@@ -64,7 +88,7 @@ const LoginScreen = ({
         const decoded = jwt_decode(token);
         user.email = decoded.useremail;
         user.username = decoded.username;
-        setUser(user);
+        setUser({...user});
         console.log("user", user);
         setSignedIn(true);
       } else if (result.type == "cancel") {
@@ -102,7 +126,7 @@ const LoginScreen = ({
       user.username = decoded.username;
       console.log("User", user);
       await SecureStore.setItemAsync(secureStoreKey, res.token);
-      setUser(user);
+      setUser({...user});
       // console.log(JSON.stringify({ res }, null, 4));
       setSignedIn(true);
     } else {
@@ -122,7 +146,15 @@ const LoginScreen = ({
     >
       <View style={styles.screen}>
         {signedIn ? (
-          <LoggedInPage email={user.email} setSignedIn={setSignedIn} />
+          <LoggedInPage
+            setSignedIn={setSignedIn}
+            visible={firstLogin}
+            userInputHandler={userInputHandler}
+            user={user}
+            setUser={setUser}
+            username={username}
+            showModal={setFirstLogin}
+          />
         ) : (
           <LoginCard
             googleLoginHandler={handleGoogleLogin}
@@ -141,8 +173,70 @@ const LoginScreen = ({
 
 // This should be removed, is only temporarily here untill MapScreen is ready
 const LoggedInPage = (props) => {
+  const [registerOAuthUser, { loading, error, data, called }] = useMutation(
+    facade.UPDATE_USERNAME_OF_OAUTHUSER
+  );
+  if (called && error) {
+    // const errorMsg = handleError(error);
+    MyAlert(error, "Ah shit...");
+  }
+
+  const confirmUsername = async () => {
+    if (!props.username) {
+      MyAlert("Please type a valid username", "Missing input");
+      return;
+    }
+    await registerOAuthUser({
+      variables: {
+        username: props.username,
+      },
+    });
+    props.user.username = props.username;
+    props.setUser({ ...props.user });
+    props.showModal(false);
+  };
+
+  const skipUsername = async () => {
+    await registerOAuthUser({
+      variables: {
+        username: props.user.email,
+      },
+    });
+    props.user.username = props.user.email;
+    props.setUser({ ...props.user });
+    props.showModal(false);
+  };
+
   return (
     <Card style={styles.container}>
+      <Modal visible={props.visible} animationType="slide">
+        <View style={styles.modal}>
+          <View style={{ height: "20%" }}>
+            {loading && <ActivityIndicator />}
+          </View>
+          <Text style={styles.title}>Please provide a username</Text>
+          <Input
+            style={styles.usernameInput}
+            value={props.username}
+            onChangeText={(input) => {
+              props.userInputHandler(input);
+            }}
+          ></Input>
+          <View style={styles.buttonContainer}>
+            <Button
+              title="Confirm"
+              style={styles.button}
+              onPress={confirmUsername}
+            />
+            <Button title="Skip" style={styles.button} onPress={skipUsername} />
+          </View>
+          <View style={{ height: "20%" }}></View>
+          <Text style={{ width: "70%" }}>
+            Your username will be shown in the application. If you skip this
+            then your email will be used as your username.
+          </Text>
+        </View>
+      </Modal>
       <View style={styles.container}>
         {/* 
         Upon Logout, be sure to set both the SignedIn state, 
@@ -156,7 +250,7 @@ const LoggedInPage = (props) => {
           }}
         />
         <Text style={styles.title}>Welcome!</Text>
-        <Text style={styles.text}>{props.email}</Text>
+        <Text style={styles.text}>{props.user.username}</Text>
       </View>
     </Card>
   );
@@ -169,6 +263,18 @@ const styles = StyleSheet.create({
     padding: 10,
     alignItems: "center",
     justifyContent: "flex-start",
+  },
+  modal: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  usernameInput: {
+    width: "60%",
+    borderBottomColor: "black",
+    borderBottomWidth: 1,
+    padding: 5,
+    marginBottom: 3,
   },
   title: {
     color: colors.secondary,
@@ -195,11 +301,12 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: "row",
     width: "100%",
-    justifyContent: "space-between",
+    justifyContent: "center",
     paddingHorizontal: 15,
   },
   button: {
-    width: 80,
+    width: 100,
+    padding: 7,
   },
 });
 

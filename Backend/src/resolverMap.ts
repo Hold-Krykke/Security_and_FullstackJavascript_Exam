@@ -78,6 +78,7 @@ const resolverMap: IResolvers = {
       }
       try{
         const success = userFacade.updateUsernameOfOAuthUser(user);
+        return success;
       } catch(err){
         throw new UserInputError("Username already taken");
       }
