@@ -3,6 +3,7 @@ const path = require('path')
 require('dotenv').config({ path: path.join(process.cwd(), '.env') })
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 import UserFacade from '../facades/userFacade'
+import IUser from "../interfaces/IUser";
 const LocalStrategy = require('passport-local').Strategy;
 const passportJWT = require('passport-jwt');
 const JWTStrategy = passportJWT.Strategy;
@@ -14,16 +15,36 @@ const initPassport = () => {
         // console.log('\nREFRESH TOKEN\n', refreshToken);
         const email: string = profile.emails[0].value;
         let user = null;
+        // First we try to get a user
         try {
             user = await userFacade.getUserByEmail(email);
+        } catch (err) { }
+        // If the user is null we create a new OAuth user
+        if (!user) {
+            try {
+                let newOAuthUser: IUser = {
+                    username: email,
+                    password: null,
+                    email: email,
+                    isOAuth: true,
+                    refreshToken: null
+                }
+                await userFacade.addOAuthUser(newOAuthUser);
+            } catch (err) {
+                console.log(err.message);
+            }
+        }
+        // Then we update the refresh token of the user
+        try {
             const success = await userFacade.updateUserRefreshToken(email, refreshToken, true);
             if (!success) {
                 console.log("FAILED TO UPDATE REFRESH TOKEN FOR OAUTH USER");
             }
-        } catch(err){}
+        } catch (err) {
+        }
         // We're adding the username to the profile so we can access it in server.ts
         profile.username = user?.username;
-        
+
         // Calls for logic or simply logic for storing these tokens goes here
         done(null, { accessToken, refreshToken, profile })
     };

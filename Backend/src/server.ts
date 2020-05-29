@@ -76,8 +76,6 @@ app.post("/auth/jwt", (req, res) => {
         });
         res.status(200).send({
           token: token,
-          username: user.username,
-          useremail: user.email
         });
       });
     }

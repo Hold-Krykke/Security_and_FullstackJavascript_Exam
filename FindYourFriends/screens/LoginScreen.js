@@ -43,7 +43,7 @@ const LoginScreen = ({
         const decoded = jwt_decode(token);
         const temp_user = { email: decoded.useremail };
         setUser({ ...temp_user });
-        console.log(JSON.stringify({ temp_user }, null, 4));
+        // console.log(JSON.stringify({ temp_user }, null, 4));
         setSignedIn(true);
       }
     };
@@ -94,12 +94,12 @@ const LoginScreen = ({
       res.json()
     );
     if (
-      res.useremail &&
       res.token
       // && (typeof res.token === String || res.token instanceof String)
     ) {
-      user.email = res.useremail;
-      user.username = res.username;
+      const decoded = jwt_decode(res.token);
+      user.email = decoded.useremail;
+      user.username = decoded.username;
       console.log("User", user);
       await SecureStore.setItemAsync(secureStoreKey, res.token);
       setUser(user);

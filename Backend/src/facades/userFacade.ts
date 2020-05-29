@@ -121,7 +121,7 @@ export default class UserFacade {
             await this._UDAO.addUser(newUser);
             return true;
         } catch (err) {
-            throw new ApiError(`User could not be added, username (${user.username}) or (${user.email}) already exists`, 400)
+            throw new ApiError(`User could not be added, email: (${user.email}) already exists`, 400)
         }
     }
 
