@@ -1,12 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-    StyleSheet,
-    View,
-    Text,
-    TouchableWithoutFeedback,
-    Keyboard,
-    Button,
-} from "react-native";
+import { StyleSheet, View, Text, TouchableWithoutFeedback, Keyboard, Button } from "react-native";
 import Card from "../components/Card";
 import LoginCard from "../components/LoginCard";
 import colors from "../constants/colors";
@@ -19,13 +12,7 @@ import MyAlert from "../utils/MakeAlert";
 // The key for Secure Store. Use this key, to fetch token again.
 const secureStoreKey = "token";
 
-const LoginScreen = ({
-    signedIn,
-    setSignedIn,
-    setTest,
-    backendURL,
-    setError,
-}) => {
+const LoginScreen = ({ signedIn, setSignedIn, create, setCreate, backendURL, setError, }) => {
     const [user, setUser] = useState({ email: "" });
     const [userEmail, setUserEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -50,6 +37,12 @@ const LoginScreen = ({
         checkIfLoggedIn();
     }, []);
 
+    /**
+     * The .slice(0, -1) is to remove a false # thats at then end, for some reason.
+     * If the user closed the web browser, the Promise resolves with { type: 'cancel' }.
+     * If the user does not permit the application to authenticate with the given url, the Promise resolved with { type: 'cancel' }.
+     * If the browser is closed using dismissBrowser, the Promise resolves with { type: 'dismiss' }.
+     */
     const handleGoogleLogin = async () => {
         try {
             let redirectUrl = await Linking.getInitialURL();
@@ -57,9 +50,7 @@ const LoginScreen = ({
             let result = await WebBrowser.openAuthSessionAsync(authUrl, redirectUrl);
 
             if (result.type == "success") {
-                // The .slice(0, -1) is to remove a false # thats at then end, for some reason.
                 const token = result.url.split("token=")[1].slice(0, -1);
-                //console.log("GOOGLE LOGIN TOKEN\n", JSON.stringify({ token }, null, 4));
                 await SecureStore.setItemAsync(secureStoreKey, token);
                 const decoded = jwt_decode(token);
                 user.email = decoded.useremail;
@@ -67,11 +58,8 @@ const LoginScreen = ({
                 console.log("user", user);
                 setSignedIn(true);
             } else if (result.type == "cancel") {
-                // If the user closed the web browser, the Promise resolves with { type: 'cancel' }.
-                // If the user does not permit the application to authenticate with the given url, the Promise resolved with { type: 'cancel' }.
                 console.log("User Cancelled.");
             } else if (result.type == "dismiss") {
-                // If the browser is closed using dismissBrowser, the Promise resolves with { type: 'dismiss' }.
                 console.log("User dismissed the browser.");
             }
         } catch (error) {
@@ -92,11 +80,7 @@ const LoginScreen = ({
         const res = await fetch(`${backendURL}/auth/jwt?`, request).then((res) =>
             res.json()
         );
-        if (
-            res.useremail &&
-            res.token
-            // && (typeof res.token === String || res.token instanceof String)
-        ) {
+        if (res.useremail && res.token) {
             user.email = res.useremail;
             await SecureStore.setItemAsync(secureStoreKey, res.token);
             setUser(user);
@@ -113,10 +97,7 @@ const LoginScreen = ({
 
     return (
         <TouchableWithoutFeedback
-            onPress={() => {
-                Keyboard.dismiss();
-            }}
-        >
+            onPress={() => { Keyboard.dismiss(); }} >
             <View style={styles.screen}>
                 {signedIn ? (
                     <LoggedInPage email={user.email} setSignedIn={setSignedIn} />
@@ -128,6 +109,8 @@ const LoginScreen = ({
                             setUserEmail={setUserEmail}
                             userEmail={userEmail}
                             password={password}
+                            create={create}
+                            setCreate={setCreate}
                         />
                     )}
             </View>

@@ -33,7 +33,7 @@ const LoginCard = props => {
                 <Text style={styles.text}>Or sign in with your Google account</Text>
                 <Button color={colors.primary} title="Google" onPress={props.googleLoginHandler} />
                 <Text style={styles.text}>Or create a user</Text>
-                <Button color={colors.grey} title="CREATE USER" onPress={() => setTest(false)} />
+                <Button color={colors.secondary} title="CREATE USER" onPress={() => props.setCreate(true)} />
 
             </View >
         </Card >
@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
         marginVertical: 10,
     },
     text: {
-        color: colors.grey,
+        color: colors.primary,
         fontSize: 14,
         fontWeight: "bold",
         marginVertical: 10,

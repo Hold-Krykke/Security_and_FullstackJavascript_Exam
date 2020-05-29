@@ -14,24 +14,19 @@ export default function App() {
     // USE SCREENS LIKE THIS
     //const [test, setTest] = useState(false);
     const [signedIn, setSignedIn] = useState(false);
+    const [create, setCreate] = useState(false);
 
     let content = <LoginScreen
         backendURL={backendUri}
         signedIn={signedIn}
         setSignedIn={setSignedIn}
+        create={create}
+        setCreate={setCreate}
     />;
-    // let content = <CreateUserScreen />;
-    // if (test) {
-    //     //content = <MapScreen test={test} />
-    //     content = (
-    //         <LoginScreen
-    //             backendURL={backendUri}
-    //             signedIn={signedIn}
-    //             setSignedIn={setSignedIn}
-    //             setTest={setTest}
-    //         />
-    //     );
-    // }
+    if (create) {
+        //content = <MapScreen test={test} />
+        content = <CreateUserScreen />;
+    }
 
     return (
         <ApolloProvider client={client}>
