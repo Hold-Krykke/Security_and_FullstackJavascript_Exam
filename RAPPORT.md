@@ -366,7 +366,7 @@ Det vil sige at implicit flow går direkte fra bruger-login til at få udleveret
 Authorizationcode flow’et hvor det er backenden der står for kommunikationen med Google, udveksling af tokens og opbevaring af tokens er den anbefalede måde at håndtere OAuth 2.0/OpenID 2.0 på. [OAuth 2.0 Flow](https://auth0.com/docs/api-auth/which-oauth-flow-to-use)
 
 #### Brugen af Expo, deep linking og URL schemes
-Brugen af custom URL schemes, såsom appname:// til at linke internt i app’en er ikke altid lige sikkert. Hvis to applikationer bruger samme skema, er det for iOS ikke garanteret hvilken app skemaet henvender sig til.  
+Brugen af custom URL schemes, såsom `appname://` til at linke internt i app’en er ikke altid lige sikkert. Hvis to applikationer bruger samme skema, er det for iOS ikke garanteret hvilken app skemaet henvender sig til.  
 For Android har man mulighed for at benytte sig af [Intents](https://developer.android.com/guide/components/intents-filters) og samtidig giver styresystemet per standard en valgmulighed mellem de apps der har registreret brug af skemaet.  
 [Denne artikel fra Nowsecure.com](https://www.nowsecure.com/blog/2019/04/05/how-to-guard-against-mobile-app-deep-link-abuse/) beskriver hvordan at at såkaldt *deep link abuse* virker i praksis, og hvordan man også kan beskytte sig ved brug af en [ekstern link-liste](https://developer.android.com/training/app-links/verify-site-associations) som indeholder en checksum. Sådan et angreb afhænger dog af mange faktorer. Typisk skal appen reverse engineeres og en lignende eller tilhørende (understøttende) app skal udvikles, fungerende som en trojansk hest. Dette er givetvis nemmere på Android, hvor man frit kan installere .apk-filer udenom App Store.  
 
