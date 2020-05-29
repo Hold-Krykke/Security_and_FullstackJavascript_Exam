@@ -255,7 +255,7 @@ I stedet sættes JWT som en query parameter og sendes med til frontenden. Det bl
 Vi begrænser mængden af login forsøg en bruger kan lave. Hvis man forsøger at logge ind mere end en gang i sekundet vil det blive opfattet som et brute force angreb og den IP forsøget kom fra vil blive afvist de næste fem sekunder. Hvor længe en IP er bannet og hvor lang tid der kan gå mellem normale forsøg kan selvfølgelig justeres - vi valgte relativt lave værdier mens systemet stadig er under udvikling.
 
 #### Kontrol af passwords
-Når man laver en ny bruger, (hvor man altså ikke logger ind med OAuth) bliver man bedt om at taste et password ind 2 gange. Det password man angiver bliver tjekket på en række forskellige punkter:
+Når man laver en ny bruger, (hvor man altså ikke logger ind med OAuth 2.0/OpenID 2.0) bliver man bedt om at taste et password ind 2 gange. Det password man angiver bliver tjekket på en række forskellige punkter:
 * Minimum længde af 10
 * Skal indeholde både et bogstav, et tal og et tegn
 * Må ikke indeholde kendte svage passwords
@@ -264,8 +264,8 @@ De fleste kendte svage passwords er kortere end 10 tegn. Vi kræver et password,
 
 #### Endpoints
 `/auth/jwt`
-Dette er vores eget login der eksekverer passport strategien `local` (se næste afsnit om Passport). Endpointet kaldes fra react native app’en med brugerens username og password.
-Password tjekkes med Bcrypt (se afsnit om Bcrypt). Til sidst genererer dette endpoint et JWT som så sendes tilbage til react native app’en. 
+Dette er vores eget login der eksekverer passport strategien `local` (se næste afsnit om [Passport](#passport)). Endpointet kaldes fra react native app’en med brugerens username og password.
+Password tjekkes med Bcrypt (se afsnit om [Bcrypt](#bcrypt)). Til sidst genererer dette endpoint et JWT som så sendes tilbage til react native app’en. 
 
 `/auth/google`
 Dette er vores OAuth 2.0/OpenID 2.0. endpoint der eksekverer passport strategien `google`. Brugere logger ind med deres Google konto. Dette endpoint kaldes fra react native app’en. Herfra redirectes der via passport videre til Googles servere som står for at authenticate den givne bruger. Når dette er gjort laver Google en request til vores `/auth/google/callback`. 
