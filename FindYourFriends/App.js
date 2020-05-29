@@ -9,11 +9,14 @@ import ChatScreen from "./screens/ChatScreen";
 import { ApolloProvider } from "@apollo/react-hooks";
 import client from "./utils/ApolloClientProvider";
 import { backendUri } from "./settings";
+import UserScreen from "./screens/UserScreen";
 
 export default function App() {
-  // USE SCREENS LIKE THIS
   const [test, setTest] = useState(false);
   const [signedIn, setSignedIn] = useState(false);
+  const [firstLogin, setFirstLogin] = useState(false);
+  const [user, setUser] = useState({ email: "", username: "" });
+  const [username, setUsername] = useState("");
 
   let content = <HomeScreen setTest={setTest} />;
   // let content = <CreateUserScreen />;
@@ -22,9 +25,24 @@ export default function App() {
     content = (
       <LoginScreen
         backendURL={backendUri}
-        signedIn={signedIn}
         setSignedIn={setSignedIn}
         setTest={setTest}
+        user={user}
+        setUser={setUser}
+        setFirstLogin={setFirstLogin}
+      />
+    );
+  }
+  if (signedIn) {
+    content = (
+      <UserScreen
+        setSignedIn={setSignedIn}
+        visible={firstLogin}
+        user={user}
+        setUser={setUser}
+        username={username}
+        setUsername={setUsername}
+        showModal={setFirstLogin}
       />
     );
   }

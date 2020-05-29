@@ -2,12 +2,9 @@ import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   View,
-  Text,
   TouchableWithoutFeedback,
   Keyboard,
   Button,
-  Modal,
-  ActivityIndicator
 } from "react-native";
 import Card from "../components/Card";
 import Input from "../components/Input";
@@ -25,17 +22,16 @@ import { useMutation } from "@apollo/react-hooks";
 const secureStoreKey = "token";
 
 const LoginScreen = ({
-  signedIn,
   setSignedIn,
   setTest,
   backendURL,
   setError,
+  setFirstLogin,
+  user,
+  setUser,
 }) => {
-  const [user, setUser] = useState({ email: "", username: "" });
   const [userEmail, setUserEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [username, setUsername] = useState("");
-  const [firstLogin, setFirstLogin] = useState(false);
 
   /**
    * If there is a JWT in SecureStore from previous login and app-use.
@@ -64,15 +60,11 @@ const LoginScreen = ({
     // Both checks are necessary
     if (!user.username) {
       setFirstLogin(true);
-    };
+    }
     if (user.username) {
       setFirstLogin(false);
     }
-  },[user]);
-
-  const userInputHandler = (inputText) => {
-    setUsername(inputText);
-  };
+  }, [user]);
 
   const handleGoogleLogin = async () => {
     try {
@@ -88,8 +80,8 @@ const LoginScreen = ({
         const decoded = jwt_decode(token);
         user.email = decoded.useremail;
         user.username = decoded.username;
-        setUser({...user});
-        console.log("user", user);
+        setUser({ ...user });
+        // console.log("user", user);
         setSignedIn(true);
       } else if (result.type == "cancel") {
         // If the user closed the web browser, the Promise resolves with { type: 'cancel' }.
@@ -124,9 +116,9 @@ const LoginScreen = ({
       const decoded = jwt_decode(res.token);
       user.email = decoded.useremail;
       user.username = decoded.username;
-      console.log("User", user);
+      // console.log("User", user);
       await SecureStore.setItemAsync(secureStoreKey, res.token);
-      setUser({...user});
+      setUser({ ...user });
       // console.log(JSON.stringify({ res }, null, 4));
       setSignedIn(true);
     } else {
@@ -145,114 +137,17 @@ const LoginScreen = ({
       }}
     >
       <View style={styles.screen}>
-        {signedIn ? (
-          <LoggedInPage
-            setSignedIn={setSignedIn}
-            visible={firstLogin}
-            userInputHandler={userInputHandler}
-            user={user}
-            setUser={setUser}
-            username={username}
-            showModal={setFirstLogin}
-          />
-        ) : (
-          <LoginCard
-            googleLoginHandler={handleGoogleLogin}
-            userLoginHandler={handleUserLogin}
-            setPassword={setPassword}
-            setUserEmail={setUserEmail}
-            userEmail={userEmail}
-            password={password}
-          />
-        )}
+        <LoginCard
+          googleLoginHandler={handleGoogleLogin}
+          userLoginHandler={handleUserLogin}
+          setPassword={setPassword}
+          setUserEmail={setUserEmail}
+          userEmail={userEmail}
+          password={password}
+        />
         <Button title="Go to HomeScreen" onPress={() => setTest(false)} />
       </View>
     </TouchableWithoutFeedback>
-  );
-};
-
-// This should be removed, is only temporarily here untill MapScreen is ready
-const LoggedInPage = (props) => {
-  const [registerOAuthUser, { loading, error, data, called }] = useMutation(
-    facade.UPDATE_USERNAME_OF_OAUTHUSER
-  );
-  if (called && error) {
-    // const errorMsg = handleError(error);
-    MyAlert(error, "Ah shit...");
-  }
-
-  const confirmUsername = async () => {
-    if (!props.username) {
-      MyAlert("Please type a valid username", "Missing input");
-      return;
-    }
-    await registerOAuthUser({
-      variables: {
-        username: props.username,
-      },
-    });
-    props.user.username = props.username;
-    props.setUser({ ...props.user });
-    props.showModal(false);
-  };
-
-  const skipUsername = async () => {
-    await registerOAuthUser({
-      variables: {
-        username: props.user.email,
-      },
-    });
-    props.user.username = props.user.email;
-    props.setUser({ ...props.user });
-    props.showModal(false);
-  };
-
-  return (
-    <Card style={styles.container}>
-      <Modal visible={props.visible} animationType="slide">
-        <View style={styles.modal}>
-          <View style={{ height: "20%" }}>
-            {loading && <ActivityIndicator />}
-          </View>
-          <Text style={styles.title}>Please provide a username</Text>
-          <Input
-            style={styles.usernameInput}
-            value={props.username}
-            onChangeText={(input) => {
-              props.userInputHandler(input);
-            }}
-          ></Input>
-          <View style={styles.buttonContainer}>
-            <Button
-              title="Confirm"
-              style={styles.button}
-              onPress={confirmUsername}
-            />
-            <Button title="Skip" style={styles.button} onPress={skipUsername} />
-          </View>
-          <View style={{ height: "20%" }}></View>
-          <Text style={{ width: "70%" }}>
-            Your username will be shown in the application. If you skip this
-            then your email will be used as your username.
-          </Text>
-        </View>
-      </Modal>
-      <View style={styles.container}>
-        {/* 
-        Upon Logout, be sure to set both the SignedIn state, 
-        But also remove the Token from the SecureStore. 
-        */}
-        <Button
-          title="Log out"
-          onPress={async () => {
-            props.setSignedIn(false);
-            await SecureStore.deleteItemAsync(secureStoreKey);
-          }}
-        />
-        <Text style={styles.title}>Welcome!</Text>
-        <Text style={styles.text}>{props.user.username}</Text>
-      </View>
-    </Card>
   );
 };
 ////////////////////////////////////////////////////////////////////////////
@@ -263,18 +158,6 @@ const styles = StyleSheet.create({
     padding: 10,
     alignItems: "center",
     justifyContent: "flex-start",
-  },
-  modal: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  usernameInput: {
-    width: "60%",
-    borderBottomColor: "black",
-    borderBottomWidth: 1,
-    padding: 5,
-    marginBottom: 3,
   },
   title: {
     color: colors.secondary,
