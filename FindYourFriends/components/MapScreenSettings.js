@@ -36,14 +36,16 @@ const MapScreenSettings = ({settings, setSettings}) => {
 				}}>
 				<View style={styles.modal} onPress={() => Keyboard.dismiss()}>
 					<View style={styles.innerModal}>
-						<Text style={styles.text}>Search radius</Text>
-						<Input
-							value={settings.distance.toString()}
-							onChangeText={inputHandler}
-							keyboardType="numeric"
-							autoFocus={true}
-						/>
-						<Text style={styles.text}>meters</Text>
+					<Text style={styles.text}>Search radius</Text>
+						<View style={styles.settingsContainer}>
+							<Input
+								value={settings.distance.toString()}
+								onChangeText={inputHandler}
+								keyboardType="numeric"
+								autoFocus={true}
+							/>
+							<Text style={{...styles.text, marginBottom: 0}}> m</Text>
+						</View>
 						<TouchableOpacity
 							onPress={() => setModalVisible(false)}
 							activeOpacity={0.7}
@@ -98,7 +100,7 @@ const styles = StyleSheet.create({
 		//width: 300,
 		//maxWidth: '80%',
 		justifyContent: 'center',
-
+		
 		alignItems: 'center',
 		padding: 0,
 		marginTop: 10,
@@ -106,6 +108,13 @@ const styles = StyleSheet.create({
 		height: Dimensions.get('window').height * 0.4,
 		backgroundColor: '#fff',
 		padding: 20,
+	},
+	settingsContainer:{
+		flexDirection:'row',
+		alignItems: 'center',
+		//justifyContent:'center',
+		justifyContent: 'space-around',
+		//alignItems: 'center'
 	},
 	touchable: {},
 	touchableText: {
