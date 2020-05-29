@@ -51,7 +51,7 @@ Da vores projekt er en kombination af valgfagene Security og Fullstack Javascrip
 ### Introduktion
 Vi ønsker at udvikle en mobil app med konceptet “Find your Friends” hvor brugerens lokation deles med andre. Efter lokationen er delt kan man finde venner i nærheden af sig. Udover det vil vi gerne give brugerne mulighed for at chatte - her kunne det enten være i plenum eller privat mellem hver bruger. 
 
-Vi har valgt at kombinere fagene Security og Fullstack JS, fordi vi godt kunne tænke os at anvende vores security læring i et større projekt, og få alle brikkerne til at spille sammen. En udfordring med læringsmaterialet, er at disse to fag ikke nødvendigvis har været kombineret, så derfor ønsker vi at lave best practice implementationer udover læringsmaterialet, der dækker begge fag. 
+Vi har valgt at kombinere fagene Security og Fullstack JS, fordi vi godt kunne tænke os at anvende vores security læring i et større projekt, og få alle brikkerne til at spille sammen. En udfordring med læringsmaterialet, er at disse to fag ikke nødvendigvis har været kombineret, så derfor ønsker vi at lave best practice implementationer, der dækker begge fag. 
 
 **Oversigt over konceptet**
 * Mobil-app udviklet i React Native 
