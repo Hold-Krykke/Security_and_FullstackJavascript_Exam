@@ -222,6 +222,7 @@ Jo flere rounds, jo længere tid tager hele operationen, hvilket betyder at når
 #### JWT
 Når en bruger er logget ind i vores applikation skal vi bruge en måde at kommunikere dette til vores mobile app. Vi ønsker ikke at sende nogle af de tokens vi får af Google ud til den mobile app og samtidig ønsker vi at kunne behandle brugere ens, efter login, uanset hvilken måde de er logget ind på. For at løse dette, bruger vi JSON Web Tokens.   
 JSON Web Token indeholder JSON-formater der bruges som bevis for authentication. JWT har følgende struktur:  
+
 **Header** - indeholder information om hvilken algoritme der er brugt til kryptering, i vores tilfælde er det default algoritmen HS256 (HMAC med SHA256).  
 **Payload** - indeholder den information der er relevant for ens applikation. Vores payload består af et expiresIn objekt og et user e-mail objekt.  
 **Signatur** - JWT validering. Formålet med signaturen er at kunne validere afsenderen. Signaturen er beregnet ved at encode header og payload med base64url encoding og herefter sammenkæde dem med et punktum imellem. Denne string krypteres herefter med den algoritme der er specificeret i headeren og vores secret.  
