@@ -32,7 +32,8 @@ const LoginCard = props => {
                 <Button color={colors.grey} title="Sign in " onPress={props.userLoginHandler} />
                 <Text style={styles.text}>Or sign in with your Google account</Text>
                 <Button color={colors.primary} title="Google" onPress={props.googleLoginHandler} />
-                <Text style={styles.text}> </Text>
+                <Text style={styles.text}>Or create a user</Text>
+                <Button color={colors.grey} title="CREATE USER" onPress={() => setTest(false)} />
 
             </View >
         </Card >
