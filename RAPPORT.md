@@ -350,7 +350,7 @@ Som så kommer tilbage nogenlunde sådan her
 <img src="https://user-images.githubusercontent.com/35559774/83128071-3377e980-a0db-11ea-9ffe-5faba7262a6c.png"/>
 </p>  
 
-Backenden genererer et Json Web Token (se mere i afsnittet JWT) og redirecter til react native app’ens custom scheme (Brugen af Expo, deep linking og URL schemes). Dette lukker den browser der var åbnet op og herefter tager App’en over og sørger videre for håndteringen af JWT. 
+Backenden genererer et Json Web Token (se mere i afsnittet [JWT](#jwt)) og redirecter til react native app’ens custom scheme (Brugen af Expo, deep linking og URL schemes). Dette lukker den browser der var åbnet op og herefter tager App’en over og sørger videre for håndteringen af JWT. 
 
 #### Kort beskrivelse af  OAuth 2.0 flows
 Der findes fire typer af flows, eller grant types som det også kaldes, for en client at få et access token fra en authorizationserver på. 
