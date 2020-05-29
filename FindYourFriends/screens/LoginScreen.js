@@ -12,7 +12,7 @@ import MyAlert from "../utils/MakeAlert";
 // The key for Secure Store. Use this key, to fetch token again.
 const secureStoreKey = "token";
 
-const LoginScreen = ({ signedIn, setSignedIn, create, setCreate, backendURL, setError, }) => {
+const LoginScreen = ({ navigation, signedIn, setSignedIn, backendURL, setError, }) => {
     const [user, setUser] = useState({ email: "" });
     const [userEmail, setUserEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -109,8 +109,7 @@ const LoginScreen = ({ signedIn, setSignedIn, create, setCreate, backendURL, set
                             setUserEmail={setUserEmail}
                             userEmail={userEmail}
                             password={password}
-                            create={create}
-                            setCreate={setCreate}
+                            navigation={navigation}
                         />
                     )}
             </View>

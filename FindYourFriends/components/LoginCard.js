@@ -33,7 +33,7 @@ const LoginCard = props => {
                 <Text style={styles.text}>Or sign in with your Google account</Text>
                 <Button color={colors.primary} title="Google" onPress={props.googleLoginHandler} />
                 <Text style={styles.text}>Or create a user</Text>
-                <Button color={colors.secondary} title="CREATE USER" onPress={() => props.setCreate(true)} />
+                <Button color={colors.secondary} title="CREATE USER" onPress={() => props.navigation.navigate('CreateUser')} />
 
             </View >
         </Card >

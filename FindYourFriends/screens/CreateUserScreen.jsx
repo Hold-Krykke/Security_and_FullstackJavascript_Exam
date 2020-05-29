@@ -162,6 +162,7 @@ const CreateUser = (props) => {
                         placeholder='PASSWORD'
                     ></Input>
                     <Button color={colors.primary} title="CREATE ME" onPress={confirmCreate} />
+                    <Button color={colors.secondary} title="TAKE ME BACK" onPress={() => props.navigation.goBack()} />
                 </Card>
             </View>
         </TouchableWithoutFeedback>
