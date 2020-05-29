@@ -211,7 +211,6 @@ Vi bruger Bcrypt til at hashe passwords hos de brugere af vores applikation der 
 Bcrypt er som nævnt en hashing algoritme der er udviklet specifikt til hashing af passwords. Den er derfor designet til at være langsom. Grunden til at en hashing algoritme bør være langsom er, at det vil tage lige så lang tid at brute force hvert password-gæt, som når det hashes. Ved også at inkorporere et salt, er der beskyttelse mod rainbow-table angreb, da to ens passwords vil resultere i 2 forskellige hash. Herudover kan antallet af rounds justeres, hvilket gør processen mere langsommelig. 
 
 Forsimplet diagram over hvordan bcrypt virker:  
-
 <p align="center">
 <img src="https://user-images.githubusercontent.com/35559774/83121674-ed1e8c80-a0d2-11ea-9b62-89a5b169bd48.png"/>
 </p>  
