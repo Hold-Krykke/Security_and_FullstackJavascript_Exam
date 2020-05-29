@@ -486,11 +486,11 @@ PKCE (udtales Pixie) [blev inkluderet i OAauth 2.0 standarden](https://tools.iet
   
   To apps bruger samme URL-skema. Styresystemet tillader uden forbehold begge apps at modtage authorization code gennem URL-skemaet og derved kan man risikere at access token bliver udleveret til tredjepart.  
   PKCE løser dette problem ved at tilsætte følgende til flowet ([kilde](https://www.oauth.com/oauth2-servers/pkce/)):
-  * Applikationen genererer en String: code_verifier
-  * Applikationen bruger code_verifier til at generere en SHA256-hash code_challenge og sender denne med i authorization-requesten
-  * Auth-serveren gemmer code_challenge
-  * Applikationen får svar på authorization-requesten, og inkluderer code_verifier i token-exchange-requesten.
-  * Auth-serveren kan nu selv generere sin egen code_challenge. 
+  * Applikationen genererer en String: `code_verifier`
+  * Applikationen bruger `code_verifier` til at generere en SHA256-hash `code_challenge` og sender denne med i authorization-requesten
+  * Auth-serveren gemmer `code_challenge`
+  * Applikationen får svar på authorization-requesten, og inkluderer `code_verifier` i token-exchange-requesten.
+  * Auth-serveren kan nu selv generere sin egen `code_challenge`. 
   * Hvis den matcher den udleverede, er applikationen hvem den udgiver sig for.
 
   Vi har ikke [implementeret](https://medium.com/passportjs/pkce-support-for-oauth-2-0-e3a77013b278) PKCE, men vores backend udleverer kun et JWT til app’en med en expiryTime på 60 minutter, hvilket gør vores løsning væsentlig bedre end traditionelle apps hvor access token kan opfanges. Samtidig sørger expo for et ekstra lag sikkerhed ved at linke direkte ind i app’en ved at formatere links sådan her: `exp://exp.host/@yourname/yourAppName`
