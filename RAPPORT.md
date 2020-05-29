@@ -175,7 +175,7 @@ Vores initielle ide af systemets design kan ses på nedenstående figur.
 Det endelige design endte med at følge skitsen nogenlunde. Vi har to servere og vi kommunikerer med to cloud services; Google og Atlas.
 
 Den midterste droplet på figuren er vores backend server. På denne server har vi installeret en reverse proxy nginx, der sikrer at al kommunikation foregår via https - alle requests til port 80 bliver omdirigeret til port 443 og hvis ikke klienten har en passende cipher suite, bliver de nødt til at droppe kommunikationen med vores server. Derudover afviser serverens firewall al anden netværkskommunikation (bortset fra SSH selvfølgelig).
-For at tilgå de forskellige data, skal man være logget ind (se Authentication & Authorization afsnit). Vi sikrer altså at alle forbindelser er sikre og at intet data er tilgængeligt uden at brugeren har en valid JWT.
+For at tilgå de forskellige data, skal man være logget ind (se [Authentication & Authorization afsnit](#authentication--authorization-med-apollo)). Vi sikrer altså at alle forbindelser er sikre og at intet data er tilgængeligt uden at brugeren har en valid JWT.
 Når vi selv skal håndtere vores servere benytter vi SSH, der sikrer en stærkt krypteret forbindelse. Vores servere har ikke nogen unødvendige porte åbne og som tidligere nævnt er det kun vores backend server, der kan oprette forbindelse til vores database server (ud over at port 22 selvfølgelig er åben). Database serverens firewall tillader kun forbindelser på port 22 og port 3306 fra backend serverens IP. 
 
 
