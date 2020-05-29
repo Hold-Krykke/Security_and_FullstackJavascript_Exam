@@ -428,7 +428,7 @@ Der findes 4 kategorier af fejl i Apollos struktur.
 
 **ForbiddenError** kan bruges i forbindelse med authorization. Hvis en user er authenticated, men ikke har tilladelse til at tilgå en bestemt ressource, så kan man smide en ForbiddenError. 
 
-**UserInputError** er til at verificere input som GraphQLs typer ikke selv kan klare. For eksempel, hvis bruger bedes skrive deres e-mail når de skal oprette en bruger, og der ikke er noget `@` i deres input, så kan vi smide en UserInputError med `“e-mail”` som `invalidArg`, og en custom besked. Denne error gør det muligt at specificere hvilken inputdata der ikke levede op til vores krav. Det gør vi ved hjælp af et custom `invalidArgs` felt.   
+**UserInputError** er til at verificere input som GraphQLs typer ikke selv kan klare. For eksempel, hvis bruger bedes skrive deres e-mail når de skal oprette en bruger, og der ikke er noget `@` i deres input, så kan vi smide en UserInputError med `“e-mail”` som `invalidArg`, og en custom besked. Denne error gør det muligt at specificere hvilken inputdata der ikke levede op til vores krav. Det gør vi ved hjælp af et custom `invalidArgs` felt. Her vist med en invalid e-mail:  
 
 <p align="center">
 <img src="https://user-images.githubusercontent.com/35559774/83139697-0fbd9f00-a0ed-11ea-8da1-196066715e27.png"/>
