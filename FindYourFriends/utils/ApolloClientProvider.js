@@ -72,10 +72,11 @@ const errorLink = onError(
 
             // modify the operation context with a new token
             const oldHeaders = operation.getContext().headers;
+            const token = await getNewToken()
             operation.setContext({
               headers: {
                 ...oldHeaders,
-                authorization: await getNewToken(),
+                authorization: token,
               },
             });
             // retry the request, returning the new observable
