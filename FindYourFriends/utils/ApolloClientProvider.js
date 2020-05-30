@@ -49,7 +49,15 @@ const errorLink = onError(
     if (graphQLErrors) {
       // console.log("ALL THE ERRORS: ", JSON.stringify(graphQLErrors, null, 4));
       graphQLErrors.map((err) => {
-        switch (err.extensions.code) {
+        const { message, locations, path, extensions } = err;
+        console.log(
+          `[GraphQL error]:
+          Message: ${message},
+          Location: ${JSON.stringify(locations, null, 4)},
+          Path: ${path}`
+          // \nFull Error: ${JSON.stringify(err, null, 4)}\n\n
+        );
+        switch (extensions.code) {
           case "UNAUTHENTICATED":
             // error code is set to UNAUTHENTICATED
             // when AuthenticationError thrown in resolver
@@ -66,14 +74,7 @@ const errorLink = onError(
             return forward(operation);
         }
 
-        const { message, locations, path } = err;
-        console.log(
-          `[GraphQL error]:
-          Message: ${message},
-          Location: ${JSON.stringify(locations, null, 4)},
-          Path: ${path}`
-          // \nFull Error: ${JSON.stringify(err, null, 4)}\n\n
-        );
+        
       });
     }
     if (networkError) console.log(`[Network error]: ${networkError}`);
