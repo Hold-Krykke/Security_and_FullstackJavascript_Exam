@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { StyleSheet, View, Alert, Button } from "react-native";
 import Header from "./components/Header";
-import HomeScreen from "./screens/HomeScreen";
 import MapScreen from "./screens/MapScreen";
 import LoginScreen from "./screens/LoginScreen";
 import CreateUserScreen from "./screens/CreateUserScreen";
@@ -9,38 +8,39 @@ import ChatScreen from "./screens/ChatScreen";
 import { ApolloProvider } from "@apollo/react-hooks";
 import client from "./utils/ApolloClientProvider";
 import { backendUri } from "./settings";
+import 'react-native-gesture-handler';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 
 export default function App() {
-  // USE SCREENS LIKE THIS
-  const [test, setTest] = useState(false);
-  const [signedIn, setSignedIn] = useState(false);
+    const [signedIn, setSignedIn] = useState(false);
 
-  // let content = <HomeScreen setTest={setTest} />;
-  let content = <CreateUserScreen />;
-  if (test) {
-    //content = <MapScreen test={test} />
-    content = (
-      <LoginScreen
-        backendURL={backendUri}
-        signedIn={signedIn}
-        setSignedIn={setSignedIn}
-        setTest={setTest}
-      />
+    const Stack = createStackNavigator();
+
+    return (
+        <ApolloProvider client={client}>
+            <View style={styles.screen}>
+                <Header title="Find Your Friends" />
+                <NavigationContainer>
+                    <Stack.Navigator initialRouteName="LoginScreen" screenOptions={{ headerShown: false }}>
+                        <Stack.Screen name="LoginScreen">
+                            {props => <LoginScreen {...props}
+                                backendURL={backendUri}
+                                signedIn={signedIn}
+                                setSignedIn={setSignedIn}
+                            />}
+                        </Stack.Screen>
+                        <Stack.Screen name="CreateUserScreen">{props => <CreateUserScreen {...props} />}</Stack.Screen>
+                        <Stack.Screen name="MapScreen">{props => <CreateUserScreen {...props} />}</Stack.Screen>
+                    </Stack.Navigator>
+                </NavigationContainer>
+            </View>
+        </ApolloProvider>
     );
-  }
-
-  return (
-    <ApolloProvider client={client}>
-      <View style={styles.screen}>
-        <Header title="Find Your Friends" />
-        {content}
-      </View>
-    </ApolloProvider>
-  );
 }
 
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-  },
+    screen: {
+        flex: 1,
+    },
 });
