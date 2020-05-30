@@ -84,7 +84,6 @@ const MapScreen = (props) => {
 				notificationColor: '#1DA1F2',
 			},
 		});
-		console.log('resultHERE', result);
 	};
 
 	useEffect(() => {
