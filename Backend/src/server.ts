@@ -12,7 +12,7 @@ import passport from "passport";
 import { requestLogger, errorLogger } from "./middlewares/logger";
 import BruteForceDetector from "./util/bruteForceDetector";
 import eventEmitter from "./util/CustomEmitter";
-import UserFacade from "./facades/userFacade";
+import refreshToken from "./routes/refreshToken";
 const jwt = require("jsonwebtoken");
 const bodyParser = require("body-parser");
 const app = express();
@@ -142,65 +142,7 @@ app.get("/auth/google/callback", (req, res) => {
 // Refresh an expired token
 app.post("/refresh", async (req, res, next) => {
   // Get token from body
-  const expiredToken = req.body.token;
-  // Check if it is valid
-  try {
-    const decryptedToken = jwt.verify(expiredToken, process.env.SECRET, {
-      ignoreExpiration: true,
-    });
-    // If google user, check with google
-    // https://developers.google.com/identity/protocols/oauth2/web-server#offline
-    const username = decryptedToken.username;
-    const useremail = decryptedToken.useremail;
-    const schema: string = process.env.DATABASE_SCHEMA || "";
-    const userFacade: UserFacade = new UserFacade(schema);
-    if (await userFacade.isOAuthUser(username)) {
-      try {
-        const googleResponse: any = await fetch(
-          "https://oauth2.googleapis.com/token",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              client_id: process.env.CLIENT_ID,
-              client_secret: process.env.CLIENT_SECRET,
-              refresh_token: await userFacade.getUserRefreshToken(useremail),
-              grant_type: "refresh_token",
-            }),
-          }
-        ).then((res) => res.json);
-        /*
-      Sample response
-        {
-          "access_token": "1/fFAGRNJru1FTz70BzhT3Zg",
-          "expires_in": 3920,
-          "scope": "https://www.googleapis.com/auth/drive.metadata.readonly",
-          "token_type": "Bearer"
-        }
-      */
-        const googleAccessToken = googleResponse.access_token;
-        if (!googleAccessToken) {
-          throw new ApiError("Google didn't accept");
-        }
-      } catch (err) {
-        // Google didn't accept
-        throw new ApiError("Google didn't accept");
-      }
-    }
-    const payload = { useremail, username };
-    const newToken = jwt.sign(payload, process.env.SECRET, {
-      expiresIn: tokenExpirationInSeconds,
-    });
-    res.status(200).send({
-      token: newToken,
-    });
-  } catch (err) {
-    next(err);
-    // Not valid
-    // Should probably at this point, somehow, log user out?
-  }
+  await refreshToken(req, res, next, tokenExpirationInSeconds);
 });
 
 //The errorlogger needs to be added AFTER the express router and BEFORE any custom error handlers.
