@@ -15,6 +15,11 @@ export default async function refreshToken(
     });
     // If google user, check with google
     // https://developers.google.com/identity/protocols/oauth2/web-server#offline
+    if (decryptedToken.timesRefreshed) {
+      if (Number(decryptedToken.timesRefreshed) > 5) {
+        throw new ApiError("Can't refresh token more than 5 times.");
+      }
+    }
     const username = decryptedToken.username;
     const useremail = decryptedToken.useremail;
     const schema: string = process.env.DATABASE_SCHEMA || "";
@@ -57,7 +62,11 @@ export default async function refreshToken(
         // Should log user out in frontend.
       }
     }
-    const payload = { useremail, username };
+    const payload = {
+      useremail,
+      username,
+      timesRefreshed: 1 + Number(decryptedToken),
+    };
     const newToken = jwt.sign(payload, process.env.SECRET, {
       expiresIn: tokenExpirationInSeconds,
     });
