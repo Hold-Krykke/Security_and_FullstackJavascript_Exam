@@ -5,6 +5,7 @@ import { InMemoryCache } from "apollo-cache-inmemory";
 import { createHttpLink } from "apollo-link-http";
 import { onError } from "apollo-link-error";
 import { backendUri } from "../settings";
+import * as SecureStore from "expo-secure-store";
 
 /**
 The setContext function takes a function that returns either an object or a promise that returns an object to set the new context of a request.
@@ -25,22 +26,59 @@ const authLink = setContext(async (request, previousContext) => {
   };
 });
 
-const errorLink = onError(({ graphQLErrors, networkError }) => {
-  if (graphQLErrors) {
-    // console.log("ALL THE ERRORS: ", JSON.stringify(graphQLErrors, null, 4));
-    graphQLErrors.map((err) => {
-      const { message, locations, path } = err;
-      console.log(
-        `[GraphQL error]:
+const getNewToken = async () => {
+  const request = {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ token: await SecureStore.getItemAsync("token") }),
+  };
+  const token = await fetch(`${backendUri}/refresh`, request)
+    .then((response) => response.json())
+    .then((data) => data.token);
+
+  await SecureStore.setItemAsync("token", token);
+
+  return token;
+};
+
+const errorLink = onError(
+  async ({ graphQLErrors, networkError, operation, forward }) => {
+    if (graphQLErrors) {
+      // console.log("ALL THE ERRORS: ", JSON.stringify(graphQLErrors, null, 4));
+      graphQLErrors.map((err) => {
+        switch (err.extensions.code) {
+          case "UNAUTHENTICATED":
+            // error code is set to UNAUTHENTICATED
+            // when AuthenticationError thrown in resolver
+
+            // modify the operation context with a new token
+            const oldHeaders = operation.getContext().headers;
+            operation.setContext({
+              headers: {
+                ...oldHeaders,
+                authorization: await getNewToken(),
+              },
+            });
+            // retry the request, returning the new observable
+            return forward(operation);
+        }
+
+        const { message, locations, path } = err;
+        console.log(
+          `[GraphQL error]:
           Message: ${message},
           Location: ${JSON.stringify(locations, null, 4)},
           Path: ${path}`
-        // \nFull Error: ${JSON.stringify(err, null, 4)}\n\n
-      );
-    });
+          // \nFull Error: ${JSON.stringify(err, null, 4)}\n\n
+        );
+      });
+    }
+    if (networkError) console.log(`[Network error]: ${networkError}`);
   }
-  if (networkError) console.log(`[Network error]: ${networkError}`);
-});
+);
 // the URI key is a string endpoint or function resolving to an endpoint -- will default to "/graphql" if not specified
 const httpLink = createHttpLink({ uri: backendUri + "/graphql" });
 /** httpLink and cache are requirements as of Apollo 2 https://www.apollographql.com/docs/react/api/apollo-client/#required-fields
