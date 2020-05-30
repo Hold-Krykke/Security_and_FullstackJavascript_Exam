@@ -157,6 +157,7 @@ app.post("/refresh", (req, res, next) => {
   } catch (err) {
     next(err);
     // Not valid
+    // Should probably at this point, somehow, log user out?
   }
 });
 
