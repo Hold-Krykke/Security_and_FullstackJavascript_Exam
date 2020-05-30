@@ -1,6 +1,14 @@
 import UserFacade from "../facades/userFacade";
 import { ApiError } from "../customErrors/apiError";
 const jwt = require("jsonwebtoken");
+
+/**
+ * If an error is thrown from this, frontend should log user out, and delete stored token
+ * @param req
+ * @param res
+ * @param next
+ * @param tokenExpirationInSeconds
+ */
 export default async function refreshToken(
   req: any,
   res: any,
