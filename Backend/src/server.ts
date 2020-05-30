@@ -181,6 +181,9 @@ app.post("/refresh", async (req, res, next) => {
         }
       */
         const googleAccessToken = googleResponse.access_token;
+        if (!googleAccessToken) {
+          throw new ApiError("Google didn't accept");
+        }
       } catch (err) {
         // Google didn't accept
         throw new ApiError("Google didn't accept");
