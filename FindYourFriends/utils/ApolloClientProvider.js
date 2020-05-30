@@ -35,13 +35,21 @@ const getNewToken = async () => {
     },
     body: JSON.stringify({ token: await SecureStore.getItemAsync("token") }),
   };
+  try{
   const token = await fetch(`${backendUri}/refresh`, request)
     .then((response) => response.json())
     .then((data) => data.token);
 
-  await SecureStore.setItemAsync("token", token);
-
+    await SecureStore.setItemAsync("token", token);
+    
   return token;
+  }catch(err){
+    // Log user out, because token couldn't be refreshed. 
+    await SecureStore.deleteItemAsync("token")
+    // setSignedIn(false)
+  }
+  
+
 };
 
 const errorLink = onError(
