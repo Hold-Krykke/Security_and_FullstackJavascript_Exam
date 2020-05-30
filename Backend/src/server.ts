@@ -12,6 +12,7 @@ import passport from "passport";
 import { requestLogger, errorLogger } from "./middlewares/logger";
 import BruteForceDetector from "./util/bruteForceDetector";
 import eventEmitter from "./util/CustomEmitter";
+import UserFacade from "./facades/userFacade";
 const jwt = require("jsonwebtoken");
 const bodyParser = require("body-parser");
 const app = express();
@@ -139,7 +140,7 @@ app.get("/auth/google/callback", (req, res) => {
 });
 
 // Refresh an expired token
-app.post("/refresh", (req, res, next) => {
+app.post("/refresh", async (req, res, next) => {
   // Get token from body
   const expiredToken = req.body.token;
   // Check if it is valid
@@ -147,7 +148,45 @@ app.post("/refresh", (req, res, next) => {
     const decryptedToken = jwt.verify(expiredToken, process.env.SECRET, {
       ignoreExpiration: true,
     });
-    const payload = { useremail: decryptedToken.useremail };
+    // If google user, check with google
+    // https://developers.google.com/identity/protocols/oauth2/web-server#offline
+    const username = decryptedToken.username;
+    const useremail = decryptedToken.useremail;
+    const schema: string = process.env.DATABASE_SCHEMA || "";
+    const userFacade: UserFacade = new UserFacade(schema);
+    if (await userFacade.isOAuthUser(username)) {
+      try {
+        const googleResponse: any = await fetch(
+          "https://oauth2.googleapis.com/token",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              client_id: process.env.CLIENT_ID,
+              client_secret: process.env.CLIENT_SECRET,
+              refresh_token: await userFacade.getUserRefreshToken(useremail),
+              grant_type: "refresh_token",
+            }),
+          }
+        ).then((res) => res.json);
+        /*
+      Sample response
+        {
+          "access_token": "1/fFAGRNJru1FTz70BzhT3Zg",
+          "expires_in": 3920,
+          "scope": "https://www.googleapis.com/auth/drive.metadata.readonly",
+          "token_type": "Bearer"
+        }
+      */
+        const googleAccessToken = googleResponse.access_token;
+      } catch (err) {
+        // Google didn't accept
+        throw new ApiError("Google didn't accept");
+      }
+    }
+    const payload = { useremail, username };
     const newToken = jwt.sign(payload, process.env.SECRET, {
       expiresIn: tokenExpirationInSeconds,
     });
