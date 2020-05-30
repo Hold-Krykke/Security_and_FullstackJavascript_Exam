@@ -38,9 +38,7 @@ export default async function refreshToken(
           "https://oauth2.googleapis.com/token",
           {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
+            headers: { "Content-Type": "application/json", },
             body: JSON.stringify({
               client_id: process.env.CLIENT_ID,
               client_secret: process.env.CLIENT_SECRET,
