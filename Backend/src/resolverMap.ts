@@ -50,9 +50,7 @@ const resolverMap: IResolvers = {
 
   Mutation: {
     registerOAuthUser: (_: void, args: any, context: any) => {
-      if (!context.valid) {
-        throw new AuthenticationError("You need to be logged in to do that.");
-      }
+      requiresLogIn(context);
       // Only OAuth type users are allowed to use this endpoint
       if (!context.token.isOAuth) {
         throw new ForbiddenError("Wrong type of user");
