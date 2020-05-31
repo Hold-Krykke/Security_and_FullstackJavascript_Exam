@@ -34,6 +34,7 @@ export default async function refreshToken(
     const userFacade: UserFacade = new UserFacade(schema);
     if (await userFacade.isOAuthUser(username)) {
       try {
+        const refresh_token = await userFacade.getUserRefreshToken(useremail);
         const googleResponse: any = await fetch(
           "https://oauth2.googleapis.com/token",
           {
@@ -42,7 +43,7 @@ export default async function refreshToken(
             body: JSON.stringify({
               client_id: process.env.CLIENT_ID,
               client_secret: process.env.CLIENT_SECRET,
-              refresh_token: await userFacade.getUserRefreshToken(useremail),
+              refresh_token,
               grant_type: "refresh_token",
             }),
           }
@@ -68,10 +69,12 @@ export default async function refreshToken(
         // Should log user out in frontend.
       }
     }
+
+    const _timesRefreshed = decryptedToken.timesRefreshed || 0
     const payload = {
       useremail,
       username,
-      timesRefreshed: 1 + Number(decryptedToken),
+      timesRefreshed: 1 + _timesRefreshed,
     };
     const newToken = jwt.sign(payload, process.env.SECRET, {
       expiresIn: tokenExpirationInSeconds,
