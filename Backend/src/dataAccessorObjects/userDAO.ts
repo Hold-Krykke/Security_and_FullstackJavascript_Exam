@@ -69,8 +69,8 @@ export default class UserDataAccessorObject {
    * to use the instance anymore
    */
   terminateConnectionPool(): boolean {
-      this._pool.end();
-      return true;
+    this._pool.end();
+    return true;
   }
 
   /**
@@ -95,11 +95,11 @@ export default class UserDataAccessorObject {
                 return;
               }
               const data = result[0];
-              if (typeof(data) == "undefined") {
+              if (typeof (data) == "undefined") {
                 resolve(null);
                 // return statement necessary to end method
                 return;
-              } 
+              }
               //I couldn't find a better way to destructure this data
               const { username, password, email, isOAuth, refreshToken } = data;
               const user: IUser = {
@@ -144,11 +144,11 @@ export default class UserDataAccessorObject {
                 return;
               }
               const data = result[0];
-              if (typeof(data) == "undefined") {
+              if (typeof (data) == "undefined") {
                 resolve(null);
                 // return statement necessary to end method
                 return;
-              } 
+              }
               //I couldn't find a better way to destructure this data
               const { username, password, email, isOAuth, refreshToken } = data;
               const user: IUser = {
@@ -191,18 +191,19 @@ export default class UserDataAccessorObject {
         else {
           try {
             connection.query('INSERT INTO `users` (`username`, `password`, `email`, `isOAuth`) VALUES ( ?, ?, ?, ?);',
-            [user.username, user.password, user.email, user.isOAuth], function(error){
-              if (error) {
-                console.log("An error occurred when trying to insert user in database");
-                if (error.message.includes("ER_DUP_ENTRY: Duplicate entry")) {
-                  reject({"message": "Username or email already exists"});
+              [user.username, user.password, user.email, user.isOAuth],
+              function (error) {
+                if (error) {
+                  console.log("An error occurred when trying to insert user in database");
+                  if (error.message.includes("ER_DUP_ENTRY: Duplicate entry")) {
+                    reject({ "message": "Username or email already exists" });
+                    return;
+                  }
+                  reject(error);
                   return;
                 }
-                reject(error);
-                return;
-              }
-              resolve({"message": `User ${user.username} was succesfully created`});
-            })
+                resolve({ "message": `User ${user.username} was succesfully created` });
+              })
           } catch (err) {
             console.log("Failed to create user");
             reject(err);
@@ -231,19 +232,19 @@ export default class UserDataAccessorObject {
         else {
           try {
             connection.query('UPDATE `users` SET `refreshToken` = ? WHERE (`username` = ?);',
-            [token, username], function(error, result){
-              if (error) {
-                console.log("An error occurred when trying to update user refresh token");
-                reject(error);
-                return;
-              }
-              if (result.affectedRows == 0) {
-                // Should promise be resolved instead (a bit less aggressive strategy)
-                reject({"message": `User ${username} does not exist`});
-                return;
-              }
-              resolve(true);
-            })
+              [token, username], function (error, result) {
+                if (error) {
+                  console.log("An error occurred when trying to update user refresh token");
+                  reject(error);
+                  return;
+                }
+                if (result.affectedRows == 0) {
+                  // Should promise be resolved instead (a bit less aggressive strategy)
+                  reject({ "message": `User ${username} does not exist` });
+                  return;
+                }
+                resolve(true);
+              })
           } catch (err) {
             console.log("Failed to update token");
             reject(err);
@@ -272,19 +273,19 @@ export default class UserDataAccessorObject {
         else {
           try {
             connection.query('UPDATE `users` SET `refreshToken` = ? WHERE (`email` = ?);',
-            [token, email], function(error, result){
-              if (error) {
-                console.log("An error occurred when trying to update user refresh token");
-                reject(error);
-                return;
-              }
-              if (result.affectedRows == 0) {
-                // Should promise be resolved instead (a bit less aggressive strategy)
-                reject({"message": `User with email: ${email} does not exist`});
-                return;
-              }
-              resolve(true);
-            })
+              [token, email], function (error, result) {
+                if (error) {
+                  console.log("An error occurred when trying to update user refresh token");
+                  reject(error);
+                  return;
+                }
+                if (result.affectedRows == 0) {
+                  // Should promise be resolved instead (a bit less aggressive strategy)
+                  reject({ "message": `User with email: ${email} does not exist` });
+                  return;
+                }
+                resolve(true);
+              })
           } catch (err) {
             console.log("Failed to update token");
             reject(err);
@@ -307,19 +308,19 @@ export default class UserDataAccessorObject {
         else {
           try {
             connection.query('UPDATE `users` SET `username` = ? WHERE (`email` = ?);',
-            [user.username, user.email], function(error, result){
-              if (error) {
-                console.log("An error occurred when trying to update username of OAuth user");
-                reject(error);
-                return;
-              }
-              if (result.affectedRows == 0) {
-                // Should promise be resolved instead (a bit less aggressive strategy)?
-                reject({"message": `User with email: ${user.email} does not exist`});
-                return;
-              }
-              resolve(true);
-            })
+              [user.username, user.email], function (error, result) {
+                if (error) {
+                  console.log("An error occurred when trying to update username of OAuth user");
+                  reject(error);
+                  return;
+                }
+                if (result.affectedRows == 0) {
+                  // Should promise be resolved instead (a bit less aggressive strategy)?
+                  reject({ "message": `User with email: ${user.email} does not exist` });
+                  return;
+                }
+                resolve(true);
+              })
           } catch (err) {
             console.log("Failed to update username");
             reject(err);
@@ -347,19 +348,19 @@ export default class UserDataAccessorObject {
         else {
           try {
             connection.query('DELETE FROM `users` WHERE (`username` = ?);',
-            [username], function(error, result){
-              if (error) {
-                console.log("An error occurred when trying to delete user");
-                reject(error);
-                return;
-              }
-              if (result.affectedRows == 0) {
-                // Should promise be resolved instead (a bit less aggressive strategy)?
-                reject({"message": `User ${username} does not exist`});
-                return;
-              }
-              resolve({"message": `User ${username} succesfully deleted`});
-            })
+              [username], function (error, result) {
+                if (error) {
+                  console.log("An error occurred when trying to delete user");
+                  reject(error);
+                  return;
+                }
+                if (result.affectedRows == 0) {
+                  // Should promise be resolved instead (a bit less aggressive strategy)?
+                  reject({ "message": `User ${username} does not exist` });
+                  return;
+                }
+                resolve({ "message": `User ${username} succesfully deleted` });
+              })
           } catch (err) {
             console.log("Failed to delete user");
             reject(err);
@@ -386,20 +387,20 @@ export default class UserDataAccessorObject {
         else {
           try {
             connection.query('SELECT `username`, `isOAuth` FROM `users` WHERE (`username` = ?);',
-             [username], function (error, result) {
-              if (error) {
-                console.log("An error occurred when trying to check user status (OAuth)");
-                reject(false);
-                return;
-              }
-              if (typeof(result[0]) == "undefined") {
-                // Should promise be resolved instead (a bit less aggressive strategy)
-                reject({"message": `User ${username} does not exist`});
-                return;
-              }
-              if (result[0].isOAuth) resolve(true);
-              else resolve(false);
-            });
+              [username], function (error, result) {
+                if (error) {
+                  console.log("An error occurred when trying to check user status (OAuth)");
+                  reject(false);
+                  return;
+                }
+                if (typeof (result[0]) == "undefined") {
+                  // Should promise be resolved instead (a bit less aggressive strategy)
+                  reject({ "message": `User ${username} does not exist` });
+                  return;
+                }
+                if (result[0].isOAuth) resolve(true);
+                else resolve(false);
+              });
           } catch (error) {
             console.log("Failed to check user status (OAuth)");
             reject(false);
@@ -427,18 +428,18 @@ export default class UserDataAccessorObject {
         else {
           try {
             connection.query('SELECT `refreshToken` FROM `users` WHERE (`username` = ?);',
-             [username], function (error, result) {
-              if (error) {
-                console.log("An error occurred when trying to get refresh token");
-                reject(false);
-                return;
-              }
-              if (result[0].refreshToken) {
-                resolve(result[0].refreshToken);
-                return;
-              }
-              else resolve(null);
-            });
+              [username], function (error, result) {
+                if (error) {
+                  console.log("An error occurred when trying to get refresh token");
+                  reject(false);
+                  return;
+                }
+                if (result[0].refreshToken) {
+                  resolve(result[0].refreshToken);
+                  return;
+                }
+                else resolve(null);
+              });
           } catch (error) {
             console.log("Failed to refresh token");
             reject(false);
@@ -465,18 +466,18 @@ export default class UserDataAccessorObject {
         else {
           try {
             connection.query('SELECT `refreshToken` FROM `users` WHERE (`email` = ?);',
-             [email], function (error, result) {
-              if (error) {
-                console.log("An error occurred when trying to get refresh token");
-                reject(false);
-                return;
-              }
-              if (result[0].refreshToken) {
-                resolve(result[0].refreshToken);
-                return;
-              }
-              else resolve(null);
-            });
+              [email], function (error, result) {
+                if (error) {
+                  console.log("An error occurred when trying to get refresh token");
+                  reject(false);
+                  return;
+                }
+                if (result[0].refreshToken) {
+                  resolve(result[0].refreshToken);
+                  return;
+                }
+                else resolve(null);
+              });
           } catch (error) {
             console.log("Failed to refresh token");
             reject(false);
@@ -510,14 +511,14 @@ export default class UserDataAccessorObject {
           }
           try {
             connection.query('TRUNCATE TABLE users;',
-             [], function (error, result) {
-              if (error) {
-                console.log("An error occurred when truncating table");
-                reject(false);
-                return;
-              }
-              resolve(true);
-            });
+              [], function (error, result) {
+                if (error) {
+                  console.log("An error occurred when truncating table");
+                  reject(false);
+                  return;
+                }
+                resolve(true);
+              });
           } catch (error) {
             console.log("Failed to truncate table");
             reject(false);
