@@ -22,6 +22,7 @@ const LoginCard = props => {
                     placeholder='E-MAIL'
                     onChangeText={userInputHandler}
                     value={props.userEmail}
+                    keyboardType="email-address"
                 />
                 <Input style={styles.input}
                     placeholder='PASSWORD'

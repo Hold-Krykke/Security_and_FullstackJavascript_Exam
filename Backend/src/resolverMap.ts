@@ -5,10 +5,10 @@ require("dotenv").config({ path: path.join(process.cwd(), ".env") });
 import UserFacade from "./facades/userFacade";
 import IUser from "./interfaces/IUser";
 import {
-    AuthenticationError, // IF NOT AUTHENTICATED - for authentication failures
-    UserInputError, // For validation errors on user input
-    ForbiddenError, // IF NOT AUTHORIZED - for authorization failures
-    ApolloError, // IF NOT ANY OF THE ABOVE THREE - If failure is not caught in one of these three, message will be INTERNAL_SERVER_ERROR
+  AuthenticationError, // IF NOT AUTHENTICATED - for authentication failures
+  UserInputError, // For validation errors on user input
+  ForbiddenError, // IF NOT AUTHORIZED - for authorization failures
+  ApolloError, // IF NOT ANY OF THE ABOVE THREE - If failure is not caught in one of these three, message will be INTERNAL_SERVER_ERROR
 } from "apollo-server-express";
 import validateEmail from "./util/validateEmail";
 import PositionFacade from "./facades/positionFacade";
@@ -34,8 +34,8 @@ const positionFacade: PositionFacade = new PositionFacade();
 // Schema is used to make Apollo Server
 
 (async function setupDB() {
-    const client = await setup();
-    positionFacade.setDatabase(client, "exam");
+  const client = await setup();
+  positionFacade.setDatabase(client, "exam");
 })();
 
 const resolverMap: IResolvers = {
@@ -46,59 +46,34 @@ const resolverMap: IResolvers = {
       requiresLogIn(context);
       return userFacade.getUserByUsername(args.username);
     },
-    Mutation: {
-        addUser: (_, { input }) => {
-            const email: string = input.email;
-            if (!validateEmail(email)) {
-                throw new UserInputError("Email Argument invalid", {
-                    invalidArgs: "email",
-                });
-            }
-            const username: string = input.username;
-            const password: string = input.password;
-            const isOAuth: boolean = false;
-            const user: IUser = {
-                username,
-                password,
-                email,
-                isOAuth,
-                refreshToken: null,
-            };
-            return userFacade.addNonOAuthUser(user);
-        },
-        deleteUser: (_, args: any) => {
-            return userFacade.deleteUser(args.username);
-        },
-        getNearbyUsers: (_, args: any) => {
-            if (args.distance <= 0) {
-                throw new UserInputError(
-                    "Please provide a search distance that is greater than 0",
-                    {
-                        invalidArgs: "distance",
-                    }
-                );
-            }
-            isCoordinates(args.coordinates);
-            const username: string = args.username;
-            const lon: number = args.coordinates.lon;
-            const lat: number = args.coordinates.lat;
-            const distance: number = args.distance;
-            const nearbyUsers = positionFacade.nearbyUsers(
-                username,
-                lon,
-                lat,
-                distance
-            );
-            return nearbyUsers;
-        },
-        updatePosition: (_, args: any) => {
-            isCoordinates(args.coordinates);
-            const username: string = args.username;
-            const lon: number = args.coordinates.lon;
-            const lat: number = args.coordinates.lat;
-            const result = positionFacade.createOrUpdatePosition(username, lon, lat);
-            return result;
-        },
+  },
+
+  Mutation: {
+    registerOAuthUser: (_: void, args: any, context: any) => {
+      if (!context.valid) {
+        throw new AuthenticationError("You need to be logged in to do that.");
+      }
+      // Only OAuth type users are allowed to use this endpoint
+      if (!context.token.isOAuth) {
+        throw new ForbiddenError("Wrong type of user");
+      }
+      const username: string = args.username;
+      // You're only able to edit your own username
+      const email = context.token.useremail;
+      const isOAuth = true;
+      const user: IUser = {
+        username,
+        password: null,
+        email,
+        isOAuth,
+        refreshToken: null
+      }
+      try {
+        const success = userFacade.updateUsernameOfOAuthUser(user);
+        return success;
+      } catch (err) {
+        throw new UserInputError("Username already taken");
+      }
     },
     deleteUser: (_, args: any, context) => {
       requiresLogIn(context);
@@ -163,15 +138,15 @@ const requiresLogIn = (context: any) => {
 
 // This could be placed in utils, but I wanted to keep Apollo Errors thrown in this file.
 function isCoordinates(coordinates: any) {
-    if (!validateCoordinates(coordinates.lon, coordinates.lat)) {
-        throw new UserInputError(
-            "Please provide proper Coordinates. lon between -180 and 180, and lat between -90 and 90",
-            {
-                invalidArgs: "coordinates",
-                errorCode: 400,
-            }
-        );
-    }
+  if (!validateCoordinates(coordinates.lon, coordinates.lat)) {
+    throw new UserInputError(
+      "Please provide proper Coordinates. lon between -180 and 180, and lat between -90 and 90",
+      {
+        invalidArgs: "coordinates",
+        errorCode: 400,
+      }
+    );
+  }
 }
 
 export default resolverMap;

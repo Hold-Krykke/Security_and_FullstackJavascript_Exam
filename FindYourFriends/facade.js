@@ -16,9 +16,16 @@ facade = () => {
     }
   `;
 
+  const UPDATE_USERNAME_OF_OAUTHUSER = gql`
+    mutation updateUsernameOfOAuthUser($username: String!) {
+      registerOAuthUser(username: $username)
+    }
+  `;
+
   return {
     GET_USER,
-    ADD_USER
+    ADD_USER,
+    UPDATE_USERNAME_OF_OAUTHUSER
   };
 };
 
