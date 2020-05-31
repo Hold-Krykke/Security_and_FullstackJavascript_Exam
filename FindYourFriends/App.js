@@ -7,7 +7,7 @@ import CreateUserScreen from "./screens/CreateUserScreen";
 import ChatScreen from "./screens/ChatScreen";
 import { ApolloProvider } from "@apollo/react-hooks";
 import client from "./utils/ApolloClientProvider";
-import { backendUri } from "./settings";
+import { SERVER_URL } from "./constants/settings";
 import 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -25,7 +25,7 @@ export default function App() {
                     <Stack.Navigator initialRouteName="LoginScreen" screenOptions={{ headerShown: false }}>
                         <Stack.Screen name="LoginScreen">
                             {props => <LoginScreen {...props}
-                                backendURL={backendUri}
+                                backendURL={SERVER_URL}
                                 signedIn={signedIn}
                                 setSignedIn={setSignedIn}
                             />}
