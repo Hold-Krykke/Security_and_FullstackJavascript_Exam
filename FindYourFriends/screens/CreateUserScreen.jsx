@@ -14,6 +14,7 @@ import badPasswords from '../utils/badPasswords'
 import Alert from '../utils/MakeAlert'
 import colors from '../constants/colors'
 import Card from '../components/Card'
+import handleError from "../utils/ErrorHandler";
 let badPasswordsArray = badPasswords.split('\n')
 
 const CreateUser = props => {

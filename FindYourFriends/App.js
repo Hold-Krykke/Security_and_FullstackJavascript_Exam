@@ -21,12 +21,6 @@ export default function App() {
 
   const Stack = createStackNavigator();
 
-
-//   useEffect(() => {
-//       if (user);
-//     navigation.navigate('CreateUserScreen')
-//   })
-
   return (
     <ApolloProvider client={client}>
       <View style={styles.screen}>
