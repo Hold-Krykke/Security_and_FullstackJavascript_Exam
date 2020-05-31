@@ -52,9 +52,7 @@ const resolverMap: IResolvers = {
     addUser: (_, { input }) => {
       const email: string = input.email;
       if (!validateEmail(email)) {
-        throw new UserInputError("Email Argument invalid", {
-          invalidArgs: "email",
-        });
+        throw new UserInputError("Email Argument invalid");
       }
       const username: string = input.username;
       const password: string = input.password;
@@ -70,9 +68,7 @@ const resolverMap: IResolvers = {
 
         return userFacade.addNonOAuthUser(user);
       } else {
-        throw new UserInputError("Bad input", {
-          invalidArgs: ["username", "password", "email"]
-        });
+        throw new UserInputError("Bad input");
       }
     },
     registerOAuthUser: (_: void, args: any, context: any) => {
@@ -96,10 +92,7 @@ const resolverMap: IResolvers = {
         const success = userFacade.updateUsernameOfOAuthUser(user);
         return success;
       } catch (err) {
-        throw new UserInputError("Username already taken",
-          {
-            invalidArgs: "username",
-          }
+        throw new UserInputError("Username already taken"
         );
       }
     },
@@ -112,10 +105,7 @@ const resolverMap: IResolvers = {
       requiresLogIn(context);
       if (args.distance <= 0) {
         throw new UserInputError(
-          "Please provide a search distance that is greater than 0",
-          {
-            invalidArgs: "distance",
-          }
+          "Please provide a search distance that is greater than 0"
         );
       }
       isCoordinates(args.coordinates);
@@ -168,11 +158,7 @@ const requiresLogIn = (context: any) => {
 function isCoordinates(coordinates: any) {
   if (!validateCoordinates(coordinates.lon, coordinates.lat)) {
     throw new UserInputError(
-      "Please provide proper Coordinates. lon between -180 and 180, and lat between -90 and 90",
-      {
-        invalidArgs: "coordinates",
-        errorCode: 400,
-      }
+      "Please provide proper Coordinates. lon between -180 and 180, and lat between -90 and 90"
     );
   }
 }

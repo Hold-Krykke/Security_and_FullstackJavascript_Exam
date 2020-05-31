@@ -4,6 +4,7 @@
 const handleError = ({ graphQLErrors, networkError }) => {
   let errorMessage;
   if (graphQLErrors) {
+    console.log(JSON.stringify({ graphQLErrors }, null, 4))
     graphQLErrors.map((err, index) => {
       console.log(
         "ERROR IN HANDLE-ERROR",
@@ -28,9 +29,7 @@ const handleError = ({ graphQLErrors, networkError }) => {
           },
           BAD_USER_INPUT: () => {
             return {
-              message: `Following fields were wrong: 
-                  ${err.extensions.exception.invalidArgs}
-                  \n${message}`,
+              message,
               title: "Bad user input",
             };
           },
