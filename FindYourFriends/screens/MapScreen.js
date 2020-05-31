@@ -85,19 +85,6 @@ const MapScreen = (props) => {
 	//grab all users from facade and map to screen. Update every so often? streams, subscriptions, taskManager?
 	//pass userInfo as props
 
-	// useEffect(() => {
-	// 	//set MapView region close to user only on startup
-	// 	if (settings.latitude && settings.longitude) {
-	// 		setRegion({
-	// 			latitude: settings.latitude,
-	// 			longitude: settings.longitude,
-	// 			latitudeDelta: LATITUDE_DELTA,
-	// 			longitudeDelta: LONGITUDE_DELTA,
-	// 		});
-	// 		setChangeRegion(true);
-	// 		console.log('regionHere', region);
-	// 	}
-	// }, [settings]);
 
 	useEffect(() => {
 		console.log('In region useEffect');
@@ -235,5 +222,21 @@ const styles = StyleSheet.create({
 		height: '100%',
 	},
 });
+
+// TaskManager.defineTask(TASKMANAGER_TASK_NAME, async ({data: {locations}, error}) => {
+// 	if (error) {
+// 		console.log('taskError', error);
+// 		// check `error.message` for more details.
+// 		//actually handle error with new error system
+// 		return;
+// 	}
+// 	console.log('Received new locations', locations);
+// 	await locations;
+// 	setSettings({
+// 		...settings,
+// 		longitude: locations[0].coords.longitude,
+// 		latitude: locations[0].coords.latitude,
+// 	});
+// });
 
 export default MapScreen;
