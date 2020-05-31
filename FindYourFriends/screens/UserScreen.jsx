@@ -37,28 +37,50 @@ const UserScreen = ({
     facade.UPDATE_USERNAME_OF_OAUTHUSER
   );
 
+  useEffect(() => {
+    async function saveNewToken() {
+      if (data) {
+        if (data.registerOAuthUser != "") {
+          await SecureStore.setItemAsync(
+            secureStoreKey,
+            data.registerOAuthUser
+          );
+        } else {
+          Alert("Could not save new username", "Error");
+        }
+      }
+    }
+    saveNewToken();
+  }, [data]);
+
   const userInputHandler = (inputText) => {
     setUsername(inputText);
   };
 
-  if (called && error) {
-    const errorMsg = handleError(error);
-    Alert(errorMsg.message, errorMsg.title);
-  }
+  // if (called && error) {
+  //   console.log("Error!");
+  //   const errorMsg = handleError(error);
+  //   Alert(errorMsg.message, errorMsg.title);
+  // }
 
   const confirmUsername = async () => {
-    if (!username) {
-      Alert("Please type a valid username", "Missing input");
-      return;
+    try {
+      if (!username) {
+        Alert("Please type a valid username", "Missing input");
+        return;
+      }
+      await registerOAuthUser({
+        variables: {
+          username: username,
+        },
+      });
+      user.username = username;
+      setUser({ ...user });
+      showModal(false);
+    } catch (err) {
+      const errorMsg = handleError(err);
+      Alert(errorMsg.message, errorMsg.title);
     }
-    await registerOAuthUser({
-      variables: {
-        username: username,
-      },
-    });
-    user.username = username;
-    setUser({ ...user });
-    showModal(false);
   };
 
   const skipUsername = async () => {

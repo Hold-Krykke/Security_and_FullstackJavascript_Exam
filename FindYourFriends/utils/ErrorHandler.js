@@ -28,9 +28,7 @@ const handleError = ({ graphQLErrors, networkError }) => {
           },
           BAD_USER_INPUT: () => {
             return {
-              message: `Following fields were wrong: 
-                  ${err.extensions.exception.invalidArgs}
-                  \n${message}`,
+              message,
               title: "Bad user input",
             };
           },
