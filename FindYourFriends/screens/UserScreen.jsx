@@ -84,14 +84,19 @@ const UserScreen = ({
   };
 
   const skipUsername = async () => {
-    await registerOAuthUser({
-      variables: {
-        username: user.email,
-      },
-    });
-    user.username = user.email;
-    setUser({ ...user });
-    showModal(false);
+    try {
+      await registerOAuthUser({
+        variables: {
+          username: user.email,
+        },
+      });
+      user.username = user.email;
+      setUser({ ...user });
+      showModal(false);
+    } catch (err) {
+      const errorMsg = handleError(err);
+      Alert(errorMsg.message, errorMsg.title);
+    }
   };
 
   return (
