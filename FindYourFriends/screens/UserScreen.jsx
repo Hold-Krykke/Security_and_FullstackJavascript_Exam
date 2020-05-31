@@ -37,6 +37,19 @@ const UserScreen = ({
     facade.UPDATE_USERNAME_OF_OAUTHUSER
   );
 
+  useEffect(() => {
+    async function saveNewToken(){
+      if (data) {
+        if (data.registerOAuthUser != "") {
+          await SecureStore.setItemAsync(secureStoreKey, data.registerOAuthUser);
+        } else {
+          Alert("Could not save new username", "Error");
+        }
+      }
+    }
+    saveNewToken();
+  }, [data]);
+
   const userInputHandler = (inputText) => {
     setUsername(inputText);
   };
