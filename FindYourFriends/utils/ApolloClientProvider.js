@@ -27,15 +27,18 @@ const authLink = setContext(async (request, previousContext) => {
 });
 
 const getNewToken = async () => {
-  const request = {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ token: await SecureStore.getItemAsync("token") }),
-  };
+
   try {
+    const expiredToken = await SecureStore.getItemAsync("token");
+
+    const request = {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ token: expiredToken }),
+    };
     const token = await fetch(`${backendUri}/refresh`, request)
       .then((response) => response.json())
       .then((data) => data.token);
@@ -65,6 +68,10 @@ const errorLink = onError(
         );
         switch (extensions.code) {
           case "UNAUTHENTICATED":
+            /*
+            One caveat is that the errors from the new response from retrying the request does not get passed into the error handler again. 
+            This helps to avoid being trapped in an endless request loop when you call forward() in your error handler.
+            */
             // error code is set to UNAUTHENTICATED
             // when AuthenticationError thrown in resolver
 
@@ -80,7 +87,6 @@ const errorLink = onError(
             // retry the request, returning the new observable
             return forward(operation);
         }
-
 
       });
     }

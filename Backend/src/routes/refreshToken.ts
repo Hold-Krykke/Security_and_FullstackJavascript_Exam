@@ -21,18 +21,14 @@ export default async function refreshToken(
     const decryptedToken = jwt.verify(expiredToken, process.env.SECRET, {
       ignoreExpiration: true,
     });
-    // If google user, check with google
-    // https://developers.google.com/identity/protocols/oauth2/web-server#offline
-    if (decryptedToken.timesRefreshed) {
-      if (Number(decryptedToken.timesRefreshed) > 5) {
-        throw new ApiError("Can't refresh token more than 5 times.");
-      }
-    }
-    const username = decryptedToken.username;
-    const useremail = decryptedToken.useremail;
-    const schema: string = process.env.DATABASE_SCHEMA || "";
-    const userFacade: UserFacade = new UserFacade(schema);
-    if (await userFacade.isOAuthUser(username)) {
+    if (decryptedToken.isOAuth) {
+      // If google user, check with google
+      // https://developers.google.com/identity/protocols/oauth2/web-server#offline
+      const username = decryptedToken.username;
+      const useremail = decryptedToken.useremail;
+      // Asger talked about making one instance of userFacade and passing it around, to avoid this. 
+      const schema: string = process.env.DATABASE_SCHEMA || "";
+      const userFacade: UserFacade = new UserFacade(schema);
       try {
         const refresh_token = await userFacade.getUserRefreshToken(useremail);
         const googleResponse: any = await fetch(
@@ -57,10 +53,10 @@ export default async function refreshToken(
             "token_type": "Bearer"
           }
         */
-        const googleAccessToken = googleResponse.access_token;
-        if (!googleAccessToken) {
+        if (!googleResponse.access_token) {
           throw new ApiError("Google didn't accept");
         }
+
       } catch (err) {
         // Google didn't accept
         // Should it just be next(err)?
@@ -68,20 +64,21 @@ export default async function refreshToken(
         throw new ApiError("Google didn't accept");
         // Should log user out in frontend.
       }
-    }
 
-    const _timesRefreshed = decryptedToken.timesRefreshed || 0
-    const payload = {
-      useremail,
-      username,
-      timesRefreshed: 1 + _timesRefreshed,
-    };
-    const newToken = jwt.sign(payload, process.env.SECRET, {
-      expiresIn: tokenExpirationInSeconds,
-    });
-    res.status(200).send({
-      token: newToken,
-    });
+      const payload = {
+        useremail,
+        username,
+        isOAuth: true
+      };
+      const newToken = jwt.sign(payload, process.env.SECRET, {
+        expiresIn: tokenExpirationInSeconds,
+      });
+      res.status(200).send({
+        token: newToken,
+      });
+    } else {
+      throw new ApiError("You have to log in again.")
+    }
   } catch (err) {
     next(err);
     // Not valid
