@@ -21,6 +21,12 @@ export default function App() {
 
   const Stack = createStackNavigator();
 
+
+//   useEffect(() => {
+//       if (user);
+//     navigation.navigate('CreateUserScreen')
+//   })
+
   return (
     <ApolloProvider client={client}>
       <View style={styles.screen}>
@@ -29,13 +35,27 @@ export default function App() {
           <Stack.Navigator initialRouteName="LoginScreen" screenOptions={{ headerShown: false }}>
             <Stack.Screen name="LoginScreen">
               {props => <LoginScreen {...props}
+                user={user}
+                setUser={setUser}
                 backendURL={SERVER_URL}
-                signedIn={signedIn}
                 setSignedIn={setSignedIn}
+                setFirstLogin={setFirstLogin}
               />}
             </Stack.Screen>
+            <Stack.Screen name="UserScreen">
+                {(props) => (<UserScreen {...props}
+                    setSignedIn={setSignedIn}
+                    user={user}
+                    setUser={setUser}
+                    username={username}
+                    setUsername={setUsername}
+                    visible={firstLogin}
+                    showModal={setFirstLogin}
+                  />
+                )}
+            </Stack.Screen>
             <Stack.Screen name="CreateUserScreen">{props => <CreateUserScreen {...props} />}</Stack.Screen>
-            <Stack.Screen name="MapScreen">{props => <CreateUserScreen {...props} />}</Stack.Screen>
+            <Stack.Screen name="MapScreen">{props => <MapScreen {...props} />}</Stack.Screen>
           </Stack.Navigator>
         </NavigationContainer>
       </View>

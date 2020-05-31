@@ -16,7 +16,6 @@ const secureStoreKey = "token";
 const LoginScreen = ({
   navigation,
   setSignedIn,
-  setTest,
   backendURL,
   setFirstLogin,
   user,
@@ -43,6 +42,7 @@ const LoginScreen = ({
         setUser({ ...temp_user });
         // console.log(JSON.stringify({ temp_user }, null, 4));
         setSignedIn(true);
+        navigation.navigate('UserScreen')
       }
     };
     checkIfLoggedIn();
@@ -75,6 +75,7 @@ const LoginScreen = ({
         setUser({ ...user });
         // console.log("user", user);
         setSignedIn(true);
+        navigation.navigate('UserScreen');
       } else if (result.type == "cancel") {
         // If the user closed the web browser, the Promise resolves with { type: 'cancel' }.
         // If the user does not permit the application to authenticate with the given url, the Promise resolved with { type: 'cancel' }.
@@ -113,6 +114,7 @@ const LoginScreen = ({
       setUser({ ...user });
       // console.log(JSON.stringify({ res }, null, 4));
       setSignedIn(true);
+      navigation.navigate('UserScreen');
     } else {
       console.log(
         "Something went wrong while logging in:\n",
@@ -138,7 +140,6 @@ const LoginScreen = ({
           userEmail={userEmail}
           password={password}
         />
-        <Button title="Go to HomeScreen" onPress={() => setTest(false)} />
       </View>
     </TouchableWithoutFeedback>
   );

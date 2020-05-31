@@ -47,7 +47,7 @@ const resolverMap: IResolvers = {
     //     return UserFacade.getAllUsers();
     // },
     getUser(_: void, args: any, context): any {
-      console.log(context);
+    //   console.log(context);
       // This is an Authorization Guard.
       // Protect GraphQL mutations like this.
       if (!context.valid) {
