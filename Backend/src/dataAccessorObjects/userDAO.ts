@@ -190,8 +190,8 @@ export default class UserDataAccessorObject {
         }
         else {
           try {
-            connection.query('INSERT INTO `users` (`username`, `password`, `email`, `isOAuth`, `refreshToken`) VALUES ( ?, ?, ?, ?, ?);',
-            [user.username, user.password, user.email, user.isOAuth, user.refreshToken], function(error){
+            connection.query('INSERT INTO `users` (`username`, `password`, `email`, `isOAuth`) VALUES ( ?, ?, ?, ?);',
+            [user.username, user.password, user.email, user.isOAuth], function(error){
               if (error) {
                 console.log("An error occurred when trying to insert user in database");
                 if (error.message.includes("ER_DUP_ENTRY: Duplicate entry")) {
@@ -287,6 +287,41 @@ export default class UserDataAccessorObject {
             })
           } catch (err) {
             console.log("Failed to update token");
+            reject(err);
+          } finally {
+            connection.release();
+          }
+        }
+      });
+    })
+  }
+
+  updateUsernameOfOAuthUser(user: IUser): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this._pool.getConnection((err, connection) => {
+        if (err) {
+          console.log("Failed to get connection from pool");
+          reject(err);
+          return;
+        }
+        else {
+          try {
+            connection.query('UPDATE `users` SET `username` = ? WHERE (`email` = ?);',
+            [user.username, user.email], function(error, result){
+              if (error) {
+                console.log("An error occurred when trying to update username of OAuth user");
+                reject(error);
+                return;
+              }
+              if (result.affectedRows == 0) {
+                // Should promise be resolved instead (a bit less aggressive strategy)?
+                reject({"message": `User with email: ${user.email} does not exist`});
+                return;
+              }
+              resolve(true);
+            })
+          } catch (err) {
+            console.log("Failed to update username");
             reject(err);
           } finally {
             connection.release();

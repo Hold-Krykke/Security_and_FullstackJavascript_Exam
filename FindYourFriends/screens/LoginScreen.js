@@ -1,13 +1,7 @@
 import React, { useState, useEffect } from "react";
-import {
-  StyleSheet,
-  View,
-  Text,
-  TouchableWithoutFeedback,
-  Keyboard,
-  Button,
-} from "react-native";
+import { StyleSheet, View, Text, TouchableWithoutFeedback, Keyboard, Button } from "react-native";
 import Card from "../components/Card";
+import Input from "../components/Input";
 import LoginCard from "../components/LoginCard";
 import colors from "../constants/colors";
 import { Linking } from "expo";
@@ -15,18 +9,18 @@ import * as WebBrowser from "expo-web-browser";
 import jwt_decode from "jwt-decode"; // https://www.npmjs.com/package/jwt-decode
 import * as SecureStore from "expo-secure-store";
 import MyAlert from "../utils/MakeAlert";
-
+import facade from "../facade";
 // The key for Secure Store. Use this key, to fetch token again.
 const secureStoreKey = "token";
 
 const LoginScreen = ({
-  signedIn,
+  navigation,
   setSignedIn,
-  setTest,
   backendURL,
-  setError,
+  setFirstLogin,
+  user,
+  setUser,
 }) => {
-  const [user, setUser] = useState({ email: "" });
   const [userEmail, setUserEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -41,14 +35,28 @@ const LoginScreen = ({
       const token = await SecureStore.getItemAsync(secureStoreKey);
       if (token) {
         const decoded = jwt_decode(token);
-        const temp_user = { email: decoded.useremail };
+        const temp_user = {
+          email: decoded.useremail,
+          username: decoded.username,
+        };
         setUser({ ...temp_user });
-        console.log(JSON.stringify({ temp_user }, null, 4));
+        // console.log(JSON.stringify({ temp_user }, null, 4));
         setSignedIn(true);
+        navigation.navigate('UserScreen')
       }
     };
     checkIfLoggedIn();
   }, []);
+
+  useEffect(() => {
+    // Both checks are necessary
+    if (!user.username) {
+      setFirstLogin(true);
+    }
+    if (user.username) {
+      setFirstLogin(false);
+    }
+  }, [user]);
 
   const handleGoogleLogin = async () => {
     try {
@@ -63,9 +71,11 @@ const LoginScreen = ({
         await SecureStore.setItemAsync(secureStoreKey, token);
         const decoded = jwt_decode(token);
         user.email = decoded.useremail;
-        setUser(user);
-        console.log("user", user);
+        user.username = decoded.username;
+        setUser({ ...user });
+        // console.log("user", user);
         setSignedIn(true);
+        navigation.navigate('UserScreen');
       } else if (result.type == "cancel") {
         // If the user closed the web browser, the Promise resolves with { type: 'cancel' }.
         // If the user does not permit the application to authenticate with the given url, the Promise resolved with { type: 'cancel' }.
@@ -93,15 +103,18 @@ const LoginScreen = ({
       res.json()
     );
     if (
-      res.useremail &&
       res.token
       // && (typeof res.token === String || res.token instanceof String)
     ) {
-      user.email = res.useremail;
+      const decoded = jwt_decode(res.token);
+      user.email = decoded.useremail;
+      user.username = decoded.username;
+      // console.log("User", user);
       await SecureStore.setItemAsync(secureStoreKey, res.token);
-      setUser(user);
-      console.log(JSON.stringify({ res }, null, 4));
+      setUser({ ...user });
+      // console.log(JSON.stringify({ res }, null, 4));
       setSignedIn(true);
+      navigation.navigate('UserScreen');
     } else {
       console.log(
         "Something went wrong while logging in:\n",
@@ -118,47 +131,19 @@ const LoginScreen = ({
       }}
     >
       <View style={styles.screen}>
-        {signedIn ? (
-          <LoggedInPage email={user.email} setSignedIn={setSignedIn} />
-        ) : (
-          <LoginCard
-            googleLoginHandler={handleGoogleLogin}
-            userLoginHandler={handleUserLogin}
-            setPassword={setPassword}
-            setUserEmail={setUserEmail}
-            userEmail={userEmail}
-            password={password}
-          />
-        )}
-        <Button title="Go to HomeScreen" onPress={() => setTest(false)} />
+        <LoginCard
+          navigation={navigation}
+          googleLoginHandler={handleGoogleLogin}
+          userLoginHandler={handleUserLogin}
+          setPassword={setPassword}
+          setUserEmail={setUserEmail}
+          userEmail={userEmail}
+          password={password}
+        />
       </View>
     </TouchableWithoutFeedback>
   );
 };
-
-// This should be removed, is only temporarily here untill MapScreen is ready
-const LoggedInPage = (props) => {
-  return (
-    <Card style={styles.container}>
-      <View style={styles.container}>
-        {/* 
-        Upon Logout, be sure to set both the SignedIn state, 
-        But also remove the Token from the SecureStore. 
-        */}
-        <Button
-          title="Log out"
-          onPress={async () => {
-            props.setSignedIn(false);
-            await SecureStore.deleteItemAsync(secureStoreKey);
-          }}
-        />
-        <Text style={styles.title}>Welcome!</Text>
-        <Text style={styles.text}>{props.email}</Text>
-      </View>
-    </Card>
-  );
-};
-////////////////////////////////////////////////////////////////////////////
 
 const styles = StyleSheet.create({
   screen: {
@@ -192,11 +177,12 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: "row",
     width: "100%",
-    justifyContent: "space-between",
+    justifyContent: "center",
     paddingHorizontal: 15,
   },
   button: {
-    width: 80,
+    width: 100,
+    padding: 7,
   },
 });
 

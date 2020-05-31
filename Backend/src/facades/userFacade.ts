@@ -111,7 +111,7 @@ export default class UserFacade {
 
     /**
      * Used to add OAuth type user.
-     * This type of user is saved without a password and without an email
+     * This type of user is saved without a password and username
      * @param user 
      */
     async addOAuthUser(user: IUser): Promise<boolean> {
@@ -121,7 +121,18 @@ export default class UserFacade {
             await this._UDAO.addUser(newUser);
             return true;
         } catch (err) {
-            throw new ApiError(`User could not be added, username (${user.username}) or (${user.email}) already exists`, 400)
+            throw new ApiError(`User could not be added, email: (${user.email}) already exists`, 400)
+        }
+    }
+
+    async updateUsernameOfOAuthUser(user: IUser): Promise<boolean> {
+        const updateUser: IUser = user;
+        updateUser.isOAuth = true;
+        try {
+            await this._UDAO.updateUsernameOfOAuthUser(updateUser);
+            return true;
+        } catch (err) {
+            throw new ApiError(`Username could not be updated for user with email: (${user.email})`, 400)
         }
     }
 

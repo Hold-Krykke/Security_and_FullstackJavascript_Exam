@@ -47,7 +47,7 @@ const resolverMap: IResolvers = {
     //     return UserFacade.getAllUsers();
     // },
     getUser(_: void, args: any, context): any {
-      console.log(context);
+    //   console.log(context);
       // This is an Authorization Guard.
       // Protect GraphQL mutations like this.
       if (!context.valid) {
@@ -56,7 +56,34 @@ const resolverMap: IResolvers = {
       return userFacade.getUserByUsername(args.username);
     },
   },
+
   Mutation: {
+    registerOAuthUser: (_: void, args: any, context: any) => {
+      if (!context.valid) {
+        throw new AuthenticationError("You need to be logged in to do that.");
+      }
+      // Only OAuth type users are allowed to use this endpoint
+      if (!context.token.isOAuth) {
+        throw new ForbiddenError("Wrong type of user");
+      }
+      const username: string = args.username;
+      // You're only able to edit your own username
+      const email = context.token.useremail;
+      const isOAuth = true;
+      const user: IUser = {
+        username,
+        password: null,
+        email,
+        isOAuth,
+        refreshToken: null
+      }
+      try {
+        const success = userFacade.updateUsernameOfOAuthUser(user);
+        return success;
+      } catch (err) {
+        throw new UserInputError("Username already taken");
+      }
+    },
     addUser: (_, { input }) => {
       const email: string = input.email;
       // if (!validateEmail(email)) {
@@ -67,14 +94,18 @@ const resolverMap: IResolvers = {
       const username: string = input.username;
       const password: string = input.password;
       const isOAuth: boolean = false;
-      const user: IUser = {
-        username,
-        password,
-        email,
-        isOAuth,
-        refreshToken: null,
-      };
-      return userFacade.addNonOAuthUser(user);
+      if (username != "" && password != "" && email != "") {
+        let user: IUser = {
+          username,
+          password,
+          email,
+          isOAuth,
+          refreshToken: null,
+        };
+        return userFacade.addNonOAuthUser(user);
+      } else {
+        throw new UserInputError("Bad input");
+      }
     },
     deleteUser: (_, args: any) => {
       return userFacade.deleteUser(args.username);
@@ -109,7 +140,7 @@ const resolverMap: IResolvers = {
       const result = positionFacade.createOrUpdatePosition(username, lon, lat);
       return result;
     },
-  },
+  }
 };
 
 export default resolverMap;
