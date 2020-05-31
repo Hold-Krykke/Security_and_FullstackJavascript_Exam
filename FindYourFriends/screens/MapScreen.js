@@ -41,6 +41,33 @@ const MARKER_COLORS = [
 	'indigo',
 ];
 
+TaskManager.defineTask(TASKMANAGER_TASK_NAME, async ({data: {locations}, error}) => {
+	console.log('in taskManager');
+	if (error) {
+		console.log('taskError', error);
+		// check `error.message` for more details.
+		//TODO actually handle error with new error system
+		//return;
+	}
+	console.log('Received new locations', locations);
+	//await locations;
+	// if (locations) {
+	// 	setSettings({
+	// 		...settings,
+	// 		longitude: locations[0].coords.longitude,
+	// 		latitude: locations[0].coords.latitude,
+	// 	});
+	// 	setRegion({
+	// 		latitude: locations[0].coords.latitude,
+	// 		longitude: locations[0].coords.longitude,
+	// 		latitudeDelta: LATITUDE_DELTA,
+	// 		longitudeDelta: LONGITUDE_DELTA,
+	// 	});
+	// 	setChangeRegion(true);
+	// 	//changeRegion = true
+	// }
+});
+
 const MapScreen = (props) => {
 	let mapRef = useRef(null);
 	const DEBUG = true; //use to display settings on screen
@@ -52,55 +79,28 @@ const MapScreen = (props) => {
 	});
 	const [errorMsg, setErrorMsg] = useState(null);
 	const [changeRegion, setChangeRegion] = useState(false);
+	//let changeRegion = false;
 	const [region, setRegion] = useState(null);
 	const [nearbyUsers, setNearbyUsers] = useState([]);
 	//grab all users from facade and map to screen. Update every so often? streams, subscriptions, taskManager?
 	//pass userInfo as props
 
-	TaskManager.defineTask(TASKMANAGER_TASK_NAME, async ({data: {locations}, error}) => {
-		if (error) {
-			console.log('taskError', error);
-			// check `error.message` for more details.
-			//actually handle error with new error system
-			return;
-		}
-		console.log('Received new locations', locations);
-		await locations;
-		setSettings({
-			...settings,
-			longitude: locations[0].coords.longitude,
-			latitude: locations[0].coords.latitude,
-		});
-	});
-
-	async () => {
-		let result = await Location.startLocationUpdatesAsync(TASKMANAGER_TASK_NAME, {
-			accuracy: 4,
-			timeInterval: 1000,
-			showsBackgroundLocationIndicator: true,
-			foregroundService: {
-				notificationTitle: 'FindYourFriends is running',
-				notificationBody: 'Updating location in background',
-				notificationColor: '#1DA1F2',
-			},
-		});
-	};
+	// useEffect(() => {
+	// 	//set MapView region close to user only on startup
+	// 	if (settings.latitude && settings.longitude) {
+	// 		setRegion({
+	// 			latitude: settings.latitude,
+	// 			longitude: settings.longitude,
+	// 			latitudeDelta: LATITUDE_DELTA,
+	// 			longitudeDelta: LONGITUDE_DELTA,
+	// 		});
+	// 		setChangeRegion(true);
+	// 		console.log('regionHere', region);
+	// 	}
+	// }, [settings]);
 
 	useEffect(() => {
-		//set MapView region close to user only on startup
-		if (settings.latitude && settings.longitude) {
-			setRegion({
-				latitude: settings.latitude,
-				longitude: settings.longitude,
-				latitudeDelta: LATITUDE_DELTA,
-				longitudeDelta: LONGITUDE_DELTA,
-			});
-			setChangeRegion(true);
-			console.log('regionHere', region);
-		}
-	}, [settings]);
-
-	useEffect(() => {
+		console.log('In region useEffect');
 		let timeout;
 		if (changeRegion && region) {
 			setTimeout(() => mapRef.current.animateToRegion(region, 1000), 5);
@@ -113,15 +113,29 @@ const MapScreen = (props) => {
 			let {status} = await Location.requestPermissionsAsync();
 			if (status !== 'granted') {
 				setErrorMsg('Permission to access location was denied');
+				//TODO Handle error with new system
+				return; //go to settings would be cool
 			}
-			let location = await Location.getCurrentPositionAsync({});
-			setSettings({
-				...settings,
-				longitude: location.coords.longitude,
-				latitude: location.coords.latitude,
+			if (status == 'granted') {
+			await Location.startLocationUpdatesAsync(TASKMANAGER_TASK_NAME, {
+				accuracy: 4,
+				timeInterval: 1000,
+				showsBackgroundLocationIndicator: true,
+				foregroundService: {
+					notificationTitle: 'FindYourFriends is running',
+					notificationBody: 'Updating location in background',
+					notificationColor: '#1DA1F2',
+				},
 			});
+		}
+			// let location = await Location.getCurrentPositionAsync({});
+			// setSettings({
+			// 	...settings,
+			// 	longitude: location.coords.longitude,
+			// 	latitude: location.coords.latitude,
+			// });
 
-			console.log('happened ' + new Date(Date.now()).toLocaleTimeString());
+			// console.log('happened ' + new Date(Date.now()).toLocaleTimeString());
 		})();
 	}, []);
 
@@ -218,7 +232,7 @@ const styles = StyleSheet.create({
 	},
 	mapStyle: {
 		width: WIDTH,
-		height: '100%'
+		height: '100%',
 	},
 });
 
