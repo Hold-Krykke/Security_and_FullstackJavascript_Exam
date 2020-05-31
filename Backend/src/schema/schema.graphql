@@ -42,6 +42,10 @@ input LocationInput {
 
 type Mutation {
   """
+  Register an OAuth user
+  """
+  registerOAuthUser(username: String!): Boolean
+  """
   Adds a new user to the facade
   """
   addUser(input: UserInput!): Boolean
