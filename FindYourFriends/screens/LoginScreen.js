@@ -1,11 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  StyleSheet,
-  View,
-  TouchableWithoutFeedback,
-  Keyboard,
-  Button,
-} from "react-native";
+import { StyleSheet, View, Text, TouchableWithoutFeedback, Keyboard, Button } from "react-native";
 import Card from "../components/Card";
 import Input from "../components/Input";
 import LoginCard from "../components/LoginCard";
@@ -16,16 +10,14 @@ import jwt_decode from "jwt-decode"; // https://www.npmjs.com/package/jwt-decode
 import * as SecureStore from "expo-secure-store";
 import MyAlert from "../utils/MakeAlert";
 import facade from "../facade";
-import { useMutation } from "@apollo/react-hooks";
-
 // The key for Secure Store. Use this key, to fetch token again.
 const secureStoreKey = "token";
 
 const LoginScreen = ({
+  navigation,
   setSignedIn,
   setTest,
   backendURL,
-  setError,
   setFirstLogin,
   user,
   setUser,
@@ -138,6 +130,7 @@ const LoginScreen = ({
     >
       <View style={styles.screen}>
         <LoginCard
+          navigation={navigation}
           googleLoginHandler={handleGoogleLogin}
           userLoginHandler={handleUserLogin}
           setPassword={setPassword}
@@ -150,7 +143,6 @@ const LoginScreen = ({
     </TouchableWithoutFeedback>
   );
 };
-////////////////////////////////////////////////////////////////////////////
 
 const styles = StyleSheet.create({
   screen: {

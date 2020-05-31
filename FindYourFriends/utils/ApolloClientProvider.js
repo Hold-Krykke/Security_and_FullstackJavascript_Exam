@@ -4,7 +4,7 @@ import { ApolloClient } from "apollo-client";
 import { InMemoryCache } from "apollo-cache-inmemory";
 import { createHttpLink } from "apollo-link-http";
 import { onError } from "apollo-link-error";
-import { backendUri } from "../settings";
+import { SERVER_URL } from "../constants/settings";
 
 /**
 The setContext function takes a function that returns either an object or a promise that returns an object to set the new context of a request.
@@ -42,7 +42,7 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (networkError) console.log(`[Network error]: ${networkError}`);
 });
 // the URI key is a string endpoint or function resolving to an endpoint -- will default to "/graphql" if not specified
-const httpLink = createHttpLink({ uri: backendUri + "/graphql" });
+const httpLink = createHttpLink({ uri: SERVER_URL + "/graphql" });
 /** httpLink and cache are requirements as of Apollo 2 https://www.apollographql.com/docs/react/api/apollo-client/#required-fields
  * - Error link - https://www.apollographql.com/docs/link/links/error/
  * - In Memory Cache - https://www.apollographql.com/docs/angular/basics/caching/
@@ -51,7 +51,7 @@ const httpLink = createHttpLink({ uri: backendUri + "/graphql" });
  * This makes subsequent executions of the same query extremely fast.
  */
 const client = new ApolloClient({
-  uri: backendUri,
+  uri: SERVER_URL,
   link: errorLink.concat(authLink.concat(httpLink)),
   cache: new InMemoryCache(), // automatic caching
 });

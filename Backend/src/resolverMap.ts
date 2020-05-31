@@ -56,8 +56,9 @@ const resolverMap: IResolvers = {
       return userFacade.getUserByUsername(args.username);
     },
   },
+
   Mutation: {
-    registerOAuthUser: (_, args: any, context) => {
+    registerOAuthUser: (_: void, args: any, context: any) => {
       if (!context.valid) {
         throw new AuthenticationError("You need to be logged in to do that.");
       }
@@ -76,10 +77,10 @@ const resolverMap: IResolvers = {
         isOAuth,
         refreshToken: null
       }
-      try{
+      try {
         const success = userFacade.updateUsernameOfOAuthUser(user);
         return success;
-      } catch(err){
+      } catch (err) {
         throw new UserInputError("Username already taken");
       }
     },
@@ -139,7 +140,7 @@ const resolverMap: IResolvers = {
       const result = positionFacade.createOrUpdatePosition(username, lon, lat);
       return result;
     },
-  },
+  }
 };
 
 export default resolverMap;
