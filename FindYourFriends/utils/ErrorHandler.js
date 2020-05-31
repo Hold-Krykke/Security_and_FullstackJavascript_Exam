@@ -4,7 +4,6 @@
 const handleError = ({ graphQLErrors, networkError }) => {
   let errorMessage;
   if (graphQLErrors) {
-    console.log(JSON.stringify({ graphQLErrors }, null, 4))
     graphQLErrors.map((err, index) => {
       console.log(
         "ERROR IN HANDLE-ERROR",
