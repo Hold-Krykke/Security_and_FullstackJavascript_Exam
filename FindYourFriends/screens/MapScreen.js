@@ -16,7 +16,7 @@ const INITIAL_REGION = {
 	latitudeDelta: 30,
 	longitudeDelta: 30,
 };
-const TASKMANAGER_TASK_NAME = 'FindYourFriends-background-location';
+//const TASKMANAGER_TASK_NAME = 'FindYourFriends-background-location';
 const {width: WIDTH, height: HEIGHT} = Dimensions.get('window');
 const ASPECT_RATIO = WIDTH / HEIGHT;
 const LATITUDE_DELTA = 0.06;
@@ -124,7 +124,7 @@ const MapScreen = (props) => {
 
 			// console.log('happened ' + new Date(Date.now()).toLocaleTimeString());
 		})();
-	}, []);
+	});
 
 	// let userMessage = 'Waiting for location...';
 	// if (errorMsg) {
