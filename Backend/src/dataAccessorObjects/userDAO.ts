@@ -190,8 +190,8 @@ export default class UserDataAccessorObject {
         }
         else {
           try {
-            connection.query('INSERT INTO `users` (`username`, `password`, `email`, `isOAuth`) VALUES ( ?, ?, ?, ?);',
-              [user.username, user.password, user.email, user.isOAuth],
+            connection.query('INSERT INTO `users` (`username`, `password`, `email`, `isOAuth`, `refreshToken`) VALUES ( ?, ?, ?, ?, ?);',
+              [user.username, user.password, user.email, user.isOAuth, user.refreshToken],
               function (error) {
                 if (error) {
                   console.log("An error occurred when trying to insert user in database");
