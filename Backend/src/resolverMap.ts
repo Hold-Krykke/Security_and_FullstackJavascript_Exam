@@ -49,6 +49,32 @@ const resolverMap: IResolvers = {
   },
 
   Mutation: {
+    addUser: (_, { input }) => {
+      const email: string = input.email;
+      if (!validateEmail(email)) {
+        throw new UserInputError("Email Argument invalid", {
+          invalidArgs: "email",
+        });
+      }
+      const username: string = input.username;
+      const password: string = input.password;
+      const isOAuth: boolean = false;
+      if (username != "" && password != "" && email != "") {
+        let user: IUser = {
+          username,
+          password,
+          email,
+          isOAuth,
+          refreshToken: null,
+        };
+
+        return userFacade.addNonOAuthUser(user);
+      } else {
+        throw new UserInputError("Bad input", {
+          invalidArgs: ["username", "password", "email"]
+        });
+      }
+    },
     registerOAuthUser: (_: void, args: any, context: any) => {
       requiresLogIn(context);
       // Only OAuth type users are allowed to use this endpoint

@@ -143,7 +143,7 @@ const server = new ApolloServer({
     // https://www.apollographql.com/docs/apollo-server/data/errors/#for-the-client-response
     if (err.originalError instanceof ApiError) {
       return new ApolloError(
-        err.originalError.msg,
+        err.originalError.message,
         String(err.originalError.errorCode)
       );
     }
