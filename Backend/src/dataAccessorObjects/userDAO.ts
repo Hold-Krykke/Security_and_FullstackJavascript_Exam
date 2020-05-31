@@ -373,43 +373,6 @@ export default class UserDataAccessorObject {
   }
 
   /**
-   * Used to check if the user provided correct credentials.
-   * (Not used) Perhaps this method should be removed? 
-   * @param email email of user
-   * @param password password of use
-   */
-  checkUser(email: string, password: string): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      this._pool.getConnection((err, connection) => {
-        if (err) {
-          console.log("Failed to get connection from pool");
-          reject(err);
-          return;
-        }
-        else {
-          try {
-            connection.query('SELECT `username`, `password` FROM `users` WHERE (`username` = ?);',
-             [email], function (error, result) {
-              if (error) {
-                console.log("An error occurred when trying to check user");
-                reject(false);
-                return;
-              }
-              if (result[0].password == password) resolve(true);
-              else resolve(false);
-            });
-          } catch (error) {
-            console.log("Failed to check user");
-            reject(false);
-          } finally {
-            connection.release();
-          }
-        }
-      });
-    })
-  }
-
-  /**
    * Used to check if a specific user is an OAuth type user.
    * @param username username of user
    */
