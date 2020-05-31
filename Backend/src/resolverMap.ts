@@ -60,7 +60,7 @@ const resolverMap: IResolvers = {
         },
     },
     Mutation: {
-        registerOAuthUser: (_: void, args: any, context: any) => {
+        registerOAuthUser: async (_: void, args: any, context: any) => {
             if (!context.valid) {
                 throw new AuthenticationError("You need to be logged in to do that.");
             }
@@ -80,7 +80,7 @@ const resolverMap: IResolvers = {
                 refreshToken: null
             }
             try {
-                const success = userFacade.updateUsernameOfOAuthUser(user);
+                const success = await userFacade.updateUsernameOfOAuthUser(user);
                 if (success) {
                     const payload = { useremail: context.token.email, username: args.username, isOAuth: true };
                     const token = jwt.sign(payload, process.env.SECRET, {
@@ -88,20 +88,21 @@ const resolverMap: IResolvers = {
                     });
                     return token;
                 } else {
-                    return "";
+                    throw new UserInputError("Username already taken", {
+                        invalidArgs: "Username"
+                    });
                 }
             } catch (err) {
-                console.log("Why doesn't this catch block work.......?");
                 throw new UserInputError("Username already taken");
             }
         },
         addUser: (_, { input }) => {
             const email: string = input.email;
-            // if (!validateEmail(email)) {
-            //   throw new UserInputError("Email Argument invalid", {
-            //     invalidArgs: "email",
-            //   });
-            // }
+            if (!validateEmail(email)) {
+                throw new UserInputError("Email Argument invalid", {
+                    invalidArgs: "email",
+                });
+            }
             const username: string = input.username;
             const password: string = input.password;
             const isOAuth: boolean = false;
@@ -113,7 +114,11 @@ const resolverMap: IResolvers = {
                     isOAuth,
                     refreshToken: null,
                 };
-                return userFacade.addNonOAuthUser(user);
+                try {
+                    return userFacade.addNonOAuthUser(user);
+                } catch (err) {
+                    throw new UserInputError("Bad input");
+                }
             } else {
                 throw new UserInputError("Bad input");
             }

@@ -55,6 +55,7 @@ const UserScreen = ({
   };
 
   if (called && error) {
+    console.log("Error!");
     const errorMsg = handleError(error);
     Alert(errorMsg.message, errorMsg.title);
   }
