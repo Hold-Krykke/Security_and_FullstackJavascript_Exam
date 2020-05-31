@@ -5,15 +5,16 @@ require("dotenv").config({ path: path.join(process.cwd(), ".env") });
 import UserFacade from "./facades/userFacade";
 import IUser from "./interfaces/IUser";
 import {
-  AuthenticationError, // IF NOT AUTHENTICATED - for authentication failures
-  UserInputError, // For validation errors on user input
-  ForbiddenError, // IF NOT AUTHORIZED - for authorization failures
-  ApolloError, // IF NOT ANY OF THE ABOVE THREE - If failure is not caught in one of these three, message will be INTERNAL_SERVER_ERROR
+    AuthenticationError, // IF NOT AUTHENTICATED - for authentication failures
+    UserInputError, // For validation errors on user input
+    ForbiddenError, // IF NOT AUTHORIZED - for authorization failures
+    ApolloError, // IF NOT ANY OF THE ABOVE THREE - If failure is not caught in one of these three, message will be INTERNAL_SERVER_ERROR
 } from "apollo-server-express";
 import validateEmail from "./util/validateEmail";
 import PositionFacade from "./facades/positionFacade";
 import setup from "./config/setupDB";
 import validateCoordinates from "./util/validateCoordinates";
+const jwt = require("jsonwebtoken");
 
 /**
  * AUTHENTICATION / AUTHORIZATION ERROR HANDLING:
@@ -27,6 +28,8 @@ import validateCoordinates from "./util/validateCoordinates";
 
 const schema: string = process.env.DATABASE_SCHEMA || "";
 
+const tokenExpirationInSeconds = 3600;
+
 const userFacade: UserFacade = new UserFacade(schema);
 const positionFacade: PositionFacade = new PositionFacade();
 // Resolvers
@@ -34,8 +37,8 @@ const positionFacade: PositionFacade = new PositionFacade();
 // Schema is used to make Apollo Server
 
 (async function setupDB() {
-  const client = await setup();
-  positionFacade.setDatabase(client, "exam");
+    const client = await setup();
+    positionFacade.setDatabase(client, "exam");
 })();
 
 const resolverMap: IResolvers = {
@@ -46,100 +49,104 @@ const resolverMap: IResolvers = {
       requiresLogIn(context);
       return userFacade.getUserByUsername(args.username);
     },
-  },
-
-  Mutation: {
-    addUser: (_, { input }) => {
-      const email: string = input.email;
-      if (!validateEmail(email)) {
-        throw new UserInputError("Email Argument invalid");
-      }
-      const username: string = input.username;
-      const password: string = input.password;
-      const isOAuth: boolean = false;
-      if (username != "" && password != "" && email != "") {
-        let user: IUser = {
-          username,
-          password,
-          email,
-          isOAuth,
-          refreshToken: null,
-        };
-
-        return userFacade.addNonOAuthUser(user);
-      } else {
-        throw new UserInputError("Bad input");
-      }
-    },
-    registerOAuthUser: (_: void, args: any, context: any) => {
-      requiresLogIn(context);
-      // Only OAuth type users are allowed to use this endpoint
-      if (!context.token.isOAuth) {
-        throw new ForbiddenError("Wrong type of user");
-      }
-      const username: string = args.username;
-      // You're only able to edit your own username
-      const email = context.token.useremail;
-      const isOAuth = true;
-      const user: IUser = {
-        username,
-        password: null,
-        email,
-        isOAuth,
-        refreshToken: null
-      }
-      try {
-        const success = userFacade.updateUsernameOfOAuthUser(user);
-        return success;
-      } catch (err) {
-        throw new UserInputError("Username already taken");
-      }
-    },
-    deleteUser: (_, args: any, context) => {
-      requiresLogIn(context);
-      mayOnlyModifySelf(args, context);
-      return userFacade.deleteUser(args.username);
-    },
-    getNearbyUsers: (_, args: any, context) => {
-      requiresLogIn(context);
-      if (args.distance <= 0) {
-        throw new UserInputError(
-          "Please provide a search distance that is greater than 0"
-        );
-      }
-      isCoordinates(args.coordinates);
-      const username: string = args.username;
-      const lon: number = args.coordinates.lon;
-      const lat: number = args.coordinates.lat;
-      const distance: number = args.distance;
-      const nearbyUsers = positionFacade.nearbyUsers(
-        username,
-        lon,
-        lat,
-        distance
-      );
-      return nearbyUsers;
-    },
-    updatePosition: (_, args: any, context) => {
-      // Three guards.
-      requiresLogIn(context);
-      mayOnlyModifySelf(args, context);
-      isCoordinates(args.coordinates);
-      const username: string = args.username;
-      const lon: number = args.coordinates.lon;
-      const lat: number = args.coordinates.lat;
-      const result = positionFacade.createOrUpdatePosition(username, lon, lat);
-      return result;
-    },
-  },
-};
-
-/**
- * Check if the person requesting something, is actually who they say they are.
- * For example used for deletion. People may only delete themselves.
- * @param args
- * @param context
- */
+    Mutation: {
+        registerOAuthUser: async (_: void, args: any, context: any) => {
+            if (!context.valid) {
+                throw new AuthenticationError("You need to be logged in to do that.");
+            }
+            // Only OAuth type users are allowed to use this endpoint
+            if (!context.token.isOAuth) {
+                throw new ForbiddenError("Wrong type of user");
+            }
+            const username: string = args.username;
+            // You're only able to edit your own username
+            const email = context.token.useremail;
+            const isOAuth = true;
+            const user: IUser = {
+                username,
+                password: null,
+                email,
+                isOAuth,
+                refreshToken: null
+            }
+            try {
+                const success = await userFacade.updateUsernameOfOAuthUser(user);
+                if (success) {
+                    const payload = { useremail: context.token.email, username: args.username, isOAuth: true };
+                    const token = jwt.sign(payload, process.env.SECRET, {
+                        expiresIn: tokenExpirationInSeconds,
+                    });
+                    return token;
+                } else {
+                    throw new UserInputError("Username already taken", {
+                        invalidArgs: "Username"
+                    });
+                }
+            } catch (err) {
+                throw new UserInputError("Username already taken");
+            }
+        },
+        addUser: (_, { input }) => {
+            const email: string = input.email;
+            if (!validateEmail(email)) {
+                throw new UserInputError("Email Argument invalid", {
+                    invalidArgs: "email",
+                });
+            }
+            const username: string = input.username;
+            const password: string = input.password;
+            const isOAuth: boolean = false;
+            if (username != "" && password != "" && email != "") {
+                let user: IUser = {
+                    username,
+                    password,
+                    email,
+                    isOAuth,
+                    refreshToken: null,
+                };
+                try {
+                    return userFacade.addNonOAuthUser(user);
+                } catch (err) {
+                    throw new UserInputError("Bad input");
+                }
+            } else {
+                throw new UserInputError("Bad input");
+            }
+        },
+        deleteUser: (_, args: any) => {
+            return userFacade.deleteUser(args.username);
+        },
+        getNearbyUsers: (_, args: any) => {
+            if (args.distance <= 0) {
+                throw new UserInputError(
+                    "Please provide a search distance that is greater than 0",
+                    {
+                        invalidArgs: "distance",
+                    }
+                );
+            }
+            isCoordinates(args.coordinates);
+            const username: string = args.username;
+            const lon: number = args.coordinates.lon;
+            const lat: number = args.coordinates.lat;
+            const distance: number = args.distance;
+            const nearbyUsers = positionFacade.nearbyUsers(
+                username,
+                lon,
+                lat,
+                distance
+            );
+            return nearbyUsers;
+        },
+        updatePosition: (_, args: any) => {
+            isCoordinates(args.coordinates);
+            const username: string = args.username;
+            const lon: number = args.coordinates.lon;
+            const lat: number = args.coordinates.lat;
+            const result = positionFacade.createOrUpdatePosition(username, lon, lat);
+            return result;
+        },
+    }}
 const mayOnlyModifySelf = async (args: any, context: any) => {
   const user = await userFacade.getUserByEmail(context.token.useremail);
   if (!(user.username == args.username)) {

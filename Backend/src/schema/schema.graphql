@@ -44,7 +44,7 @@ type Mutation {
   """
   Register an OAuth user
   """
-  registerOAuthUser(username: String!): Boolean
+  registerOAuthUser(username: String!): String
   """
   Adds a new user to the facade
   """

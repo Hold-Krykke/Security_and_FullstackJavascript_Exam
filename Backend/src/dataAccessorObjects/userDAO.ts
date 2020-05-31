@@ -389,15 +389,15 @@ export default class UserDataAccessorObject {
         else {
           try {
             connection.query('SELECT `username`, `password` FROM `users` WHERE (`username` = ?);',
-              [email], function (error, result) {
-                if (error) {
-                  console.log("An error occurred when trying to check user");
-                  reject(false);
-                  return;
-                }
-                if (result[0].password == password) resolve(true);
-                else resolve(false);
-              });
+             [email], function (error, result) {
+              if (error) {
+                console.log("An error occurred when trying to check user");
+                reject(false);
+                return;
+              }
+              if (result[0].password == password) resolve(true);
+              else resolve(false);
+            });
           } catch (error) {
             console.log("Failed to check user");
             reject(false);
