@@ -8,7 +8,6 @@ import * as WebBrowser from "expo-web-browser";
 import jwt_decode from "jwt-decode"; // https://www.npmjs.com/package/jwt-decode
 import * as SecureStore from "expo-secure-store";
 import MyAlert from "../utils/MakeAlert";
-
 // The key for Secure Store. Use this key, to fetch token again.
 const secureStoreKey = "token";
 
@@ -44,6 +43,7 @@ const LoginScreen = ({ navigation, signedIn, setSignedIn, backendURL }) => {
      * If the browser is closed using dismissBrowser, the Promise resolves with { type: 'dismiss' }.
      */
     const handleGoogleLogin = async () => {
+
         try {
             let redirectUrl = await Linking.getInitialURL();
             let authUrl = `${backendURL}/auth/google?redirecturl=${redirectUrl}`;
