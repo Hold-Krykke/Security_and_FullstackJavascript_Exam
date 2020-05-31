@@ -5,7 +5,6 @@ import { InMemoryCache } from "apollo-cache-inmemory";
 import { createHttpLink } from "apollo-link-http";
 import { onError } from "apollo-link-error";
 import { SERVER_URL } from "../constants/settings";
-import * as SecureStore from "expo-secure-store";
 
 /**
 The setContext function takes a function that returns either an object or a promise that returns an object to set the new context of a request.
@@ -77,7 +76,7 @@ const errorLink = onError(
 
             // modify the operation context with a new token
             const oldHeaders = operation.getContext().headers;
-            const token = await getNewToken()
+            const token = getNewToken()
             operation.setContext({
               headers: {
                 ...oldHeaders,
