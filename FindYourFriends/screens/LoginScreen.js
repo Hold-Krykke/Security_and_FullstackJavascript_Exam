@@ -33,18 +33,10 @@ const LoginScreen = ({
   const [password, setPassword] = useState("");
   const { data, error } = useQuery(facade.CHECK_JWT);
 
-//   () =>
-//     checkJWT({
-//       variables: {
-//         input: "yourmum",
-//       },
-//     });
-
   useEffect(() => {
     async function check() {
       if (data) {
         if (!data.checkToken) {
-          console.log("foh token");
           // We need to set the username to something that's not empty because another 
           // useEffect checks this value and shows the username modal if this value is falsy
           setUser({username: "..."});

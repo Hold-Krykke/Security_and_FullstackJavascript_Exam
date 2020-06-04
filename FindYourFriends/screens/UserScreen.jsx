@@ -57,12 +57,6 @@ const UserScreen = ({
     setUsername(inputText);
   };
 
-  // if (called && error) {
-  //   console.log("Error!");
-  //   const errorMsg = handleError(error);
-  //   Alert(errorMsg.message, errorMsg.title);
-  // }
-
   const confirmUsername = async () => {
     try {
       if (!username) {
