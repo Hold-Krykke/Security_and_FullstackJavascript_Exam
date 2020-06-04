@@ -12,8 +12,47 @@ import Card from "../components/Card";
 import colors from "../constants/colors";
 import Input from "../components/Input";
 import facade from "../facade";
+import useMutation from "@apollo/react-hooks";
 
 const MapScreen = (props) => {
+
+  const [updatePosition, { loading, error, data, called }] = useMutation(
+    facade.UPDATE_POSITION
+  );
+
+  // Example of how to use the hook
+  async function updateMyPosition(){
+    await updatePosition({
+      variables: {
+        username: "name",
+        coordinates: {
+          lon: 12.57,
+          lat: 55.66
+        }
+      }
+    });
+  }
+
+  // Will return data with the following structure:
+  /*
+    {
+      "data": {
+        "updatePosition": {
+          "lastUpdated": "2020-06-04T16:17:31.656Z",
+          "username": "name",
+          "location": {
+            "coordinates": [
+              12.55,
+              55.55
+            ]
+          }
+        }
+      }
+    }
+    So to access the username, you should be able to use: data.updatePosition.username
+    To access longitude: data.updatePosition.location.coordinates[0]
+  */
+
   return (
     <TouchableWithoutFeedback
       onPress={() => {
