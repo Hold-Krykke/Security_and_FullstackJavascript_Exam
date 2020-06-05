@@ -6,6 +6,8 @@ import {
   Text,
   TouchableWithoutFeedback,
   Keyboard,
+  ScrollView,
+  KeyboardAvoidingView
 } from "react-native";
 import Input from "../components/Input";
 import facade from "../facade";
