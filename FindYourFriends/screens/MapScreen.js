@@ -12,15 +12,57 @@ import Card from "../components/Card";
 import colors from "../constants/colors";
 import Input from "../components/Input";
 import facade from "../facade";
-import useMutation from "@apollo/react-hooks";
+import { useMutation } from "@apollo/react-hooks";
 
 const MapScreen = (props) => {
 
   const [updatePosition, { loading, error, data, called }] = useMutation(
     facade.UPDATE_POSITION
   );
+                      // Bad names, should be changed
+  const [nearbyUsers, { loading2, error2, data2, called2 }] = useMutation(facade.NEARBY_USERS);
 
-  // Example of how to use the hook
+  // Example of how to use nearbyUsers
+  async function getNearbyUsers(){
+    await nearbyUsers({
+      variables: {
+        username: "name",
+        coordinates: {
+          lon: 12.57,
+          lat: 55.66
+        },
+        distance: 5000
+      }
+    });
+  }
+
+  // Will give an array that looks like this:
+  /*
+  {
+    "data": {
+      "getNearbyUsers": [
+        {
+          "username": "Johnny",
+          "lon": 12.13,
+          "lat": 55.75
+        },
+        {
+          "username": "George",
+          "lon": 12.13,
+          "lat": 55.7677
+        },
+        {
+          "username": "Jenny",
+          "lon": 12.13,
+          "lat": 55.77
+        }
+      ]
+    }
+  }
+  */
+
+
+  // Example of how to use updatePosition
   async function updateMyPosition(){
     await updatePosition({
       variables: {

@@ -34,6 +34,16 @@ facade = () => {
     }
   `;
 
+  const NEARBY_USERS = gql`
+    mutation getNearbyUsers($username: String!, $coordinates: LocationInput!, $distance: Float!) {
+      getNearbyUsers(username: $username, coordinates: $coordinates, distance: $distance) {
+        username
+        lon
+        lat
+      }
+    }
+  `;
+
   const CHECK_JWT = gql`
     query checkJWT($input: String) {
       checkToken(input: $input)
@@ -46,6 +56,7 @@ facade = () => {
     UPDATE_POSITION,
     UPDATE_USERNAME_OF_OAUTHUSER,
     CHECK_JWT,
+    NEARBY_USERS
   };
 };
 
