@@ -6,6 +6,8 @@ import {
   Text,
   TouchableWithoutFeedback,
   Keyboard,
+  ScrollView,
+  KeyboardAvoidingView
 } from "react-native";
 import Input from "../components/Input";
 import facade from "../facade";
@@ -134,110 +136,113 @@ const CreateUser = (props) => {
     }
   }
 
-  return (
-    <TouchableWithoutFeedback
-      onPress={() => {
-        Keyboard.dismiss();
-      }}
-    >
-      <View style={styles.screen}>
-        <Card style={styles.container}>
-          <Text style={styles.title}>Create User</Text>
-          <Input
-            style={styles.input}
-            onChangeText={handleUsernameInput}
-            name="username"
-            value={newUser.username}
-            placeholder="USERNAME"
-          ></Input>
-          <Input
-            style={styles.input}
-            onChangeText={handleEmailInput}
-            name="email"
-            keyboardType="email-address"
-            value={newUser.email}
-            placeholder="E-MAIL"
-          ></Input>
-          <Input
-            style={styles.input}
-            onChangeText={handlePasswordInput}
-            name="password"
-            secureTextEntry={true}
-            value={newUser.password}
-            placeholder="PASSWORD"
-          ></Input>
-          <Input
-            style={styles.input}
-            onChangeText={handlePassword2Input}
-            name="password2"
-            secureTextEntry={true}
-            value={newUser.password2}
-            placeholder="PASSWORD"
-          ></Input>
-          <View style={styles.button}>
-            <Button
-              color={colors.primary}
-              title="CREATE ME"
-              onPress={confirmCreate}
-            />
-          </View>
-          <View style={styles.button}>
-            <Button
-              color={colors.secondary}
-              title="TAKE ME BACK"
-              onPress={() => props.navigation.goBack()}
-            />
-          </View>
-        </Card>
-      </View>
-    </TouchableWithoutFeedback>
-  );
+    return (
+        <ScrollView scrollToOverflowEnabled={true} style={styles.scrollView}>
+            <TouchableWithoutFeedback onPress={() => { Keyboard.dismiss(); }} >
+                <View style={styles.screen}>
+                    <Card style={styles.container}>
+                        <KeyboardAvoidingView behavior="padding" >
+                            <Text style={styles.title}>Create User</Text>
+                            <Input
+                                style={styles.input}
+                                onChangeText={handleUsernameInput}
+                                name="username"
+                                value={newUser.username}
+                                placeholder="USERNAME"
+                            ></Input>
+                            <Input
+                                style={styles.input}
+                                onChangeText={handleEmailInput}
+                                name="email"
+                                keyboardType="email-address"
+                                value={newUser.email}
+                                placeholder="E-MAIL"
+                            ></Input>
+                            <Input
+                                style={styles.input}
+                                onChangeText={handlePasswordInput}
+                                name="password"
+                                secureTextEntry={true}
+                                value={newUser.password}
+                                placeholder="PASSWORD"
+                            ></Input>
+                            <Input
+                                style={styles.input}
+                                onChangeText={handlePassword2Input}
+                                name="password2"
+                                secureTextEntry={true}
+                                value={newUser.password2}
+                                placeholder="PASSWORD"
+                            ></Input>
+                            <View style={styles.button}>
+                                <Button
+                                    color={colors.primary}
+                                    title="CREATE ME"
+                                    onPress={confirmCreate}
+                                />
+                            </View>
+                            <View style={styles.button}>
+                                <Button
+                                    color={colors.secondary}
+                                    title="TAKE ME BACK"
+                                    onPress={() => props.navigation.goBack()}
+                                />
+                            </View>
+                        </KeyboardAvoidingView>
+                    </Card>
+                </View>
+            </TouchableWithoutFeedback>
+        </ScrollView>
+    );
 };
 
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    padding: 10,
-    alignItems: "center",
-    justifyContent: "flex-start",
-  },
-  inputContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  title: {
-    color: colors.secondary,
-    fontSize: 22,
-    fontWeight: "bold",
-    marginVertical: 10,
-  },
-  text: {
-    color: colors.primary,
-    fontSize: 14,
-    fontWeight: "bold",
-    marginVertical: 10,
-    textAlign: "center",
-  },
-  container: {
-    width: 300,
-    maxWidth: "80%",
-    alignItems: "center",
-  },
-  input: {
-    width: 100,
-    textAlign: "center",
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    width: "100%",
-    justifyContent: "space-between",
-    paddingHorizontal: 15,
-  },
-  button: {
-    width: 110,
-    marginVertical: 10,
-  },
+    screen: {
+        flex: 1,
+        padding: 10,
+        alignItems: "center",
+        justifyContent: "flex-start",
+    },
+    scrollView: {
+        marginHorizontal: 20,
+    },
+    inputContainer: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    title: {
+        color: colors.secondary,
+        fontSize: 22,
+        fontWeight: "bold",
+        marginVertical: 10,
+    },
+    text: {
+        color: colors.primary,
+        fontSize: 14,
+        fontWeight: "bold",
+        marginVertical: 10,
+        textAlign: "center",
+    },
+    container: {
+        width: 300,
+        maxWidth: "90%",
+        alignItems: "center",
+    },
+    input: {
+        width: 100,
+        textAlign: "center",
+    },
+    buttonContainer: {
+        flexDirection: "row",
+        width: "100%",
+        justifyContent: "space-between",
+        paddingHorizontal: 15,
+    },
+    button: {
+        width: 110,
+        marginVertical: 10,
+    },
 });
 
 export default CreateUser;
