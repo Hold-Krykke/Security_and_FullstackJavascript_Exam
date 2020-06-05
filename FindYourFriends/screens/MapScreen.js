@@ -41,32 +41,32 @@ const MARKER_COLORS = [
 	'indigo',
 ];
 
-TaskManager.defineTask(TASKMANAGER_TASK_NAME, async ({data: {locations}, error}) => {
-	console.log('in taskManager');
-	if (error) {
-		console.log('taskError', error);
-		// check `error.message` for more details.
-		//TODO actually handle error with new error system
-		//return;
-	}
-	console.log('Received new locations', locations);
-	//await locations;
-	// if (locations) {
-	// 	setSettings({
-	// 		...settings,
-	// 		longitude: locations[0].coords.longitude,
-	// 		latitude: locations[0].coords.latitude,
-	// 	});
-	// 	setRegion({
-	// 		latitude: locations[0].coords.latitude,
-	// 		longitude: locations[0].coords.longitude,
-	// 		latitudeDelta: LATITUDE_DELTA,
-	// 		longitudeDelta: LONGITUDE_DELTA,
-	// 	});
-	// 	setChangeRegion(true);
-	// 	//changeRegion = true
-	// }
-});
+// TaskManager.defineTask(TASKMANAGER_TASK_NAME, async ({data: {locations}, error}) => {
+// 	console.log('in taskManager');
+// 	if (error) {
+// 		console.log('taskError', error);
+// 		// check `error.message` for more details.
+// 		//TODO actually handle error with new error system
+// 		//return;
+// 	}
+// 	console.log('Received new locations', locations);
+// 	//await locations;
+// 	// if (locations) {
+// 	// 	setSettings({
+// 	// 		...settings,
+// 	// 		longitude: locations[0].coords.longitude,
+// 	// 		latitude: locations[0].coords.latitude,
+// 	// 	});
+// 	// 	setRegion({
+// 	// 		latitude: locations[0].coords.latitude,
+// 	// 		longitude: locations[0].coords.longitude,
+// 	// 		latitudeDelta: LATITUDE_DELTA,
+// 	// 		longitudeDelta: LONGITUDE_DELTA,
+// 	// 	});
+// 	// 	setChangeRegion(true);
+// 	// 	//changeRegion = true
+// 	// }
+// });
 
 const MapScreen = (props) => {
 	let mapRef = useRef(null);
@@ -84,7 +84,18 @@ const MapScreen = (props) => {
 	const [nearbyUsers, setNearbyUsers] = useState([]);
 	//grab all users from facade and map to screen. Update every so often? streams, subscriptions, taskManager?
 	//pass userInfo as props
-
+	useEffect(() => {
+		//set MapView region close to user only on startup
+		if (settings.latitude && settings.longitude) {
+			setRegion({
+				latitude: settings.latitude,
+				longitude: settings.longitude,
+				latitudeDelta: LATITUDE_DELTA,
+				longitudeDelta: LONGITUDE_DELTA,
+			});
+			setChangeRegion(true);
+		}
+	}, [settings]);
 
 	useEffect(() => {
 		console.log('In region useEffect');
@@ -99,30 +110,30 @@ const MapScreen = (props) => {
 		(async () => {
 			let {status} = await Location.requestPermissionsAsync();
 			if (status !== 'granted') {
-				setErrorMsg('Permission to access location was denied');
+				setErrorMsg('Permission to access location was denied');	
 				//TODO Handle error with new system
 				return; //go to settings would be cool
 			}
-			if (status == 'granted') {
-			await Location.startLocationUpdatesAsync(TASKMANAGER_TASK_NAME, {
-				accuracy: 4,
-				timeInterval: 1000,
-				showsBackgroundLocationIndicator: true,
-				foregroundService: {
-					notificationTitle: 'FindYourFriends is running',
-					notificationBody: 'Updating location in background',
-					notificationColor: '#1DA1F2',
-				},
+		// 	if (status == 'granted') {
+		// 	await Location.startLocationUpdatesAsync(TASKMANAGER_TASK_NAME, {
+		// 		accuracy: 4,
+		// 		timeInterval: 1000,
+		// 		showsBackgroundLocationIndicator: true,
+		// 		foregroundService: {
+		// 			notificationTitle: 'FindYourFriends is running',
+		// 			notificationBody: 'Updating location in background',
+		// 			notificationColor: '#1DA1F2',
+		// 		},
+		// 	});
+		// }
+			let location = await Location.getCurrentPositionAsync({});
+			setSettings({
+				...settings,
+				longitude: location.coords.longitude,
+				latitude: location.coords.latitude,
 			});
-		}
-			// let location = await Location.getCurrentPositionAsync({});
-			// setSettings({
-			// 	...settings,
-			// 	longitude: location.coords.longitude,
-			// 	latitude: location.coords.latitude,
-			// });
 
-			// console.log('happened ' + new Date(Date.now()).toLocaleTimeString());
+			console.log('happened ' + new Date(Date.now()).toLocaleTimeString());
 		})();
 	});
 
