@@ -12,8 +12,6 @@ import {
 } from 'react-native';
 import Card from './Card';
 import Input from './Input';
-import TouchableOpacity from './TouchableOpacity';
-
 import colors from '../constants/colors';
 
 const MapScreenSettings = ({settings, setSettings}) => {
@@ -60,7 +58,15 @@ const MapScreenSettings = ({settings, setSettings}) => {
 								/>
 								<Text style={styles.text}> m</Text>
 							</View>
-							<TouchableOpacity
+							<View style={styles.button}>
+								<Button
+									onPress={() => setModalVisible(false)}
+									color={colors.secondary}
+									title="Return"
+									disabled={!!inputMsg}
+								/>
+							</View>
+							{/* <TouchableOpacity
 								onPress={() => setModalVisible(false)}
 								activeOpacity={0.7}
 								text="Return"
@@ -69,7 +75,7 @@ const MapScreenSettings = ({settings, setSettings}) => {
 									TouchableText: styles.touchableText,
 								}}
 								disabled={!!inputMsg}
-							/>
+							/> */}
 							{inputMsg ? <Text style={{...styles.text, color: 'red'}}>{inputMsg}</Text> : null}
 							<Text style={styles.tipText}>Tip: Press the map to return to your location </Text>
 						</Card>
@@ -79,12 +85,19 @@ const MapScreenSettings = ({settings, setSettings}) => {
 				{/* Below is settings button */}
 				<View style={styles.screen}>
 					<View style={styles.settings}>
-						<TouchableOpacity
+						<View style={styles.button}>
+							<Button
+								onPress={() => setModalVisible(true)}
+								color={colors.secondary}
+								title="Settings"
+							/>
+						</View>
+						{/* <TouchableOpacity
 							onPress={() => setModalVisible(true)}
 							activeOpacity={0.7}
 							text="Settings"
 							style={{Touchable: styles.touchableEnabled, TouchableText: styles.touchableText}}
-						/>
+						/> */}
 					</View>
 				</View>
 			</View>
@@ -164,6 +177,11 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		marginTop: 22,
 		backgroundColor: 'rgba(80,80,80,0.1)',
+	},
+	button: {
+		//backgroundColor: 'white',
+		width: 110,
+		marginVertical: 10,
 	},
 });
 
