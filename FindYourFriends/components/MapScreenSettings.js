@@ -4,7 +4,6 @@ import {
 	View,
 	Text,
 	TouchableWithoutFeedback,
-	//TouchableHighlight,
 	Keyboard,
 	Button,
 	Modal,
@@ -15,7 +14,7 @@ import Input from './Input';
 import colors from '../constants/colors';
 
 const MapScreenSettings = ({settings, setSettings}) => {
-	console.log(settings);
+	console.log("MapScreenSettigns printing settings", settings);
 	const [modalVisible, setModalVisible] = useState(false);
 	const [distanceInput, setDistanceInput] = useState(settings.distance | 1000);
 	const [inputMsg, setInputMsg] = useState('');
@@ -24,7 +23,7 @@ const MapScreenSettings = ({settings, setSettings}) => {
 		setInputMsg('');
 		distance = distance.replace(',', '.');
 		setDistanceInput(distance);
-		distance = parseFloat(distance); //converts pretty much any flawed string to our demands. "abc105.5abc" would be parsed "105.5"
+		distance = parseFloat(distance); //converts pretty much any flawed string to our demands. "abc105.5abc" would be parsed 105.5
 		if (distance) {
 			setSettings({...settings, distance});
 		} else {
@@ -78,7 +77,7 @@ const MapScreenSettings = ({settings, setSettings}) => {
 						<View style={styles.button}>
 							<Button
 								onPress={() => setModalVisible(true)}
-								color={colors.secondary}
+								color={colors.primary}
 								title="SETTINGS"
 							/>
 						</View>
