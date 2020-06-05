@@ -48,6 +48,14 @@ const resolverMap: IResolvers = {
             // Protect GraphQL mutations like this.
             requiresLogIn(context);
             return userFacade.getUserByUsername(args.username);
+        },
+        checkToken(_, args, context): boolean {
+            try {
+                requiresLogIn(context);
+                return true;
+            } catch (err) {
+                return false;
+            }
         }
     },
     Mutation: {

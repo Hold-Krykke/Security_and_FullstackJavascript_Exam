@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, View, Text, TouchableWithoutFeedback, Keyboard, Button } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Text,
+  TouchableWithoutFeedback,
+  Keyboard,
+  Button,
+} from "react-native";
 import Card from "../components/Card";
 import Input from "../components/Input";
 import LoginCard from "../components/LoginCard";
@@ -8,8 +15,9 @@ import { Linking } from "expo";
 import * as WebBrowser from "expo-web-browser";
 import jwt_decode from "jwt-decode"; // https://www.npmjs.com/package/jwt-decode
 import * as SecureStore from "expo-secure-store";
-import MyAlert from "../utils/MakeAlert";
+import Alert from "../utils/MakeAlert";
 import facade from "../facade";
+import { useQuery } from "@apollo/react-hooks";
 // The key for Secure Store. Use this key, to fetch token again.
 const secureStoreKey = "token";
 
@@ -23,6 +31,25 @@ const LoginScreen = ({
 }) => {
   const [userEmail, setUserEmail] = useState("");
   const [password, setPassword] = useState("");
+  const { data, error } = useQuery(facade.CHECK_JWT);
+
+  useEffect(() => {
+    async function check() {
+      if (data) {
+        if (!data.checkToken) {
+          // We need to set the username to something that's not empty because another 
+          // useEffect checks this value and shows the username modal if this value is falsy
+          setUser({username: "..."});
+          setFirstLogin(false);
+          setSignedIn(false);
+          await SecureStore.deleteItemAsync(secureStoreKey);
+          navigation.navigate("LoginScreen");
+          return;
+        }
+      }
+    }
+    check();
+  }, [data]);
 
   /**
    * If there is a JWT in SecureStore from previous login and app-use.
@@ -42,7 +69,7 @@ const LoginScreen = ({
         setUser({ ...temp_user });
         // console.log(JSON.stringify({ temp_user }, null, 4));
         setSignedIn(true);
-        navigation.navigate('UserScreen')
+        navigation.navigate("UserScreen");
       }
     };
     checkIfLoggedIn();
@@ -75,7 +102,7 @@ const LoginScreen = ({
         setUser({ ...user });
         // console.log("user", user);
         setSignedIn(true);
-        navigation.navigate('UserScreen');
+        navigation.navigate("UserScreen");
       } else if (result.type == "cancel") {
         // If the user closed the web browser, the Promise resolves with { type: 'cancel' }.
         // If the user does not permit the application to authenticate with the given url, the Promise resolved with { type: 'cancel' }.
@@ -86,7 +113,7 @@ const LoginScreen = ({
       }
     } catch (error) {
       console.log(error);
-      MyAlert(error); // This needs to be finetuned, to send something more specific. We do not wish to hand everything to the User.
+      Alert(error); // This needs to be finetuned, to send something more specific. We do not wish to hand everything to the User.
     }
   };
 
@@ -114,13 +141,13 @@ const LoginScreen = ({
       setUser({ ...user });
       // console.log(JSON.stringify({ res }, null, 4));
       setSignedIn(true);
-      navigation.navigate('UserScreen');
+      navigation.navigate("UserScreen");
     } else {
       console.log(
         "Something went wrong while logging in:\n",
         JSON.stringify({ res }, null, 4)
       );
-      MyAlert("Wrong username or password!", "Login Error!");
+      Alert("Wrong username or password!", "Login Error!");
     }
   };
 
