@@ -8,15 +8,20 @@ import IUser from "../interfaces/IUser.js";
 const host = process.env.DATABASE_IP;
 const username = process.env.DATABASE_USER_USERNAME;
 const password = process.env.DATABASE_USER_PASSWORD;
-const schema = process.env.DATABASE_SCHEMA;
 const port = 3306
 
+/**
+ * Class used to connect to MySQL database. 
+ * Pass schema to constructor to choose which database to work with
+ */
 export default class UserDataAccessorObject {
 
   private _pool: mysql.Pool;
+  private _currentSchema: string;
 
-  constructor() {
-    this._pool = this._createConnectionPool();
+  constructor(schema: string) {
+    this._pool = this._createConnectionPool(schema);
+    this._currentSchema = schema;
   }
 
   // Does not work
@@ -36,7 +41,7 @@ export default class UserDataAccessorObject {
   //   })
   // }
 
-  private _createConnectionPool(): mysql.Pool {
+  private _createConnectionPool(schema: string): mysql.Pool {
     return mysql.createPool({
       host,
       port,
@@ -63,8 +68,9 @@ export default class UserDataAccessorObject {
    * Do not use this method unless you are absolutely sure you're not going 
    * to use the instance anymore
    */
-  terminateConnectionPool() {
+  terminateConnectionPool(): boolean {
     this._pool.end();
+    return true;
   }
 
   /**
@@ -89,12 +95,11 @@ export default class UserDataAccessorObject {
                 return;
               }
               const data = result[0];
-              console.log(typeof(data));
-              if (typeof(data) == "undefined") {
+              if (typeof (data) == "undefined") {
                 resolve(null);
                 // return statement necessary to end method
                 return;
-              } 
+              }
               //I couldn't find a better way to destructure this data
               const { username, password, email, isOAuth, refreshToken } = data;
               const user: IUser = {
@@ -108,6 +113,55 @@ export default class UserDataAccessorObject {
             });
           } catch (error) {
             console.log("Failed to get user by username");
+            reject(error);
+          } finally {
+            //console.log("Releasing connection back to the pool");
+            connection.release();
+          }
+        }
+      });
+    })
+  }
+
+  /**
+   * Used to get a user by email. Use this for authentication.
+   * @param email email of user
+   */
+  getUserByEmail(email: string): Promise<IUser> | Promise<any> {
+    return new Promise((resolve, reject) => {
+      this._pool.getConnection((err, connection) => {
+        if (err) {
+          console.log("Failed to get connection from pool");
+          reject(err);
+          return;
+        }
+        else {
+          try {
+            connection.query('SELECT * FROM users WHERE email = ?', [email], function (error, result) {
+              if (error) {
+                console.log("An error occurred when trying to fetch user");
+                reject(error);
+                return;
+              }
+              const data = result[0];
+              if (typeof (data) == "undefined") {
+                resolve(null);
+                // return statement necessary to end method
+                return;
+              }
+              //I couldn't find a better way to destructure this data
+              const { username, password, email, isOAuth, refreshToken } = data;
+              const user: IUser = {
+                username,
+                password,
+                email,
+                isOAuth,
+                refreshToken
+              }
+              resolve(user);
+            });
+          } catch (error) {
+            console.log("Failed to get user by email");
             reject(error);
           } finally {
             //console.log("Releasing connection back to the pool");
@@ -136,19 +190,20 @@ export default class UserDataAccessorObject {
         }
         else {
           try {
-            connection.query('INSERT INTO `exam`.`users` (`username`, `password`, `email`, `isOAuth`, `refreshToken`) VALUES ( ?, ?, ?, ?, ?);',
-            [user.username, user.password, user.email, user.isOAuth, user.refreshToken], function(error){
-              if (error) {
-                console.log("An error occurred when trying to insert user in database");
-                if (error.message.includes("ER_DUP_ENTRY: Duplicate entry")) {
-                  reject({"message": "Username or email already exists"});
+            connection.query('INSERT INTO `users` (`username`, `password`, `email`, `isOAuth`, `refreshToken`) VALUES ( ?, ?, ?, ?, ?);',
+              [user.username, user.password, user.email, user.isOAuth, user.refreshToken],
+              function (error) {
+                if (error) {
+                  console.log("An error occurred when trying to insert user in database");
+                  if (error.message.includes("ER_DUP_ENTRY: Duplicate entry")) {
+                    reject({ "message": "Username or email already exists" });
+                    return;
+                  }
+                  reject(error);
                   return;
                 }
-                reject(error);
-                return;
-              }
-              resolve({"message": `User ${user.username} was succesfully created`});
-            })
+                resolve({ "message": `User ${user.username} was succesfully created` });
+              })
           } catch (err) {
             console.log("Failed to create user");
             reject(err);
@@ -166,7 +221,7 @@ export default class UserDataAccessorObject {
    * @param username username of user
    * @param token new refresh token
    */
-  updateUserRefreshToken(username: string, token: string): Promise<any> {
+  updateUserRefreshTokenByUsername(username: string, token: string): Promise<any> {
     return new Promise((resolve, reject) => {
       this._pool.getConnection((err, connection) => {
         if (err) {
@@ -176,23 +231,98 @@ export default class UserDataAccessorObject {
         }
         else {
           try {
-            connection.query('UPDATE `exam`.`users` SET `refreshToken` = ? WHERE (`username` = ?);',
-            [token, username], function(error, result){
-              if (error) {
-                console.log("An error occurred when trying to update user refresh token");
-                reject(error);
-                return;
-              }
-              console.log(result);
-              if (result.affectedRows == 0) {
-                // Should promise be resolved instead (a bit less aggressive strategy)
-                reject({"message": `User ${username} does not exist`});
-                return;
-              }
-              resolve(true);
-            })
+            connection.query('UPDATE `users` SET `refreshToken` = ? WHERE (`username` = ?);',
+              [token, username], function (error, result) {
+                if (error) {
+                  console.log("An error occurred when trying to update user refresh token");
+                  reject(error);
+                  return;
+                }
+                if (result.affectedRows == 0) {
+                  // Should promise be resolved instead (a bit less aggressive strategy)
+                  reject({ "message": `User ${username} does not exist` });
+                  return;
+                }
+                resolve(true);
+              })
           } catch (err) {
             console.log("Failed to update token");
+            reject(err);
+          } finally {
+            connection.release();
+          }
+        }
+      });
+    })
+  }
+
+  /**
+   * Used to update the refresh token of a user.
+   * Returns promise boolean true if token was updated
+   * @param email email of user
+   * @param token new refresh token
+   */
+  updateUserRefreshTokenByEmail(email: string, token: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this._pool.getConnection((err, connection) => {
+        if (err) {
+          console.log("Failed to get connection from pool");
+          reject(err);
+          return;
+        }
+        else {
+          try {
+            connection.query('UPDATE `users` SET `refreshToken` = ? WHERE (`email` = ?);',
+              [token, email], function (error, result) {
+                if (error) {
+                  console.log("An error occurred when trying to update user refresh token");
+                  reject(error);
+                  return;
+                }
+                if (result.affectedRows == 0) {
+                  // Should promise be resolved instead (a bit less aggressive strategy)
+                  reject({ "message": `User with email: ${email} does not exist` });
+                  return;
+                }
+                resolve(true);
+              })
+          } catch (err) {
+            console.log("Failed to update token");
+            reject(err);
+          } finally {
+            connection.release();
+          }
+        }
+      });
+    })
+  }
+
+  updateUsernameOfOAuthUser(user: IUser): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this._pool.getConnection((err, connection) => {
+        if (err) {
+          console.log("Failed to get connection from pool");
+          reject(err);
+          return;
+        }
+        else {
+          try {
+            connection.query('UPDATE `users` SET `username` = ? WHERE (`email` = ?);',
+              [user.username, user.email], function (error, result) {
+                if (error) {
+                  console.log("An error occurred when trying to update username of OAuth user");
+                  reject(error);
+                  return;
+                }
+                if (result.affectedRows == 0) {
+                  // Should promise be resolved instead (a bit less aggressive strategy)?
+                  reject({ "message": `User with email: ${user.email} does not exist` });
+                  return;
+                }
+                resolve(true);
+              })
+          } catch (err) {
+            console.log("Failed to update username");
             reject(err);
           } finally {
             connection.release();
@@ -217,61 +347,23 @@ export default class UserDataAccessorObject {
         }
         else {
           try {
-            connection.query('DELETE FROM `exam`.`users` WHERE (`username` = ?);',
-            [username], function(error, result){
-              console.log(result);
-              if (error) {
-                console.log("An error occurred when trying to delete user");
-                reject(error);
-                return;
-              }
-              if (result.affectedRows == 0) {
-                // Should promise be resolved instead (a bit less aggressive strategy)?
-                reject({"message": `User ${username} does not exist`});
-                return;
-              }
-              resolve({"message": `User ${username} succesfully deleted`});
-            })
+            connection.query('DELETE FROM `users` WHERE (`username` = ?);',
+              [username], function (error, result) {
+                if (error) {
+                  console.log("An error occurred when trying to delete user");
+                  reject(error);
+                  return;
+                }
+                if (result.affectedRows == 0) {
+                  // Should promise be resolved instead (a bit less aggressive strategy)?
+                  reject({ "message": `User ${username} does not exist` });
+                  return;
+                }
+                resolve({ "message": `User ${username} succesfully deleted` });
+              })
           } catch (err) {
             console.log("Failed to delete user");
             reject(err);
-          } finally {
-            connection.release();
-          }
-        }
-      });
-    })
-  }
-
-  /**
-   * Used to check if the user provided correct credentials.
-   * Perhaps this method should be removed?
-   * @param username username of user
-   * @param password password of use
-   */
-  checkUser(username: string, password: string): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      this._pool.getConnection((err, connection) => {
-        if (err) {
-          console.log("Failed to get connection from pool");
-          reject(err);
-          return;
-        }
-        else {
-          try {
-            connection.query('SELECT `username`, `password` FROM `exam`.`users` WHERE (`username` = ?);',
-             [username], function (error, result) {
-              if (error) {
-                console.log("An error occurred when trying to check user");
-                reject(false);
-                return;
-              }
-              if (result[0].password == password) resolve(true);
-              else resolve(false);
-            });
-          } catch (error) {
-            console.log("Failed to check user");
-            reject(false);
           } finally {
             connection.release();
           }
@@ -294,21 +386,21 @@ export default class UserDataAccessorObject {
         }
         else {
           try {
-            connection.query('SELECT `username`, `isOAuth` FROM `exam`.`users` WHERE (`username` = ?);',
-             [username], function (error, result) {
-              if (error) {
-                console.log("An error occurred when trying to check user status (OAuth)");
-                reject(false);
-                return;
-              }
-              if (typeof(result[0]) == "undefined") {
-                // Should promise be resolved instead (a bit less aggressive strategy)
-                reject({"message": `User ${username} does not exist`});
-                return;
-              }
-              if (result[0].isOAuth) resolve(true);
-              else resolve(false);
-            });
+            connection.query('SELECT `username`, `isOAuth` FROM `users` WHERE (`username` = ?);',
+              [username], function (error, result) {
+                if (error) {
+                  console.log("An error occurred when trying to check user status (OAuth)");
+                  reject(false);
+                  return;
+                }
+                if (typeof (result[0]) == "undefined") {
+                  // Should promise be resolved instead (a bit less aggressive strategy)
+                  reject({ "message": `User ${username} does not exist` });
+                  return;
+                }
+                if (result[0].isOAuth) resolve(true);
+                else resolve(false);
+              });
           } catch (error) {
             console.log("Failed to check user status (OAuth)");
             reject(false);
@@ -322,9 +414,10 @@ export default class UserDataAccessorObject {
 
   /**
    * Used to get refresh token of specific user.
+   * Should be removed because it is unnecessary?
    * @param username username of user
    */
-  getRefreshToken(username: string): Promise<string> | Promise<any> {
+  getRefreshTokenByUsername(username: string): Promise<string> | Promise<any> {
     return new Promise((resolve, reject) => {
       this._pool.getConnection((err, connection) => {
         if (err) {
@@ -334,19 +427,19 @@ export default class UserDataAccessorObject {
         }
         else {
           try {
-            connection.query('SELECT `refreshToken` FROM `exam`.`users` WHERE (`username` = ?);',
-             [username], function (error, result) {
-              if (error) {
-                console.log("An error occurred when trying to get refresh token");
-                reject(false);
-                return;
-              }
-              if (result[0].refreshToken) {
-                resolve(result[0].refreshToken);
-                return;
-              }
-              else resolve(null);
-            });
+            connection.query('SELECT `refreshToken` FROM `users` WHERE (`username` = ?);',
+              [username], function (error, result) {
+                if (error) {
+                  console.log("An error occurred when trying to get refresh token");
+                  reject(false);
+                  return;
+                }
+                if (result[0].refreshToken) {
+                  resolve(result[0].refreshToken);
+                  return;
+                }
+                else resolve(null);
+              });
           } catch (error) {
             console.log("Failed to refresh token");
             reject(false);
@@ -358,56 +451,84 @@ export default class UserDataAccessorObject {
     })
   }
 
+  /**
+   * Used to get refresh token of specific user.
+   * @param email email of user
+   */
+  getRefreshTokenByEmail(email: string): Promise<string> | Promise<any> {
+    return new Promise((resolve, reject) => {
+      this._pool.getConnection((err, connection) => {
+        if (err) {
+          console.log("Failed to get connection from pool");
+          reject(err);
+          return;
+        }
+        else {
+          try {
+            connection.query('SELECT `refreshToken` FROM `users` WHERE (`email` = ?);',
+              [email], function (error, result) {
+                if (error) {
+                  console.log("An error occurred when trying to get refresh token");
+                  reject(false);
+                  return;
+                }
+                if (result[0].refreshToken) {
+                  resolve(result[0].refreshToken);
+                  return;
+                }
+                else resolve(null);
+              });
+          } catch (error) {
+            console.log("Failed to refresh token");
+            reject(false);
+          } finally {
+            connection.release();
+          }
+        }
+      });
+    })
+  }
+
+  /**
+   * Used to delete all data in users table.
+   * Only allows deletion in test databases.
+   * Returns false if: 
+   * deletion fails
+   * current database is not a test database
+   */
+  truncateUserTable(): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this._pool.getConnection((err, connection) => {
+        if (err) {
+          console.log("Failed to get connection from pool");
+          reject(err);
+          return;
+        }
+        else {
+          if (!this._currentSchema.includes("_test")) {
+            resolve(false);
+            return;
+          }
+          try {
+            connection.query('TRUNCATE TABLE users;',
+              [], function (error, result) {
+                if (error) {
+                  console.log("An error occurred when truncating table");
+                  reject(false);
+                  return;
+                }
+                resolve(true);
+              });
+          } catch (error) {
+            console.log("Failed to truncate table");
+            reject(false);
+          } finally {
+            connection.release();
+          }
+        }
+      });
+    })
+  }
+
 }
 
-// const dao: UserDataAccessorObject = new UserDataAccessorObject();
-// async function getUser() {
-//   const user: IUser = await dao.getUserByUsername("ass");
-//   console.log(user);
-// }
-// getUser();
-
-// const newUser: IUser = {username: "ass", password: "xyzhash", isOAuth: false, email: "bitch@mail.com", refreshToken: null};
-// const newOAuthUser: IUser = {username: "Neko Chan", password: null, email: null, isOAuth: true, refreshToken: "Meow meow"}
-
-// async function addUser(newUser: IUser){
-//   let success = await dao.addUser(newUser);
-//   console.log(success);
-// }
-// addUser(newOAuthUser);
-
-// async function updateUserRefreshToken(username: string, token: string){
-//   let success = await dao.updateUserRefreshToken(username, token);
-//   console.log(success);
-// }
-// updateUserRefreshToken("fail", "megatoken");
-
-// async function deleteUser(username: string){
-//   let success = await dao.deleteUser(username);
-//   console.log(success);
-// }
-// deleteUser("TestBoi");
-
-// async function checkUser(username: string, password: string){
-//   let success = await dao.checkUser(username, password);
-//   console.log(success);
-// }
-// checkUser("Jenny", "badhash");
-
-// async function isOAuthUser(username: string){
-//   let success = await dao.isOAuthUser(username);
-//   console.log(success);
-// }
-// isOAuthUser("fail");
-
-// async function getRefreshToken(username: string){
-//   let success = await dao.getRefreshToken(username);
-//   console.log(success);
-// }
-// getRefreshToken("Johnny");
-
-
-// setTimeout(() => {
-//   console.log("Ending pool");
-//   dao.terminateConnectionPool();
-// }, 6000);

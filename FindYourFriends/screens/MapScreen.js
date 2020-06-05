@@ -39,6 +39,11 @@ const MARKER_COLORS = [
 	'plum',
 	'indigo',
 ];
+  const [updatePosition, { loading, error, data, called }] = useMutation(
+    facade.UPDATE_POSITION
+  );
+                      // Bad names, should be changed
+  const [nearbyUsers, { loading2, error2, data2, called2 }] = useMutation(facade.NEARBY_USERS);
 
 const MapScreen = (props) => {
 	let mapRef = useRef(null);
@@ -154,6 +159,19 @@ const MapScreen = (props) => {
 		</>
 	);
 };
+  // Example of how to use nearbyUsers
+  async function getNearbyUsers(){
+    await nearbyUsers({
+      variables: {
+        username: "name",
+        coordinates: {
+          lon: 12.57,
+          lat: 55.66
+        },
+        distance: 5000
+      }
+    });
+  }
 
 const styles = StyleSheet.create({
 	screen: {
@@ -183,6 +201,64 @@ const styles = StyleSheet.create({
 		width: WIDTH,
 		height: '100%',
 	},
+  */
+    To access longitude: data.updatePosition.location.coordinates[0]
+    }
+    So to access the username, you should be able to use: data.updatePosition.username
+      }
+        }
+          }
+            ]
+              55.55
+              12.55,
+            "coordinates": [
+          "location": {
+          "username": "name",
+          "lastUpdated": "2020-06-04T16:17:31.656Z",
+        "updatePosition": {
+      "data": {
+    {
+  /*
+  // Will return data with the following structure:
+
+  }
+    });
+      }
+        }
+          lat: 55.66
+          lon: 12.57,
+        coordinates: {
+        username: "name",
+      variables: {
+    await updatePosition({
+  async function updateMyPosition(){
+  // Example of how to use updatePosition
+
+
+  */
+    }
+  }
+      ]
+        }
+          "lat": 55.77
+          "lon": 12.13,
+          "username": "Jenny",
+        {
+        },
+          "lat": 55.7677
+          "lon": 12.13,
+          "username": "George",
+        {
+        },
+          "lat": 55.75
+          "lon": 12.13,
+          "username": "Johnny",
+        {
+      "getNearbyUsers": [
+    "data": {
+  {
+  /*
+  // Will give an array that looks like this:
 });
 
 export default MapScreen;

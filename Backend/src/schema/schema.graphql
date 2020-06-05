@@ -1,16 +1,36 @@
 type Query {
   """
-  Multiline docstring
-  It is used for providing descriptions of types, fields and arguments.
-  Docstrings show up in the documentation panel inside GraphQL playground and GraphiQL.
-  Description for the field
+  Get a single user with the given username
   """
   getUser(username: String!): User
+  """
+  Check JWT validity
+  """
+  checkToken(input: String): Boolean
 }
 
 type User {
   username: String!
   email: String!
+}
+
+scalar Date
+
+type OwnPosition {
+  lastUpdated: Date
+  username: String
+  location: Point
+}
+
+type Position {
+  username: String
+  lon: Float
+  lat: Float
+}
+
+type Point {
+  type: String
+  coordinates: [Float]
 }
 
 input UserInput {
@@ -19,9 +39,36 @@ input UserInput {
   email: String!
 }
 
+input LocationInput {
+  lon: Float!
+  lat: Float!
+}
+
 type Mutation {
-    addUser(input: UserInput!): Boolean
-    deleteUser(username: String!): String
+  """
+  Register an OAuth user
+  """
+  registerOAuthUser(username: String!): String
+  """
+  Adds a new user to the facade
+  """
+  addUser(input: UserInput!): Boolean
+  """
+  Deletes an existing user with the given username
+  """
+  deleteUser(username: String!): String
+  """
+  Get nearby users based on location and distance and update own position
+  """
+  getNearbyUsers(
+    username: String!
+    coordinates: LocationInput!
+    distance: Float!
+  ): [Position]
+  """
+  Update or create own position and returns result of the update
+  """
+  updatePosition(username: String!, coordinates: LocationInput!): OwnPosition
 }
 # You can comment like this here.
 # https://github.com/apollographql/graphql-tag#importing-graphql-files
