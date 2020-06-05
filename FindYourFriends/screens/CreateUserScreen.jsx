@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Button, StyleSheet, Text, TouchableWithoutFeedback, Keyboard, ScrollView } from "react-native";
+import { View, Button, StyleSheet, Text, TouchableWithoutFeedback, Keyboard, ScrollView, KeyboardAvoidingView } from "react-native";
 import Input from "../components/Input";
 import facade from "../facade";
 import { useMutation } from "@apollo/react-hooks";
@@ -127,60 +127,62 @@ const CreateUser = (props) => {
     }
 
     return (
-        <TouchableWithoutFeedback onPress={() => { Keyboard.dismiss(); }} >
-            <ScrollView style={styles.scrollView}>
+        <ScrollView scrollToOverflowEnabled={true} style={styles.scrollView}>
+            <TouchableWithoutFeedback onPress={() => { Keyboard.dismiss(); }} >
                 <View style={styles.screen}>
                     <Card style={styles.container}>
-                        <Text style={styles.title}>Create User</Text>
-                        <Input
-                            style={styles.input}
-                            onChangeText={handleUsernameInput}
-                            name="username"
-                            value={newUser.username}
-                            placeholder="USERNAME"
-                        ></Input>
-                        <Input
-                            style={styles.input}
-                            onChangeText={handleEmailInput}
-                            name="email"
-                            keyboardType="email-address"
-                            value={newUser.email}
-                            placeholder="E-MAIL"
-                        ></Input>
-                        <Input
-                            style={styles.input}
-                            onChangeText={handlePasswordInput}
-                            name="password"
-                            secureTextEntry={true}
-                            value={newUser.password}
-                            placeholder="PASSWORD"
-                        ></Input>
-                        <Input
-                            style={styles.input}
-                            onChangeText={handlePassword2Input}
-                            name="password2"
-                            secureTextEntry={true}
-                            value={newUser.password2}
-                            placeholder="PASSWORD"
-                        ></Input>
-                        <View style={styles.button}>
-                            <Button
-                                color={colors.primary}
-                                title="CREATE ME"
-                                onPress={confirmCreate}
-                            />
-                        </View>
-                        <View style={styles.button}>
-                            <Button
-                                color={colors.secondary}
-                                title="TAKE ME BACK"
-                                onPress={() => props.navigation.goBack()}
-                            />
-                        </View>
+                        <KeyboardAvoidingView behavior="padding" >
+                            <Text style={styles.title}>Create User</Text>
+                            <Input
+                                style={styles.input}
+                                onChangeText={handleUsernameInput}
+                                name="username"
+                                value={newUser.username}
+                                placeholder="USERNAME"
+                            ></Input>
+                            <Input
+                                style={styles.input}
+                                onChangeText={handleEmailInput}
+                                name="email"
+                                keyboardType="email-address"
+                                value={newUser.email}
+                                placeholder="E-MAIL"
+                            ></Input>
+                            <Input
+                                style={styles.input}
+                                onChangeText={handlePasswordInput}
+                                name="password"
+                                secureTextEntry={true}
+                                value={newUser.password}
+                                placeholder="PASSWORD"
+                            ></Input>
+                            <Input
+                                style={styles.input}
+                                onChangeText={handlePassword2Input}
+                                name="password2"
+                                secureTextEntry={true}
+                                value={newUser.password2}
+                                placeholder="PASSWORD"
+                            ></Input>
+                            <View style={styles.button}>
+                                <Button
+                                    color={colors.primary}
+                                    title="CREATE ME"
+                                    onPress={confirmCreate}
+                                />
+                            </View>
+                            <View style={styles.button}>
+                                <Button
+                                    color={colors.secondary}
+                                    title="TAKE ME BACK"
+                                    onPress={() => props.navigation.goBack()}
+                                />
+                            </View>
+                        </KeyboardAvoidingView>
                     </Card>
                 </View>
-            </ScrollView>
-        </TouchableWithoutFeedback>
+            </TouchableWithoutFeedback>
+        </ScrollView>
     );
 };
 
