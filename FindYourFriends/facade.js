@@ -22,7 +22,7 @@ facade = () => {
     }
   `;
 
-  const UPDATE_POSITION = gqp`
+  const UPDATE_POSITION = gql`
     mutation updatePosition($username: String!, $coordinates: LocationInput!) {
       updatePosition(username: $username, coordinates: $coordinates) {
         lastUpdated
