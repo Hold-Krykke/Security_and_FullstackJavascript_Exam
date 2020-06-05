@@ -21,7 +21,7 @@ const styles = StyleSheet.create({
     },
     headerTitle: {
         color: colors.secondary,
-        fontSize: 22,
+        fontSize: 26,
         fontWeight: "bold"
     }
 

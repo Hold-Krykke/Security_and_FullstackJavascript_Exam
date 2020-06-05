@@ -1,12 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-    StyleSheet,
-    View,
-    Text,
-    TouchableWithoutFeedback,
-    Keyboard,
-    Button,
-} from "react-native";
+import { StyleSheet, View, Text, TouchableWithoutFeedback, Keyboard, ScrollView, KeyboardAvoidingView } from "react-native";
 import Card from "../components/Card";
 import Input from "../components/Input";
 import LoginCard from "../components/LoginCard";
@@ -21,14 +14,7 @@ import { useQuery } from "@apollo/react-hooks";
 // The key for Secure Store. Use this key, to fetch token again.
 const secureStoreKey = "token";
 
-const LoginScreen = ({
-    navigation,
-    setSignedIn,
-    backendURL,
-    setFirstLogin,
-    user,
-    setUser,
-}) => {
+const LoginScreen = ({ navigation, setSignedIn, backendURL, setFirstLogin, user, setUser }) => {
     const [userEmail, setUserEmail] = useState("");
     const [password, setPassword] = useState("");
     const { data, error } = useQuery(facade.CHECK_JWT);
@@ -151,19 +137,24 @@ const LoginScreen = ({
         }
     };
 
-    return (<TouchableWithoutFeedback onPress={() => { Keyboard.dismiss(); }} >
-        <View style={styles.screen}>
-            <LoginCard
-                navigation={navigation}
-                googleLoginHandler={handleGoogleLogin}
-                userLoginHandler={handleUserLogin}
-                setPassword={setPassword}
-                setUserEmail={setUserEmail}
-                userEmail={userEmail}
-                password={password}
-            />
-        </View>
-    </TouchableWithoutFeedback>
+    return (
+        <ScrollView scrollToOverflowEnabled={true} style={styles.scrollView}>
+            <TouchableWithoutFeedback onPress={() => { Keyboard.dismiss(); }} >
+                <KeyboardAvoidingView behavior="padding" >
+                    <View style={styles.screen}>
+                        <LoginCard
+                            navigation={navigation}
+                            googleLoginHandler={handleGoogleLogin}
+                            userLoginHandler={handleUserLogin}
+                            setPassword={setPassword}
+                            setUserEmail={setUserEmail}
+                            userEmail={userEmail}
+                            password={password}
+                        />
+                    </View>
+                </KeyboardAvoidingView>
+            </TouchableWithoutFeedback>
+        </ScrollView>
     );
 };
 
