@@ -26,10 +26,10 @@ const CreateUser = (props) => {
   const [addUser, { loading, error, data, called }] = useMutation(
     facade.ADD_USER
   );
-  if (called && error) {
-    const errorMsg = handleError(error);
-    Alert(errorMsg.message, errorMsg.title);
-  }
+  // if (called && error) {
+  //   const errorMsg = handleError(error);
+  //   Alert(errorMsg.message, errorMsg.title);
+  // }
   // Sadly the value passed to the function in onChangeText is only the value of the element (what the user typed)
   // and not an event with more data than just a string. This means that you can't a generic handler
   // that can handle the input of all the input fields since we can't access any id or anything from the event
@@ -119,18 +119,23 @@ const CreateUser = (props) => {
       return;
     }
     // If everything is okay then we add the user
-    await addUser({
-      variables: {
-        input: {
-          username: newUser.username,
-          email: newUser.email,
-          password: newUser.password,
+    try {
+      await addUser({
+        variables: {
+          input: {
+            username: newUser.username,
+            email: newUser.email,
+            password: newUser.password,
+          },
         },
-      },
-    });
-    console.log("Created new user");
-    setNewUser({});
-    Alert("User successfully created", "Success!");
+      });
+      console.log("Created new user");
+      setNewUser({});
+      Alert("User successfully created", "Success!");
+    } catch (err) {
+      const errorMsg = handleError(err);
+      Alert(errorMsg.message, errorMsg.title);
+    }
   }
 
   return (
