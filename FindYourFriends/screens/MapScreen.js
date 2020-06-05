@@ -1,20 +1,13 @@
 import React, {useState, useEffect, useRef} from 'react';
 import {Dimensions, StyleSheet, View, Text, TouchableWithoutFeedback, Keyboard} from 'react-native';
 import * as Location from 'expo-location';
-import MapView, {Marker} from 'react-native-maps';
-import Card from '../components/Card';
+import MapView from 'react-native-maps';
 import colors from '../constants/colors';
-import Input from '../components/Input';
 import facade from '../facade';
 import MapScreenSettings from '../components/MapScreenSettings';
+import {useMutation} from '@apollo/react-hooks';
 
-const INITIAL_REGION = {
-	//Milan, Italy - start location
-	latitude: 45.464664,
-	longitude: 9.18854,
-	latitudeDelta: 30,
-	longitudeDelta: 30,
-};
+
 const {width: WIDTH, height: HEIGHT} = Dimensions.get('window');
 const ASPECT_RATIO = WIDTH / HEIGHT;
 const LATITUDE_DELTA = 0.06;
@@ -51,14 +44,58 @@ const MapScreen = (props) => {
 	});
 	const [changeRegion, setChangeRegion] = useState(false);
 	const [region, setRegion] = useState(null);
-	const [nearbyUsers, setNearbyUsers] = useState([]);
-	//grab all users from facade and map to screen.
-	//pass userInfo as props
+	const [users, setUsers] = useState([]);
+	//pass userInfo as props instead of bogus "settings" object
 
-	/**
-	 * Uses @region and mapRef (useRef) from state to animateToRegion on the mapview.
-	 * @param {*} animationTime
-	 */
+	const [
+		updatePosition,
+		{loadingPosition, errorPosition, dataPosition, calledPosition},
+	] = useMutation(facade.UPDATE_POSITION);
+
+	const [nearbyUsers, {loadingUsers, errorUsers, dataUsers, calledUsers}] = useMutation(
+		facade.NEARBY_USERS
+	);
+
+	const getNearbyUsers = async () => {
+		try {
+			const result = await nearbyUsers({
+				variables: {
+					username: settings.username,
+					coordinates: {
+						lon: settings.longitude,
+						lat: settings.latitude,
+					},
+					distance: settings.distance,
+				},
+			});
+			console.log('getNearbyUsers', result);
+			setUsers(result.dataUsers.getNearbyUsers); //experiemental, can't test because no login. may be "data" or "dataUsers"
+		} catch (err) {
+			console.log('getNearbyUsers error:', err);
+			//todo proper error handling
+		}
+	};
+
+	const updateMyPosition = async () => {
+		//experiemental, can't test because no login
+		try {
+			const result = await updatePosition({
+				variables: {
+					username: settings.username,
+					coordinates: {
+						lon: 12.57,
+						lat: 55.66,
+					},
+				},
+			});
+			console.log('updateMyPosition', result);
+			//Do anything?
+		} catch (err) {
+			console.log('updateMyPosition error:', err);
+			//todo proper error handling
+		}
+	};
+
 	const animateRegionMapView = (animationTime = 1000) => {
 		mapRef.current.animateToRegion(region, animationTime);
 	};
@@ -75,6 +112,9 @@ const MapScreen = (props) => {
 			//On first run, trigger next useEffect
 			setChangeRegion(true);
 		}
+		//getNearbyUsers() //todo activate when testing can be done. currently tells "need to be logged in".
+		//^This might be too often. Should maybe be chained with updateMyPosition
+		//updateMyPosition()
 	}, [settings]);
 
 	useEffect(() => {
@@ -94,8 +134,9 @@ const MapScreen = (props) => {
 				let {status} = await Location.requestPermissionsAsync();
 				if (status !== 'granted') {
 					//setErrorMsg('Permission to access location was denied');
-					//TODO Handle error with new system | go to settings would be cool
-					return; 
+					//TODO Handle error with new system
+					//go to settings would be cool: https://docs.expo.io/versions/latest/sdk/intent-launcher/
+					return;
 				}
 
 				let location = await Location.getCurrentPositionAsync({});
@@ -105,18 +146,20 @@ const MapScreen = (props) => {
 					latitude: location.coords.latitude,
 				});
 
-				console.log('happened ' + new Date(Date.now()).toLocaleTimeString()); //Debug TODO REMOVE
+				if (DEBUG) {
+					console.log('MapScreen: Update happened ' + new Date(Date.now()).toLocaleTimeString()); //Debug TODO REMOVE
+				}
 			})();
 		}, 1000);
 		return () => {
 			clearInterval(interval);
 		};
 	}, []);
-	
+
 	return (
 		<>
 			<MapScreenSettings settings={settings} setSettings={setSettings} />
-			{DEBUG && settings && <Text>{JSON.stringify(settings, null, 4)}</Text>} 
+			{DEBUG && settings && <Text>{JSON.stringify(settings, null, 4)}</Text>}
 
 			<TouchableWithoutFeedback
 				touchSoundDisabled={true}
@@ -131,21 +174,19 @@ const MapScreen = (props) => {
 								style={styles.mapStyle}
 								showsUserLocation
 								loadingEnabled={true}
-								onLongPress={() => animateRegionMapView()}> 
-								{/* mapview tag ends here. Map players below, before closing tag. 
-								https://github.com/react-native-community/react-native-maps#rendering-a-list-of-markers-on-a-map */}
-								
-								{/* {settings.latitude && settings.longitude && ( //use similar for mapping nearbyPlayers. Legacy from own user, modify to currently-mapped player
-									<MapView.Marker
-										title={settings.username}
-										pinColor="blue" //use MARKER_COLORS
-										key={settings.username}
-										coordinate={{
-											longitude: settings.longitude,
-											latitude: settings.latitude,
-										}}
-									/>
-								)} */}
+								onLongPress={() => animateRegionMapView()}>
+								{users && //experiemental, can't test because no login
+									users.map((user) => {
+										<MapView.Marker
+											title={user.username}
+											pinColor={MARKER_COLORS[Math.floor(Math.random() * array.length)]} //random color from possible ones
+											key={user.username}
+											coordinate={{
+												longitude: user.lon,
+												latitude: user.lat,
+											}}
+										/>;
+									})}
 							</MapView>
 						)}
 					</View>
