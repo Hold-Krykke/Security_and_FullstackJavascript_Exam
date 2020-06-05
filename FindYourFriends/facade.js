@@ -34,11 +34,18 @@ facade = () => {
     }
   `;
 
+  const CHECK_JWT = gql`
+    query checkJWT($input: String) {
+      checkToken(input: $input)
+    }
+  `;
+
   return {
     GET_USER,
     ADD_USER,
     UPDATE_POSITION,
-    UPDATE_USERNAME_OF_OAUTHUSER
+    UPDATE_USERNAME_OF_OAUTHUSER,
+    CHECK_JWT,
   };
 };
 

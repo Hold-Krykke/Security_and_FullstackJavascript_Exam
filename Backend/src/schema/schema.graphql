@@ -3,6 +3,10 @@ type Query {
   Get a single user with the given username
   """
   getUser(username: String!): User
+  """
+  Check JWT validity
+  """
+  checkToken(input: String): Boolean
 }
 
 type User {
