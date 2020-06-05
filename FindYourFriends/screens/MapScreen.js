@@ -42,26 +42,29 @@ const MARKER_COLORS = [
 
 const MapScreen = (props) => {
 	let mapRef = useRef(null);
-	const DEBUG = true; //use to display settings on screen
+	const DEBUG = true; //use to display settings on screen | debug TODO remove
 	const [settings, setSettings] = useState({
 		username: 'Johnny',
 		distance: 1000,
 		longitude: null,
 		latitude: null,
 	});
-	const [errorMsg, setErrorMsg] = useState(null);
 	const [changeRegion, setChangeRegion] = useState(false);
-	//let changeRegion = false;
 	const [region, setRegion] = useState(null);
 	const [nearbyUsers, setNearbyUsers] = useState([]);
 	//grab all users from facade and map to screen.
 	//pass userInfo as props
 
+	/**
+	 * Uses @region and mapRef (useRef) from state to animateToRegion on the mapview.
+	 * @param {*} animationTime
+	 */
 	const animateRegionMapView = (animationTime = 1000) => {
 		mapRef.current.animateToRegion(region, animationTime);
 	};
 
 	useEffect(() => {
+		//Always change MapView region based on new location
 		if (settings.latitude && settings.longitude) {
 			setRegion({
 				latitude: settings.latitude,
@@ -69,13 +72,13 @@ const MapScreen = (props) => {
 				latitudeDelta: LATITUDE_DELTA,
 				longitudeDelta: LONGITUDE_DELTA,
 			});
+			//On first run, trigger next useEffect
 			setChangeRegion(true);
 		}
 	}, [settings]);
 
 	useEffect(() => {
-		//TODO make function and call here & onLongPress
-		//set MapView region close to user only on startup
+		//set MapView camera region close to user ONLY on startup
 		let timeout;
 		if (changeRegion && region) {
 			setTimeout(() => animateRegionMapView(), 5);
@@ -83,14 +86,16 @@ const MapScreen = (props) => {
 		}
 		if (timeout) clearTimeout(timeout);
 	}, [changeRegion]);
+
 	useEffect(() => {
+		//Every second ask for location permission and update location state.
 		const interval = setInterval(() => {
 			(async () => {
 				let {status} = await Location.requestPermissionsAsync();
 				if (status !== 'granted') {
-					setErrorMsg('Permission to access location was denied');
-					//TODO Handle error with new system
-					return; //go to settings would be cool
+					//setErrorMsg('Permission to access location was denied');
+					//TODO Handle error with new system | go to settings would be cool
+					return; 
 				}
 
 				let location = await Location.getCurrentPositionAsync({});
@@ -100,25 +105,18 @@ const MapScreen = (props) => {
 					latitude: location.coords.latitude,
 				});
 
-				console.log('happened ' + new Date(Date.now()).toLocaleTimeString());
+				console.log('happened ' + new Date(Date.now()).toLocaleTimeString()); //Debug TODO REMOVE
 			})();
 		}, 1000);
 		return () => {
 			clearInterval(interval);
 		};
 	}, []);
-
-	// let userMessage = 'Waiting for location...';
-	// if (errorMsg) {
-	// 	userMessage = errorMsg;
-	// } else if (settings.latitude && settings.longitude) {
-	// 	userMessage = "";
-	// }
-
+	
 	return (
 		<>
 			<MapScreenSettings settings={settings} setSettings={setSettings} />
-			{<Text>{DEBUG && JSON.stringify(settings, null, 4)}</Text>}
+			{DEBUG && settings && <Text>{JSON.stringify(settings, null, 4)}</Text>} 
 
 			<TouchableWithoutFeedback
 				touchSoundDisabled={true}
@@ -126,39 +124,21 @@ const MapScreen = (props) => {
 					Keyboard.dismiss();
 				}}>
 				<View style={styles.screen}>
-					{/* <Text style={styles.text}>{userMessage}</Text> */}
-
 					<View style={styles.container}>
-						{/* {!region && (<MapView //could be useful if long load or user hasn't given permission!!
-								//ref={mapRef}
-								style={styles.mapStyle}
-								region={INITIAL_REGION}
-								//showsUserLocation
-								loadingEnabled>
-								
-							</MapView>
-						)} */}
 						{region && (
 							<MapView
-								//onLayout={() => doStuff}
-								//initialRegion={INITIAL_REGION} //probably not needed
-								//onMapReady={() => doStuff}
-								//onMapReady={() => setChangeRegion(false)}
 								ref={mapRef}
 								style={styles.mapStyle}
-								//region={INITIAL_REGION}
-								//region={region}
-								//onRegionChangeComplete={(region) => mapRef.current.animateToRegion(region, 1000)}
 								showsUserLocation
 								loadingEnabled={true}
-								onLongPress={() => animateRegionMapView()}
-								//showsIndoorLevelPicker={true}
-								//followsUserLocation={true}
-							>
-								{/* {settings.latitude && settings.longitude && ( //legacy, use for mapping others
+								onLongPress={() => animateRegionMapView()}> 
+								{/* mapview tag ends here. Map players below, before closing tag. 
+								https://github.com/react-native-community/react-native-maps#rendering-a-list-of-markers-on-a-map */}
+								
+								{/* {settings.latitude && settings.longitude && ( //use similar for mapping nearbyPlayers. Legacy from own user, modify to currently-mapped player
 									<MapView.Marker
-										title={settings.username + ' (YOU)'}
-										pinColor="blue"
+										title={settings.username}
+										pinColor="blue" //use MARKER_COLORS
 										key={settings.username}
 										coordinate={{
 											longitude: settings.longitude,
