@@ -7,7 +7,6 @@ import colors from '../constants/colors';
 import Input from '../components/Input';
 import facade from '../facade';
 import MapScreenSettings from '../components/MapScreenSettings';
-import * as TaskManager from 'expo-task-manager';
 
 const INITIAL_REGION = {
 	//Milan, Italy - start location
@@ -16,12 +15,12 @@ const INITIAL_REGION = {
 	latitudeDelta: 30,
 	longitudeDelta: 30,
 };
-//const TASKMANAGER_TASK_NAME = 'FindYourFriends-background-location';
 const {width: WIDTH, height: HEIGHT} = Dimensions.get('window');
 const ASPECT_RATIO = WIDTH / HEIGHT;
 const LATITUDE_DELTA = 0.06;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
+//Select random color from here for nearbyPlayers
 const MARKER_COLORS = [
 	'red',
 	'tomato',
@@ -41,33 +40,6 @@ const MARKER_COLORS = [
 	'indigo',
 ];
 
-// TaskManager.defineTask(TASKMANAGER_TASK_NAME, async ({data: {locations}, error}) => {
-// 	console.log('in taskManager');
-// 	if (error) {
-// 		console.log('taskError', error);
-// 		// check `error.message` for more details.
-// 		//TODO actually handle error with new error system
-// 		//return;
-// 	}
-// 	console.log('Received new locations', locations);
-// 	//await locations;
-// 	// if (locations) {
-// 	// 	setSettings({
-// 	// 		...settings,
-// 	// 		longitude: locations[0].coords.longitude,
-// 	// 		latitude: locations[0].coords.latitude,
-// 	// 	});
-// 	// 	setRegion({
-// 	// 		latitude: locations[0].coords.latitude,
-// 	// 		longitude: locations[0].coords.longitude,
-// 	// 		latitudeDelta: LATITUDE_DELTA,
-// 	// 		longitudeDelta: LONGITUDE_DELTA,
-// 	// 	});
-// 	// 	setChangeRegion(true);
-// 	// 	//changeRegion = true
-// 	// }
-// });
-
 const MapScreen = (props) => {
 	let mapRef = useRef(null);
 	const DEBUG = true; //use to display settings on screen
@@ -82,10 +54,14 @@ const MapScreen = (props) => {
 	//let changeRegion = false;
 	const [region, setRegion] = useState(null);
 	const [nearbyUsers, setNearbyUsers] = useState([]);
-	//grab all users from facade and map to screen. Update every so often? streams, subscriptions, taskManager?
+	//grab all users from facade and map to screen.
 	//pass userInfo as props
+
+	const animateRegionMapView = (animationTime = 1000) => {
+		mapRef.current.animateToRegion(region, animationTime);
+	};
+
 	useEffect(() => {
-		//set MapView region close to user only on startup
 		if (settings.latitude && settings.longitude) {
 			setRegion({
 				latitude: settings.latitude,
@@ -98,44 +74,39 @@ const MapScreen = (props) => {
 	}, [settings]);
 
 	useEffect(() => {
-		console.log('In region useEffect');
+		//TODO make function and call here & onLongPress
+		//set MapView region close to user only on startup
 		let timeout;
 		if (changeRegion && region) {
-			setTimeout(() => mapRef.current.animateToRegion(region, 1000), 5);
+			setTimeout(() => animateRegionMapView(), 5);
 			//https://github.com/react-native-community/react-native-maps/issues/1717
 		}
 		if (timeout) clearTimeout(timeout);
 	}, [changeRegion]);
 	useEffect(() => {
-		(async () => {
-			let {status} = await Location.requestPermissionsAsync();
-			if (status !== 'granted') {
-				setErrorMsg('Permission to access location was denied');	
-				//TODO Handle error with new system
-				return; //go to settings would be cool
-			}
-		// 	if (status == 'granted') {
-		// 	await Location.startLocationUpdatesAsync(TASKMANAGER_TASK_NAME, {
-		// 		accuracy: 4,
-		// 		timeInterval: 1000,
-		// 		showsBackgroundLocationIndicator: true,
-		// 		foregroundService: {
-		// 			notificationTitle: 'FindYourFriends is running',
-		// 			notificationBody: 'Updating location in background',
-		// 			notificationColor: '#1DA1F2',
-		// 		},
-		// 	});
-		// }
-			let location = await Location.getCurrentPositionAsync({});
-			setSettings({
-				...settings,
-				longitude: location.coords.longitude,
-				latitude: location.coords.latitude,
-			});
+		const interval = setInterval(() => {
+			(async () => {
+				let {status} = await Location.requestPermissionsAsync();
+				if (status !== 'granted') {
+					setErrorMsg('Permission to access location was denied');
+					//TODO Handle error with new system
+					return; //go to settings would be cool
+				}
 
-			console.log('happened ' + new Date(Date.now()).toLocaleTimeString());
-		})();
-	});
+				let location = await Location.getCurrentPositionAsync({});
+				setSettings({
+					...settings,
+					longitude: location.coords.longitude,
+					latitude: location.coords.latitude,
+				});
+
+				console.log('happened ' + new Date(Date.now()).toLocaleTimeString());
+			})();
+		}, 1000);
+		return () => {
+			clearInterval(interval);
+		};
+	}, []);
 
 	// let userMessage = 'Waiting for location...';
 	// if (errorMsg) {
@@ -180,7 +151,7 @@ const MapScreen = (props) => {
 								//onRegionChangeComplete={(region) => mapRef.current.animateToRegion(region, 1000)}
 								showsUserLocation
 								loadingEnabled={true}
-								onLongPress={() => mapRef.current.animateToRegion(region, 1000)}
+								onLongPress={() => animateRegionMapView()}
 								//showsIndoorLevelPicker={true}
 								//followsUserLocation={true}
 							>
@@ -233,21 +204,5 @@ const styles = StyleSheet.create({
 		height: '100%',
 	},
 });
-
-// TaskManager.defineTask(TASKMANAGER_TASK_NAME, async ({data: {locations}, error}) => {
-// 	if (error) {
-// 		console.log('taskError', error);
-// 		// check `error.message` for more details.
-// 		//actually handle error with new error system
-// 		return;
-// 	}
-// 	console.log('Received new locations', locations);
-// 	await locations;
-// 	setSettings({
-// 		...settings,
-// 		longitude: locations[0].coords.longitude,
-// 		latitude: locations[0].coords.latitude,
-// 	});
-// });
 
 export default MapScreen;
