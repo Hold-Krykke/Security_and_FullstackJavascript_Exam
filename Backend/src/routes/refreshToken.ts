@@ -1,6 +1,8 @@
 import UserFacade from "../facades/userFacade";
 import { ApiError } from "../customErrors/apiError";
 const jwt = require("jsonwebtoken");
+const fetch = require("node-fetch");
+
 // import jwt from "jsonwebtoken"
 
 /**
@@ -40,25 +42,34 @@ export default async function refreshToken(
         const refresh_token = await userFacade.getUserRefreshToken(useremail);
         console.log("Right before Google POST for checking refresh token.",
           JSON.stringify({ refresh_token }, null, 4))
+        const urlencodedParams = new URLSearchParams()
+        // const myBody = {
+        //   client_id: process.env.CLIENT_ID || "",
+        //   client_secret: process.env.CLIENT_SECRET || "",
+        //   refresh_token,
+        //   grant_type: "refresh_token",
+        // }
+        urlencodedParams.append("client_id", process.env.CLIENT_ID || "")
+        urlencodedParams.append("client_secret", process.env.CLIENT_SECRET || "")
+        urlencodedParams.append("refresh_token", refresh_token)
+        urlencodedParams.append("grant_type", "refresh_token")
+        console.log("application/x-www-form-urlencoded",
+          urlencodedParams.toString()
+        )
+        const options = {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+          },
+          body: urlencodedParams.toString(),
+        }
+        console.log("OPTIONS: ", JSON.stringify(options, null, 4))
         const googleResponse: any = await fetch(
           `https://oauth2.googleapis.com/token`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/x-www-form-urlencoded",
-              // "client_id": process.env.CLIENT_ID || "",
-              // "client_secret": process.env.CLIENT_SECRET || "",
-              // "refresh_token": refresh_token,
-              // "grant_type": "refresh_token",
-            },
-            body: JSON.stringify({
-              client_id: process.env.CLIENT_ID,
-              client_secret: process.env.CLIENT_SECRET,
-              refresh_token,
-              grant_type: "refresh_token",
-            }),
-          }
-        ).then((res) => res.json);
+          options
+        )
+        const googleObject = await googleResponse.json()
+
 
         /*
         Sample response
@@ -69,9 +80,9 @@ export default async function refreshToken(
             "token_type": "Bearer"
           }
         */
-        console.log("Right after google response.", JSON.stringify({ googleResponse }, null, 4))
-        if (!googleResponse.access_token) {
-          console.log("entered if access_token")
+        console.log("Right after google response.", JSON.stringify({ googleObject }, null, 4))
+        if (!googleObject.access_token) {
+          console.log("entered if not access_token")
           throw new ApiError("Google didn't accept");
         }
 
@@ -79,8 +90,9 @@ export default async function refreshToken(
         // Google didn't accept
         // Should it just be next(err)?
         // next(err)
-        throw new ApiError("Google didn't accept");
+        // throw new ApiError("Google didn't accept");
         // Should log user out in frontend.
+        throw err
       }
 
       const payload = {
@@ -95,7 +107,8 @@ export default async function refreshToken(
         token: newToken,
       });
     } else {
-      throw new ApiError("You have to be an OAuth user to get your token refreshed.")
+      // throw new ApiError("You have to be an OAuth user to get your token refreshed.")
+      // throw err
     }
   } catch (err) {
     next(err);
