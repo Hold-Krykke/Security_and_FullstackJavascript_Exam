@@ -40,7 +40,11 @@ const handleError = ({ graphQLErrors, networkError }) => {
     });
   }
   if (networkError) console.log(`[Network error]: ${networkError}`);
-  return errorMessage;
+  return ({
+    message: errorMessage,
+    title: "Network error"
+  })
+
 };
 
 export default handleError;
