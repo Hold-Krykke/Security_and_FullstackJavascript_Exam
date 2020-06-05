@@ -66,16 +66,6 @@ const MapScreenSettings = ({settings, setSettings}) => {
 									disabled={!!inputMsg}
 								/>
 							</View>
-							{/* <TouchableOpacity
-								onPress={() => setModalVisible(false)}
-								activeOpacity={0.7}
-								text="Return"
-								style={{
-									Touchable: !inputMsg ? styles.touchableEnabled : {backgroundColor: 'red'},
-									TouchableText: styles.touchableText,
-								}}
-								disabled={!!inputMsg}
-							/> */}
 							{inputMsg ? <Text style={{...styles.text, color: 'red'}}>{inputMsg}</Text> : null}
 							<Text style={styles.tipText}>Tip: Press the map to return to your location </Text>
 						</Card>
@@ -84,20 +74,21 @@ const MapScreenSettings = ({settings, setSettings}) => {
 				{/* Above is settings modal  */}
 				{/* Below is settings button */}
 				<View style={styles.screen}>
-					<View style={styles.settings}>
+					<View style={styles.mapButtons}>
 						<View style={styles.button}>
 							<Button
 								onPress={() => setModalVisible(true)}
 								color={colors.secondary}
-								title="Settings"
+								title="SETTINGS"
 							/>
 						</View>
-						{/* <TouchableOpacity
-							onPress={() => setModalVisible(true)}
-							activeOpacity={0.7}
-							text="Settings"
-							style={{Touchable: styles.touchableEnabled, TouchableText: styles.touchableText}}
-						/> */}
+						<View style={styles.button}>
+						<Button
+							color={colors.secondary}
+							title="GO BACK"
+							onPress={() => props.navigation.goBack()}
+						/>
+						</View>
 					</View>
 				</View>
 			</View>
@@ -123,11 +114,14 @@ const styles = StyleSheet.create({
 		//alignItems: 'center',
 		justifyContent: 'center',
 	},
-	settings: {
+	mapButtons: {
 		flex: 0,
 		//padding: 10,
 		alignItems: 'stretch',
 		justifyContent: 'flex-start',
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'space-evenly',
 	},
 	title: {
 		color: colors.primary,
