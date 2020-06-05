@@ -6,6 +6,7 @@ import {
   Text,
   TouchableWithoutFeedback,
   Keyboard,
+  ActivityIndicator,
   Button
 } from "react-native";
 import Card from "../components/Card";
@@ -149,7 +150,7 @@ const UserInfo = () => {
   if (loading)
     content = (
       <View>
-        <Text>Loading...</Text>
+        <ActivityIndicator/>
       </View>
     );
 
