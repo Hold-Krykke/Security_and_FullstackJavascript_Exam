@@ -1,13 +1,11 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState} from 'react';
 import {
 	StyleSheet,
 	View,
 	Text,
 	TouchableWithoutFeedback,
 	//TouchableHighlight,
-	TouchableNativeFeedback,
 	Keyboard,
-	Image,
 	Button,
 	Modal,
 	Dimensions,
@@ -28,7 +26,7 @@ const MapScreenSettings = ({settings, setSettings}) => {
 		setInputMsg('');
 		distance = distance.replace(',', '.');
 		setDistanceInput(distance);
-		distance = parseFloat(distance);
+		distance = parseFloat(distance); //converts pretty much any flawed string to our demands. "abc105.5abc" would be parsed "105.5"
 		if (distance) {
 			setSettings({...settings, distance});
 		} else {
@@ -52,10 +50,7 @@ const MapScreenSettings = ({settings, setSettings}) => {
 					}}>
 					<View style={styles.modal} onPress={() => Keyboard.dismiss()}>
 						<Card style={styles.cardStyle}>
-							{/* <View style={styles.modal} onPress={() => Keyboard.dismiss()}> */}
-							{/* <View style={styles.innerModal}> */}
 							<Text style={styles.text}>Search radius</Text>
-
 							<View style={styles.settingsContainer}>
 								<Input
 									value={distanceInput.toString()}
@@ -73,12 +68,10 @@ const MapScreenSettings = ({settings, setSettings}) => {
 									Touchable: !inputMsg ? styles.touchableEnabled : {backgroundColor: 'red'},
 									TouchableText: styles.touchableText,
 								}}
-								disabled={inputMsg}
+								disabled={!!inputMsg}
 							/>
 							{inputMsg ? <Text style={{...styles.text, color: 'red'}}>{inputMsg}</Text> : null}
 							<Text style={styles.tipText}>Tip: Press the map to return to your location </Text>
-							{/* </View> */}
-							{/* </View> */}
 						</Card>
 					</View>
 				</Modal>
