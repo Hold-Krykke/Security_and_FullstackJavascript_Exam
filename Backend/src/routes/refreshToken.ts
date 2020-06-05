@@ -1,6 +1,7 @@
 import UserFacade from "../facades/userFacade";
 import { ApiError } from "../customErrors/apiError";
 const jwt = require("jsonwebtoken");
+// import jwt from "jsonwebtoken"
 
 /**
  * If an error is thrown from this, frontend should log user out, and delete stored token
@@ -15,12 +16,17 @@ export default async function refreshToken(
   next: any,
   tokenExpirationInSeconds: number
 ) {
+  console.log("entered refreshtoken path")
+
   const expiredToken = req.body.token;
   // Check if it is valid
   try {
+    console.log("Entered try")
+
     const decryptedToken = jwt.verify(expiredToken, process.env.SECRET, {
       ignoreExpiration: true,
     });
+    console.log(JSON.stringify({ decryptedToken }, null, 4))
     if (decryptedToken.isOAuth) {
       // If google user, check with google
       // https://developers.google.com/identity/protocols/oauth2/web-server#offline
@@ -29,13 +35,22 @@ export default async function refreshToken(
       // Asger talked about making one instance of userFacade and passing it around, to avoid this. 
       const schema: string = process.env.DATABASE_SCHEMA || "";
       const userFacade: UserFacade = new UserFacade(schema);
+      console.log("Right before get Refresh Token")
       try {
         const refresh_token = await userFacade.getUserRefreshToken(useremail);
+        console.log("Right before Google POST for checking refresh token.",
+          JSON.stringify({ refresh_token }, null, 4))
         const googleResponse: any = await fetch(
-          "https://oauth2.googleapis.com/token",
+          `https://oauth2.googleapis.com/token`,
           {
             method: "POST",
-            headers: { "Content-Type": "application/json", },
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+              // "client_id": process.env.CLIENT_ID || "",
+              // "client_secret": process.env.CLIENT_SECRET || "",
+              // "refresh_token": refresh_token,
+              // "grant_type": "refresh_token",
+            },
             body: JSON.stringify({
               client_id: process.env.CLIENT_ID,
               client_secret: process.env.CLIENT_SECRET,
@@ -44,6 +59,7 @@ export default async function refreshToken(
             }),
           }
         ).then((res) => res.json);
+
         /*
         Sample response
           {
@@ -53,7 +69,9 @@ export default async function refreshToken(
             "token_type": "Bearer"
           }
         */
+        console.log("Right after google response.", JSON.stringify({ googleResponse }, null, 4))
         if (!googleResponse.access_token) {
+          console.log("entered if access_token")
           throw new ApiError("Google didn't accept");
         }
 
@@ -77,7 +95,7 @@ export default async function refreshToken(
         token: newToken,
       });
     } else {
-      throw new ApiError("You have to log in again.")
+      throw new ApiError("You have to be an OAuth user to get your token refreshed.")
     }
   } catch (err) {
     next(err);

@@ -12,18 +12,20 @@ import Card from "../components/Card";
 import colors from "../constants/colors";
 import Input from "../components/Input";
 import facade from "../facade";
-import { useMutation } from "@apollo/react-hooks";
+import { useMutation, useLazyQuery } from "@apollo/react-hooks";
+import handleError from "../utils/ErrorHandler"
+import MyAlert from "../utils/MakeAlert"
 
 const MapScreen = (props) => {
 
   const [updatePosition, { loading, error, data, called }] = useMutation(
     facade.UPDATE_POSITION
   );
-                      // Bad names, should be changed
+  // Bad names, should be changed
   const [nearbyUsers, { loading2, error2, data2, called2 }] = useMutation(facade.NEARBY_USERS);
 
   // Example of how to use nearbyUsers
-  async function getNearbyUsers(){
+  async function getNearbyUsers() {
     await nearbyUsers({
       variables: {
         username: "name",
@@ -63,7 +65,7 @@ const MapScreen = (props) => {
 
 
   // Example of how to use updatePosition
-  async function updateMyPosition(){
+  async function updateMyPosition() {
     await updatePosition({
       variables: {
         username: "name",
@@ -95,6 +97,8 @@ const MapScreen = (props) => {
     To access longitude: data.updatePosition.location.coordinates[0]
   */
 
+
+
   return (
     <TouchableWithoutFeedback
       onPress={() => {
@@ -102,6 +106,9 @@ const MapScreen = (props) => {
       }}
     >
       <View style={styles.screen}>
+        <Card style={styles.container}>
+          <UserInfo />
+        </Card>
         <Card style={styles.container}>
           <Text style={styles.title}>This is MapScreen</Text>
         </Card>
@@ -115,6 +122,54 @@ const MapScreen = (props) => {
         />
       </View>
     </TouchableWithoutFeedback>
+  );
+};
+
+const UserInfo = () => {
+  // This is keeping state for us.
+  // https://www.apollographql.com/docs/react/api/react-hooks/#uselazyquery
+  const [User, { loading, error, data, called }] = useLazyQuery(
+    facade.GET_USER,
+    {
+      fetchPolicy: "network-only",
+    }
+  ); // https://www.apollographql.com/docs/react/api/react-hooks/#uselazyquery
+
+  let content = (
+    <View>
+      <Text>Buffer</Text>
+    </View>
+  );
+
+  if (called && error) {
+    const errorMsg = handleError(error);
+    MyAlert(errorMsg.message, errorMsg.title);
+  }
+
+  if (loading)
+    content = (
+      <View>
+        <Text>Loading...</Text>
+      </View>
+    );
+
+  if (data) {
+    console.log(JSON.stringify({ data }, null, 4));
+    content = (
+      <View>
+        <Text>{JSON.stringify(data.getUser.username, null, 4)}</Text>
+      </View>
+    );
+  }
+
+  return (
+    <View>
+      {content}
+      <Button
+        title="Click me to fetch Johnny!"
+        onPress={() => User({ variables: { username: "Johnny" } })}
+      ></Button>
+    </View>
   );
 };
 

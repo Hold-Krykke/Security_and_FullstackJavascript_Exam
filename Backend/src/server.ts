@@ -34,7 +34,7 @@ app.use(passport.initialize());
 
 //The regular logger needs to be before the router
 
-const tokenExpirationInSeconds = 60; //3600
+const tokenExpirationInSeconds = 30; //3600
 
 app.post("/auth/jwt", (req, res) => {
   /* ---------------------------------- */
@@ -138,7 +138,11 @@ app.get("/auth/google/callback", (req, res) => {
 // Refresh an expired token
 app.post("/refresh", async (req, res, next) => {
   // Get token from body
-  await refreshToken(req, res, next, tokenExpirationInSeconds);
+  try {
+    await refreshToken(req, res, next, tokenExpirationInSeconds);
+  } catch (err) {
+    next(err)
+  }
 });
 
 //The errorlogger needs to be added AFTER the express router and BEFORE any custom error handlers.

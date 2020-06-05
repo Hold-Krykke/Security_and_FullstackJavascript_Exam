@@ -5,6 +5,9 @@ import { InMemoryCache } from "apollo-cache-inmemory";
 import { createHttpLink } from "apollo-link-http";
 import { onError } from "apollo-link-error";
 import { SERVER_URL } from "../constants/settings";
+import { Observable } from 'apollo-link'
+
+
 
 /**
 The setContext function takes a function that returns either an object or a promise that returns an object to set the new context of a request.
@@ -38,25 +41,27 @@ const getNewToken = async () => {
       },
       body: JSON.stringify({ token: expiredToken }),
     };
-    const token = await fetch(`${backendUri}/refresh`, request)
+    const token = await fetch(`${SERVER_URL}/refresh`, request)
       .then((response) => response.json())
       .then((data) => data.token);
 
+    console.log("TOKEN in GetNewToken: " + JSON.stringify(token, null, 4))
     await SecureStore.setItemAsync("token", token);
 
     return token;
   } catch (err) {
+    console.log("ERROR IN getNewToken: ", err)
     // Log user out, because token couldn't be refreshed. 
-    await SecureStore.deleteItemAsync("token")
+    // await SecureStore.deleteItemAsync("token")
     // setSignedIn(false)
   }
 };
 
 const errorLink = onError(
-  async ({ graphQLErrors, networkError, operation, forward }) => {
+  ({ graphQLErrors, networkError, operation, forward }) => {
     if (graphQLErrors) {
       // console.log("ALL THE ERRORS: ", JSON.stringify(graphQLErrors, null, 4));
-      graphQLErrors.map((err) => {
+      graphQLErrors.forEach((err) => {
         const { message, locations, path, extensions } = err;
         console.log(
           `[GraphQL error]:
@@ -65,26 +70,45 @@ const errorLink = onError(
           Path: ${path}`
           // \nFull Error: ${JSON.stringify(err, null, 4)}\n\n
         );
+        console.log("extensions.code", JSON.stringify(extensions.code, null, 4))
         switch (extensions.code) {
           case "UNAUTHENTICATED":
+            console.log("entered unauthenticated switch case")
             /*
             One caveat is that the errors from the new response from retrying the request does not get passed into the error handler again. 
             This helps to avoid being trapped in an endless request loop when you call forward() in your error handler.
             */
             // error code is set to UNAUTHENTICATED
             // when AuthenticationError thrown in resolver
-
+            const promiseToObservable = (promise) => {
+              return new Observable((subscriber) => {
+                promise.then(
+                  (token) => {
+                    if (subscriber.closed) {
+                      return;
+                    }
+                    subscriber.next(token);
+                    subscriber.complete();
+                  },
+                  (err) => {
+                    subscriber.error(err);
+                  },
+                );
+              });
+            };
             // modify the operation context with a new token
             const oldHeaders = operation.getContext().headers;
-            const token = getNewToken()
-            operation.setContext({
-              headers: {
-                ...oldHeaders,
-                authorization: token,
-              },
+            return promiseToObservable(getNewToken()).flatMap((newToken) => {
+              console.log("Refreshed Google Token")
+              operation.setContext({
+                headers: {
+                  ...oldHeaders,
+                  authorization: newToken,
+                },
+              });
+              // retry the request, returning the new observable https://github.com/apollographql/apollo-link/tree/master/packages/apollo-link-error#callback
+              return forward(operation);
             });
-            // retry the request, returning the new observable
-            return forward(operation);
         }
 
       });
