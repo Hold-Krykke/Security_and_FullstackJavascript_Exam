@@ -6,6 +6,7 @@ import { createHttpLink } from "apollo-link-http";
 import { onError } from "apollo-link-error";
 import { SERVER_URL } from "../constants/settings";
 import { Observable } from "apollo-link";
+import jwt_decode from "jwt-decode";
 
 /**
 The setContext function takes a function that returns either an object or a promise that returns an object to set the new context of a request.
@@ -29,7 +30,8 @@ const authLink = setContext(async (request, previousContext) => {
 const getNewToken = async () => {
   try {
     const expiredToken = await SecureStore.getItemAsync("token");
-
+    const decoded = jwt_decode(expiredToken);
+    if (!decoded.isOAuth) throw Error("You need to log in again");
     const request = {
       method: "POST",
       headers: {
@@ -48,6 +50,7 @@ const getNewToken = async () => {
     return token;
   } catch (err) {
     console.log("ERROR IN getNewToken: ", err);
+    throw err;
     // Log user out, because token couldn't be refreshed.
     // await SecureStore.deleteItemAsync("token")
     // setSignedIn(false)
@@ -76,7 +79,7 @@ const errorLink = onError(
             */
           // error code is set to UNAUTHENTICATED
           // when AuthenticationError thrown in resolver
-          
+
           const promiseToObservable = (promise) => {
             return new Observable((subscriber) => {
               promise.then(
@@ -88,6 +91,8 @@ const errorLink = onError(
                   subscriber.complete();
                 },
                 (err) => {
+                  // console.log("Subscriber error");
+                  // throw Error("User is not OAuth type");
                   subscriber.error(err);
                 }
               );

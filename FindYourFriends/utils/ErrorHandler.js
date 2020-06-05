@@ -39,12 +39,14 @@ const handleError = ({ graphQLErrors, networkError }) => {
       errorMessage = errorMap(code);
     });
   }
-  if (networkError) console.log(`[Network error]: ${networkError}`);
-  return ({
-    message: errorMessage,
-    title: "Network error"
-  })
-
+  if (networkError) {
+    console.log(`[Network error]: ${networkError}`);
+    errorMessage = {
+      title: "Network Error",
+      message: networkError.message,
+    };
+  }
+  return errorMessage;
 };
 
 export default handleError;

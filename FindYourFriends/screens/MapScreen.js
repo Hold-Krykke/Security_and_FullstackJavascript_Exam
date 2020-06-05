@@ -143,6 +143,7 @@ const UserInfo = () => {
   );
 
   if (called && error) {
+    // If message == "You need to log in again", then we need to clear the token and log the user out
     const errorMsg = handleError(error);
     MyAlert(errorMsg.message, errorMsg.title);
   }
