@@ -69,7 +69,7 @@ const MapScreen = (props) => {
 				},
 			});
 			console.log('getNearbyUsers', result);
-			setUsers(result.dataUsers.getNearbyUsers); //experiemental, can't test because no login. may be "data" or "dataUsers"
+			setUsers(result.data.getNearbyUsers); //experiemental, can't test because no login. may be "data" or "dataUsers"
 		} catch (err) {
 			console.log('getNearbyUsers error:', err);
 			//todo proper error handling
