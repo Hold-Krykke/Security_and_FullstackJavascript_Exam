@@ -18,7 +18,7 @@
     "@types/mongodb": "^3.5.17",
     "@types/mysql": "^2.15.11",
     "@types/passport": "^1.0.3",
-    "apollo-server-express": "^2.13.1",
+    "apollo-server-express": "^2.14.2",
     "basic-auth": "^2.0.1",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
