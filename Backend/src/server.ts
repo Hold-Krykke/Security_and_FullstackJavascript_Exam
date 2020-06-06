@@ -27,6 +27,8 @@ const addressList = new Map();
 
 initPassport();
 
+app.use("*", cors());
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
@@ -187,7 +189,6 @@ const server = new ApolloServer({
   },
 });
 
-app.use("*", cors());
 app.use(compression()); // see import
 
 server.applyMiddleware({ app, path: "/graphql" });
