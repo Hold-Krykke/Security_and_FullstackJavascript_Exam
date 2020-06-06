@@ -44,12 +44,10 @@ const getNewToken = async () => {
       .then((response) => response.json())
       .then((data) => data.token);
 
-    console.log("TOKEN in GetNewToken: " + JSON.stringify(token, null, 4));
     await SecureStore.setItemAsync("token", token);
 
     return token;
   } catch (err) {
-    console.log("ERROR IN getNewToken: ", err);
     throw err;
     // Log user out, because token couldn't be refreshed.
     // await SecureStore.deleteItemAsync("token")
@@ -62,17 +60,15 @@ const errorLink = onError(
     if (graphQLErrors) {
       // console.log("ALL THE ERRORS: ", JSON.stringify(graphQLErrors, null, 4));
       const { message, locations, path, extensions } = graphQLErrors[0];
-      console.log(
-        `[GraphQL error]:
-          Message: ${message},
-          Location: ${JSON.stringify(locations, null, 4)},
-          Path: ${path}`
-        // \nFull Error: ${JSON.stringify(err, null, 4)}\n\n
-      );
-      console.log("extensions.code", JSON.stringify(extensions.code, null, 4));
+      // console.log(
+      //   `[GraphQL error]:
+      //     Message: ${message},
+      //     Location: ${JSON.stringify(locations, null, 4)},
+      //     Path: ${path}`
+      //   // \nFull Error: ${JSON.stringify(err, null, 4)}\n\n
+      // );
       switch (extensions.code) {
         case "UNAUTHENTICATED":
-          console.log("entered unauthenticated switch case");
           /*
             One caveat is that the errors from the new response from retrying the request does not get passed into the error handler again. 
             This helps to avoid being trapped in an endless request loop when you call forward() in your error handler.
@@ -113,7 +109,7 @@ const errorLink = onError(
           });
       }
     }
-    if (networkError) console.log(`[Network error]: ${networkError}`);
+    //if (networkError) // console.log(`[Network error]: ${networkError}`);
   }
 );
 // the URI key is a string endpoint or function resolving to an endpoint -- will default to "/graphql" if not specified
