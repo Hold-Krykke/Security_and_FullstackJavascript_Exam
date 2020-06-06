@@ -19,11 +19,17 @@ export default function App() {
   const [user, setUser] = useState({ email: "", username: "" });
   const [username, setUsername] = useState("");
 
-  const logout = async () => {
+  /**
+   * Call this, to log user out. 
+   * @params navigation
+   */
+  const logout = async (navigation) => {
     Promise.all([client.clearStore(), SecureStore.deleteItemAsync(TOKEN_KEY),
     ]).then(() => {
       console.log("User has logged out");
+      setUsername("")
       setSignedIn(false);
+      navigation.navigate("LoginScreen");
     });
   };
 
@@ -42,10 +48,12 @@ export default function App() {
                 backendURL={SERVER_URL}
                 setSignedIn={setSignedIn}
                 setFirstLogin={setFirstLogin}
+                logout={logout}
               />}
             </Stack.Screen>
             <Stack.Screen name="UserScreen">
               {(props) => (<UserScreen {...props}
+                logout={logout}
                 setSignedIn={setSignedIn}
                 user={user}
                 setUser={setUser}

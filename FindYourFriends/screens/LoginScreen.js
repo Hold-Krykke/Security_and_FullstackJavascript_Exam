@@ -13,7 +13,7 @@ import facade from "../facade";
 import { useQuery } from "@apollo/react-hooks";
 import { TOKEN_KEY } from "../constants/settings"
 
-const LoginScreen = ({ navigation, setSignedIn, backendURL, setFirstLogin, user, setUser }) => {
+const LoginScreen = ({ navigation, setSignedIn, backendURL, setFirstLogin, user, setUser, logout }) => {
     const [userEmail, setUserEmail] = useState("");
     const [password, setPassword] = useState("");
     const { data, error } = useQuery(facade.CHECK_JWT);
@@ -26,9 +26,7 @@ const LoginScreen = ({ navigation, setSignedIn, backendURL, setFirstLogin, user,
                     // useEffect checks this value and shows the username modal if this value is falsy
                     setUser({ username: "..." });
                     setFirstLogin(false);
-                    setSignedIn(false);
-                    await SecureStore.deleteItemAsync(TOKEN_KEY);
-                    navigation.navigate("LoginScreen");
+                    await logout(navigation)
                     return;
                 }
             }
