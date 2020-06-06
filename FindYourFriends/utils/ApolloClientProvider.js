@@ -8,16 +8,9 @@ import { SERVER_URL } from "../constants/settings";
 import { Observable } from "apollo-link";
 import jwt_decode from "jwt-decode";
 
-/**
-The setContext function takes a function that returns either an object or a promise that returns an object to set the new context of a request.
-It receives two arguments: the GraphQL request being executed, and the previous context. 
-This link makes it easy to perform async look up of things like authentication tokens and more!
- */
+// Places auth token on every outgoing request. 
 const authLink = setContext(async (request, previousContext) => {
-  // get the authentication token from storage if it exists
-  // Login should place the token in SecureStore // https://docs.expo.io/versions/latest/sdk/securestore/
-  // So here should be logic that goes into SecureStore and gets the Token back out, then returns it.
-  const token = await SecureStore.getItemAsync("token"); // "DUMMY TOKEN" // await SecureStore.getItemAsync("token")
+  const token = await SecureStore.getItemAsync("token");
   // return the headers to the context so httpLink can read them
   return {
     headers: {
@@ -49,16 +42,12 @@ const getNewToken = async () => {
     return token;
   } catch (err) {
     throw err;
-    // Log user out, because token couldn't be refreshed.
-    // await SecureStore.deleteItemAsync("token")
-    // setSignedIn(false)
   }
 };
 
 const errorLink = onError(
   ({ graphQLErrors, networkError, operation, forward }) => {
     if (graphQLErrors) {
-      // console.log("ALL THE ERRORS: ", JSON.stringify(graphQLErrors, null, 4));
       const { message, locations, path, extensions } = graphQLErrors[0];
       // console.log(
       //   `[GraphQL error]:
@@ -72,10 +61,9 @@ const errorLink = onError(
           /*
             One caveat is that the errors from the new response from retrying the request does not get passed into the error handler again. 
             This helps to avoid being trapped in an endless request loop when you call forward() in your error handler.
-            */
+          */
           // error code is set to UNAUTHENTICATED
           // when AuthenticationError thrown in resolver
-
           const promiseToObservable = (promise) => {
             return new Observable((subscriber) => {
               promise.then(
@@ -117,8 +105,7 @@ const httpLink = createHttpLink({ uri: SERVER_URL + "/graphql" });
 /** httpLink and cache are requirements as of Apollo 2 https://www.apollographql.com/docs/react/api/apollo-client/#required-fields
  * - Error link - https://www.apollographql.com/docs/link/links/error/
  * - In Memory Cache - https://www.apollographql.com/docs/angular/basics/caching/
- * Whenever Apollo Client fetches query results from your server,
- * it automatically caches those results locally.
+ * Whenever Apollo Client fetches query results from your server, it automatically caches those results locally.
  * This makes subsequent executions of the same query extremely fast.
  */
 const client = new ApolloClient({
