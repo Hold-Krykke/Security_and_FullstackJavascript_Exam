@@ -15,7 +15,7 @@ import colors from '../constants/colors';
 
 const MapScreenSettings = ({navigation, distance, setDistance}) => {
 	const [modalVisible, setModalVisible] = useState(false);
-	const [distanceInput, setDistanceInput] = useState(distance | 1000);
+	const [distanceInput, setDistanceInput] = useState(distance | 100000);
 	const [inputMsg, setInputMsg] = useState('');
 
 	const inputHandler = (val) => {
