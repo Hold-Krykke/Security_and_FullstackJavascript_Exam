@@ -11,10 +11,9 @@ import * as SecureStore from "expo-secure-store";
 import Alert from "../utils/MakeAlert";
 import facade from "../facade";
 import { useQuery } from "@apollo/react-hooks";
-// The key for Secure Store. Use this key, to fetch token again.
-const secureStoreKey = "token";
+import { TOKEN_KEY } from "../constants/settings"
 
-const LoginScreen = ({ navigation, setSignedIn, backendURL, setFirstLogin, user, setUser }) => {
+const LoginScreen = ({ navigation, setSignedIn, backendURL, setFirstLogin, user, setUser, logout }) => {
     const [userEmail, setUserEmail] = useState("");
     const [password, setPassword] = useState("");
     const { data, error } = useQuery(facade.CHECK_JWT);
@@ -27,9 +26,7 @@ const LoginScreen = ({ navigation, setSignedIn, backendURL, setFirstLogin, user,
                     // useEffect checks this value and shows the username modal if this value is falsy
                     setUser({ username: "..." });
                     setFirstLogin(false);
-                    setSignedIn(false);
-                    await SecureStore.deleteItemAsync(secureStoreKey);
-                    navigation.navigate("LoginScreen");
+                    await logout(navigation)
                     return;
                 }
             }
@@ -45,7 +42,7 @@ const LoginScreen = ({ navigation, setSignedIn, backendURL, setFirstLogin, user,
      */
     useEffect(() => {
         const checkIfLoggedIn = async () => {
-            const token = await SecureStore.getItemAsync(secureStoreKey);
+            const token = await SecureStore.getItemAsync(TOKEN_KEY);
             if (token) {
                 const decoded = jwt_decode(token);
                 const temp_user = {
@@ -81,7 +78,7 @@ const LoginScreen = ({ navigation, setSignedIn, backendURL, setFirstLogin, user,
                 // The .slice(0, -1) is to remove a false # thats at then end, for some reason.
                 const token = result.url.split("token=")[1].slice(0, -1);
                 //console.log("GOOGLE LOGIN TOKEN\n", JSON.stringify({ token }, null, 4));
-                await SecureStore.setItemAsync(secureStoreKey, token);
+                await SecureStore.setItemAsync(TOKEN_KEY, token);
                 const decoded = jwt_decode(token);
                 user.email = decoded.useremail;
                 user.username = decoded.username;
@@ -123,7 +120,7 @@ const LoginScreen = ({ navigation, setSignedIn, backendURL, setFirstLogin, user,
             user.email = decoded.useremail;
             user.username = decoded.username;
             // console.log("User", user);
-            await SecureStore.setItemAsync(secureStoreKey, res.token);
+            await SecureStore.setItemAsync(TOKEN_KEY, res.token);
             setUser({ ...user });
             // console.log(JSON.stringify({ res }, null, 4));
             setSignedIn(true);
