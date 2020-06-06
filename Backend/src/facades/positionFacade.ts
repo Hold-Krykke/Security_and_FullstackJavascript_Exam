@@ -6,7 +6,7 @@ import * as mongo from "mongodb"
 import { ApiError } from "../customErrors/apiError"
 
 let positionCollection: mongo.Collection;
-const EXPIRATION_TIME: number = 30; // Seconds
+const EXPIRATION_TIME: number = 10000; // Seconds
 
 export default class PositionFacade {
 
