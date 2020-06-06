@@ -1,208 +1,219 @@
-import React, { useState, useEffect } from "react";
+import React, {useState, useEffect, useRef} from 'react';
 import {
-  Dimensions,
-  StyleSheet,
-  View,
-  Text,
-  TouchableWithoutFeedback,
-  Keyboard,
-  ActivityIndicator,
-  Button
-} from "react-native";
-import Card from "../components/Card";
-import colors from "../constants/colors";
-import Input from "../components/Input";
-import facade from "../facade";
-import { useMutation, useLazyQuery } from "@apollo/react-hooks";
-import handleError from "../utils/ErrorHandler"
-import MyAlert from "../utils/MakeAlert"
+	Dimensions,
+	StyleSheet,
+	View,
+	Text,
+	TouchableWithoutFeedback,
+	Keyboard,
+	Button,
+} from 'react-native';
+import * as Location from 'expo-location';
+import MapView from 'react-native-maps';
+import colors from '../constants/colors';
+import facade from '../facade';
+import MapScreenSettings from '../components/MapScreenSettings';
+import {useMutation} from '@apollo/react-hooks';
 
-const MapScreen = (props) => {
+const {width: WIDTH, height: HEIGHT} = Dimensions.get('window');
+const ASPECT_RATIO = WIDTH / HEIGHT;
+const LATITUDE_DELTA = 0.06;
+const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
-  const [updatePosition, { loading, error, data, called }] = useMutation(
-    facade.UPDATE_POSITION
-  );
-  // Bad names, should be changed
-  const [nearbyUsers, { loading2, error2, data2, called2 }] = useMutation(facade.NEARBY_USERS);
+//Select random color from here for nearbyPlayers
+const MARKER_COLORS = [
+	'red',
+	'tomato',
+	'orange',
+	'yellow',
+	'gold',
+	'wheat',
+	'tan',
+	'linen',
+	'green',
+	'aqua',
+	'teal',
+	'turquoise',
+	'violet',
+	'purple',
+	'plum',
+	'indigo',
+];
 
-  // Example of how to use nearbyUsers
-  async function getNearbyUsers() {
-    await nearbyUsers({
-      variables: {
-        username: "name",
-        coordinates: {
-          lon: 12.57,
-          lat: 55.66
-        },
-        distance: 5000
-      }
-    });
-  }
+const MapScreen = ({user, setUser, distance, setDistance, props}) => {
+	let mapRef = useRef(null);
+	const DEBUG = false; //use to display settings on screen
+	const [changeRegion, setChangeRegion] = useState(false);
+	const [region, setRegion] = useState(null);
+	const [users, setUsers] = useState([]);
 
-  // Will give an array that looks like this:
-  /*
-  {
-    "data": {
-      "getNearbyUsers": [
-        {
-          "username": "Johnny",
-          "lon": 12.13,
-          "lat": 55.75
-        },
-        {
-          "username": "George",
-          "lon": 12.13,
-          "lat": 55.7677
-        },
-        {
-          "username": "Jenny",
-          "lon": 12.13,
-          "lat": 55.77
-        }
-      ]
-    }
-  }
-  */
+	const [nearbyUsers, {loading, error, data, called}] = useMutation(facade.NEARBY_USERS);
 
+	const getNearbyUsers = async () => {
+		try {
+			await nearbyUsers({
+				variables: {
+					username: user.username,
+					coordinates: {
+						lon: user.location.lon,
+						lat: user.location.lat,
+					},
+					distance,
+				},
+			});
+		} catch (err) {
+			console.log('getNearbyUsers error:', err);
+			//todo proper error handling
+		}
+	};
 
-  // Example of how to use updatePosition
-  async function updateMyPosition() {
-    await updatePosition({
-      variables: {
-        username: "name",
-        coordinates: {
-          lon: 12.57,
-          lat: 55.66
-        }
-      }
-    });
-  }
+	if (error) {
+		console.log('NearbyUsersError:', error);
+		//todo proper error handling
+	}
 
-  // Will return data with the following structure:
-  /*
-    {
-      "data": {
-        "updatePosition": {
-          "lastUpdated": "2020-06-04T16:17:31.656Z",
-          "username": "name",
-          "location": {
-            "coordinates": [
-              12.55,
-              55.55
-            ]
-          }
-        }
-      }
-    }
-    So to access the username, you should be able to use: data.updatePosition.username
-    To access longitude: data.updatePosition.location.coordinates[0]
-  */
+	useEffect(() => {
+		if (data && data.getNearbyUsers) {
+			setUsers(...[data.getNearbyUsers]);
+		}
+	}, [data]);
 
+	const animateRegionMapView = (animationTime = 1000) => {
+		if (mapRef.current) mapRef.current.animateToRegion(region, animationTime);
+	};
 
+	useEffect(() => {
+		//Always change MapView region based on new location
+		if (user.location.lat && user.location.lon) {
+			setRegion({
+				latitude: user.location.lat,
+				longitude: user.location.lon,
+				latitudeDelta: LATITUDE_DELTA,
+				longitudeDelta: LONGITUDE_DELTA,
+			});
+			//On first run, trigger next useEffect
+			setChangeRegion(true);
+		}
+	}, [user.location]);
 
-  return (
-    <TouchableWithoutFeedback
-      onPress={() => {
-        Keyboard.dismiss();
-      }}
-    >
-      <View style={styles.screen}>
-        <Card style={styles.container}>
-          <UserInfo />
-        </Card>
-        <Card style={styles.container}>
-          <Text style={styles.title}>This is MapScreen</Text>
-        </Card>
-        <Card style={styles.container}>
-          <Text style={styles.text}>This should be a map</Text>
-        </Card>
-        <Button
-          color={colors.secondary}
-          title="TAKE ME BACK"
-          onPress={() => props.navigation.goBack()}
-        />
-      </View>
-    </TouchableWithoutFeedback>
-  );
-};
+	useEffect(() => {
+		//set MapView camera region close to user ONLY on startup
+		let timeout;
+		if (changeRegion && region) {
+			setTimeout(() => animateRegionMapView(), 5);
+			//https://github.com/react-native-community/react-native-maps/issues/1717
+		}
+		if (timeout) clearTimeout(timeout);
+	}, [changeRegion]);
 
-const UserInfo = () => {
-  // This is keeping state for us.
-  // https://www.apollographql.com/docs/react/api/react-hooks/#uselazyquery
-  const [User, { loading, error, data, called }] = useLazyQuery(
-    facade.GET_USER,
-    {
-      fetchPolicy: "network-only",
-    }
-  ); // https://www.apollographql.com/docs/react/api/react-hooks/#uselazyquery
+	useEffect(() => {
+		//Every second ask for location permission and update location state.
+		const interval = setInterval(() => {
+			(async () => {
+				let {status} = await Location.requestPermissionsAsync();
+				if (status !== 'granted') {
+					//TODO Handle error with new system
+					//go to settings would be cool: https://docs.expo.io/versions/latest/sdk/intent-launcher/
+					return;
+				}
 
-  let content = (
-    <View>
-      <Text>Buffer</Text>
-    </View>
-  );
+				let location = await Location.getCurrentPositionAsync({});
+				setUser({
+					...user,
+					location: {
+						lon: location.coords.longitude,
+						lat: location.coords.latitude,
+					},
+				});
 
-  if (called && error) {
-    // If message == "You need to log in again", then we need to clear the token and log the user out
-    const errorMsg = handleError(error);
-    MyAlert(errorMsg.message, errorMsg.title);
-  }
+				if (DEBUG) {
+					console.log('MapScreen: Update happened ' + new Date(Date.now()).toLocaleTimeString()); //Debug TODO REMOVE
+				}
+			})();
+		}, 1000);
+		return () => {
+			clearInterval(interval);
+		};
+	}, []);
 
-  if (loading)
-    content = (
-      <View>
-        <ActivityIndicator/>
-      </View>
-    );
-
-  if (data) {
-    console.log(JSON.stringify({ data }, null, 4));
-    content = (
-      <View>
-        <Text>{JSON.stringify(data.getUser.username, null, 4)}</Text>
-      </View>
-    );
-  }
-
-  return (
-    <View>
-      {content}
-      <Button
-        title="Click me to fetch Johnny!"
-        onPress={() => User({ variables: { username: "Johnny" } })}
-      ></Button>
-    </View>
-  );
+	return (
+		<>
+			<MapScreenSettings {...props} distance={distance} setDistance={setDistance} />
+			{DEBUG && user && <Text>{JSON.stringify({...user, distance: distance}, null, 4)}</Text>}
+			<View style={styles.button}>
+			<Button title="Fetch nearby users" onPress={() => getNearbyUsers()}></Button>
+			</View>
+			<TouchableWithoutFeedback
+				touchSoundDisabled={true}
+				onPress={() => {
+					Keyboard.dismiss();
+				}}>
+				<View style={styles.screen}>
+					<View style={styles.container}>
+						{region && (
+							<MapView
+								ref={mapRef}
+								style={styles.mapStyle}
+								showsUserLocation
+								loadingEnabled={true}
+								onLongPress={() => animateRegionMapView()}>
+								{users &&
+									users.map((user) => {
+										return (
+											<MapView.Marker
+												title={user.username}
+												pinColor={MARKER_COLORS[Math.floor(Math.random() * MARKER_COLORS.length)]} //random color from possible ones
+												key={user.username}
+												coordinate={{
+													longitude: user.lon,
+													latitude: user.lat,
+												}}
+											/>
+										);
+									})}
+							</MapView>
+						)}
+					</View>
+				</View>
+			</TouchableWithoutFeedback>
+		</>
+	);
 };
 
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    padding: 10,
-    alignItems: "center",
-    justifyContent: "flex-start",
-  },
-  title: {
-    color: colors.primary,
-    fontSize: 22,
-    fontWeight: "bold",
-    marginVertical: 10,
-  },
-  text: {
-    color: colors.secondary,
-    fontSize: 14,
-    fontWeight: "bold",
-    marginBottom: 20,
-  },
-  container: {
-    width: 300,
-    maxWidth: "80%",
-    alignItems: "center",
-  },
-  mapStyle: {
-    width: Dimensions.get("window").width,
-    height: Dimensions.get("window").height,
-  },
+	screen: {
+		flex: 1,
+		alignItems: 'center',
+		justifyContent: 'flex-start',
+	},
+	title: {
+		color: colors.primary,
+		fontSize: 22,
+		fontWeight: 'bold',
+		marginVertical: 10,
+	},
+	text: {
+		color: colors.secondary,
+		fontSize: 14,
+		fontWeight: 'bold',
+		marginBottom: 20,
+	},
+	container: {
+		width: 300,
+		maxWidth: '80%',
+		alignItems: 'center',
+	},
+	mapStyle: {
+		width: WIDTH,
+		height: '100%',
+	},
+	button: {
+		justifyContent:'center',
+		alignItems: 'center',
+		width: 220,
+		marginVertical: 10,
+		
+	},
 });
 
 export default MapScreen;

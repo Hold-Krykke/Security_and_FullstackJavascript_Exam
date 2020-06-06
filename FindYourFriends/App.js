@@ -17,7 +17,8 @@ import * as SecureStore from "expo-secure-store";
 export default function App() {
   const [signedIn, setSignedIn] = useState(false);
   const [firstLogin, setFirstLogin] = useState(false);
-  const [user, setUser] = useState({ email: "", username: "" });
+  const [user, setUser] = useState({ email: "", username: "", location: {lat: 0, lon: 0}});
+  const [distance, setDistance] = useState(1000)
   const [username, setUsername] = useState("");
 
   /**
@@ -35,6 +36,7 @@ export default function App() {
   };
 
   const Stack = createStackNavigator();
+  //console.log('User in app', user);
 
   return (
     <ApolloProvider client={client}>
@@ -66,7 +68,7 @@ export default function App() {
               )}
             </Stack.Screen>
             <Stack.Screen name="CreateUserScreen">{props => <CreateUserScreen {...props} />}</Stack.Screen>
-            <Stack.Screen name="MapScreen">{props => <MapScreen {...props} />}</Stack.Screen>
+            <Stack.Screen name="MapScreen">{props => <MapScreen props={props} user={user} setUser={setUser} distance={distance} setDistance={setDistance} />}</Stack.Screen>
           </Stack.Navigator>
         </NavigationContainer>
       </View>
@@ -75,7 +77,7 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-  },
+	screen: {
+		flex: 1,
+	},
 });

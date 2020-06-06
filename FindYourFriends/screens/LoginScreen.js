@@ -24,7 +24,7 @@ const LoginScreen = ({ navigation, setSignedIn, backendURL, setFirstLogin, user,
                 if (!data.checkToken) {
                     // We need to set the username to something that's not empty because another 
                     // useEffect checks this value and shows the username modal if this value is falsy
-                    setUser({ username: "..." });
+                    setUser({...user, username: "..." });
                     setFirstLogin(false);
                     await logout(navigation)
                     return;
@@ -49,7 +49,7 @@ const LoginScreen = ({ navigation, setSignedIn, backendURL, setFirstLogin, user,
                     email: decoded.useremail,
                     username: decoded.username,
                 };
-                setUser({ ...temp_user });
+                setUser({...user, ...temp_user});
                 // console.log(JSON.stringify({ temp_user }, null, 4));
                 setSignedIn(true);
                 navigation.navigate("UserScreen");
