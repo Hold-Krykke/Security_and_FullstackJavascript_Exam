@@ -1,9 +1,5 @@
 type Query {
   """
-  Get a single user with the given username
-  """
-  getUser(username: String!): User
-  """
   Check JWT validity
   """
   checkToken(input: String): Boolean
@@ -53,10 +49,6 @@ type Mutation {
   Adds a new user to the facade
   """
   addUser(input: UserInput!): Boolean
-  """
-  Deletes an existing user with the given username
-  """
-  deleteUser(username: String!): String
   """
   Get nearby users based on location and distance and update own position
   """

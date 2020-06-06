@@ -38,18 +38,6 @@ export default class UserFacade {
     }
 
     /**
-     * Used to get specific user from the database.
-     * @param username username of user
-     */
-    async getUserByUsername(username: string): Promise<IUser> {
-        const user = await this._UDAO.getUserByUsername(username)
-        if (!user) {
-            throw new ApiError(`User with username: ${username} was not found`, 404)
-        }
-        return user;
-    }
-
-    /**
      * Used to get specific user from the database based on email. Use this for authentication
      * @param email email of user
      */
@@ -60,26 +48,6 @@ export default class UserFacade {
         }
         return user;
     }
-
-    /**
-     * Used to delete specific user from the database.
-     * Returns promise with success message if user was deleted
-     * @param username username of user
-     */
-    async deleteUser(username: string): Promise<string> {
-        const status = await this._UDAO.deleteUser(username);
-        // Weird way of checking for succes. Maybe this should be refactored.
-        if (status.message.includes("succesfully deleted")) {
-            return `User ${username} was removed`;
-        }
-        else throw new ApiError(`Requested user ${username} could not be removed`, 400)
-    }
-
-    // Do we even want this functionality? What for?
-    // static async getAllUsers(): Promise<Array<any>> {
-    //     const all = UDAO.thisMethodIsNotSupported();
-    //     return all.toArray();
-    // }
 
     /**
      * Used for login.
@@ -133,19 +101,6 @@ export default class UserFacade {
             return true;
         } catch (err) {
             throw new ApiError(`Username could not be updated for user with email: (${user.email})`, 400)
-        }
-    }
-
-    /**
-     * Used to check if user is an OAuth type user or not
-     * @param username username of user
-     */
-    async isOAuthUser(username: string): Promise<boolean> {
-        try {
-            const status = await this._UDAO.isOAuthUser(username);
-            return status;
-        } catch (err) {
-            throw new ApiError(`User ${username} not found`, 400)
         }
     }
 

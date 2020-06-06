@@ -97,7 +97,6 @@ eventEmitter.on("Brute Force Attack Detected", (event: any) => {
 });
 
 app.get("/auth/google", (req, res) => {
-  console.log("redirecturlquery", req.query.redirecturl);
   const stringState = JSON.stringify({
     redirectUrl: req.query.redirecturl.toString(),
   });
@@ -176,15 +175,12 @@ const server = new ApolloServer({
         // If token is valid and not expired
         const token = jwt.verify(encryptedToken, process.env.SECRET);
         // Add the token to the context, so resolvers can get it.
-        // console.log("TOKEN WAS VALID:", JSON.stringify({ token }, null, 4));
         return { valid: true, token };
       } catch (err) {
         // Token was Expired, or signature invalid.
-        console.log("TOKEN WAS INVALID");
         return { valid: false };
       }
     } else {
-      console.log("NO TOKEN");
       // No token at all on header.
       return { valid: false };
     }

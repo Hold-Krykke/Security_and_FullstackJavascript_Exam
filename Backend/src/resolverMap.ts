@@ -43,12 +43,6 @@ const positionFacade: PositionFacade = new PositionFacade();
 
 const resolverMap: IResolvers = {
     Query: {
-        getUser(_: void, args: any, context): any {
-            // This is an Authorization Guard.
-            // Protect GraphQL mutations like this.
-            requiresLogIn(context);
-            return userFacade.getUserByUsername(args.username);
-        },
         checkToken(_, args, context): boolean {
             try {
                 requiresLogIn(context);
@@ -119,11 +113,6 @@ const resolverMap: IResolvers = {
             } else {
                 throw new UserInputError("Bad input");
             }
-        },
-        deleteUser: (_, args: any, context) => {
-            requiresLogIn(context)
-            mayOnlyModifySelf(args, context)
-            return userFacade.deleteUser(args.username);
         },
         getNearbyUsers: (_, args: any, context) => {
             requiresLogIn(context)

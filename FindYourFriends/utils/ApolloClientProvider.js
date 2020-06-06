@@ -49,13 +49,6 @@ const errorLink = onError(
   ({ graphQLErrors, networkError, operation, forward }) => {
     if (graphQLErrors) {
       const { message, locations, path, extensions } = graphQLErrors[0];
-      // console.log(
-      //   `[GraphQL error]:
-      //     Message: ${message},
-      //     Location: ${JSON.stringify(locations, null, 4)},
-      //     Path: ${path}`
-      //   // \nFull Error: ${JSON.stringify(err, null, 4)}\n\n
-      // );
       switch (extensions.code) {
         case "UNAUTHENTICATED":
           /*
@@ -75,8 +68,6 @@ const errorLink = onError(
                   subscriber.complete();
                 },
                 (err) => {
-                  // console.log("Subscriber error");
-                  // throw Error("User is not OAuth type");
                   subscriber.error(err);
                 }
               );
@@ -85,7 +76,6 @@ const errorLink = onError(
           // modify the operation context with a new token
           const oldHeaders = operation.getContext().headers;
           return promiseToObservable(getNewToken()).flatMap((newToken) => {
-            console.log("Refreshed Google Token");
             operation.setContext({
               headers: {
                 ...oldHeaders,
@@ -97,7 +87,6 @@ const errorLink = onError(
           });
       }
     }
-    //if (networkError) // console.log(`[Network error]: ${networkError}`);
   }
 );
 // the URI key is a string endpoint or function resolving to an endpoint -- will default to "/graphql" if not specified

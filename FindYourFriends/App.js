@@ -4,7 +4,6 @@ import Header from "./components/Header";
 import MapScreen from "./screens/MapScreen";
 import LoginScreen from "./screens/LoginScreen";
 import CreateUserScreen from "./screens/CreateUserScreen";
-import ChatScreen from "./screens/ChatScreen";
 import { ApolloProvider } from "@apollo/react-hooks";
 import client from "./utils/ApolloClientProvider";
 import { SERVER_URL, TOKEN_KEY } from "./constants/settings";
@@ -28,7 +27,6 @@ export default function App() {
   const logout = async (navigation) => {
     Promise.all([client.clearStore(), SecureStore.deleteItemAsync(TOKEN_KEY),
     ]).then(() => {
-      console.log("User has logged out");
       setUsername("")
       setSignedIn(false);
       navigation.navigate("LoginScreen");
@@ -36,7 +34,6 @@ export default function App() {
   };
 
   const Stack = createStackNavigator();
-  //console.log('User in app', user);
 
   return (
     <ApolloProvider client={client}>

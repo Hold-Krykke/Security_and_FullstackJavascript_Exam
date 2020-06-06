@@ -54,7 +54,6 @@ export default async function refreshToken(
         const googleObject = await googleResponse.json()
 
         if (!googleObject.access_token) {
-          console.log("entered if not access_token")
           throw new ApiError("Google didn't accept");
         }
       } catch (err) {

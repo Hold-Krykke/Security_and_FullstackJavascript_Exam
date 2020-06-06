@@ -14,6 +14,8 @@ import colors from '../constants/colors';
 import facade from '../facade';
 import MapScreenSettings from '../components/MapScreenSettings';
 import {useMutation} from '@apollo/react-hooks';
+import Alert from "../utils/MakeAlert";
+import handleError from "../utils/ErrorHandler";
 
 const {width: WIDTH, height: HEIGHT} = Dimensions.get('window');
 const ASPECT_RATIO = WIDTH / HEIGHT;
@@ -63,13 +65,12 @@ const MapScreen = ({user, setUser, distance, setDistance, navigation}) => {
 			});
 		} catch (err) {
 			console.log('getNearbyUsers error:', err);
-			//todo proper error handling
 		}
 	};
 
 	if (error) {
-		console.log('NearbyUsersError:', error);
-		//todo proper error handling
+		const errorMsg = handleError(error);
+      	Alert(errorMsg.message, errorMsg.title);
 	}
 
 	useEffect(() => {

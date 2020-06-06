@@ -71,8 +71,9 @@ const UserScreen = ({
           username: username,
         },
       });
-      user.username = username;
-      setUser({ ...user });
+      let temp = {...user};
+      temp.username = username;
+      setUser({ ...temp });
       showModal(false);
     } catch (err) {
       const errorMsg = handleError(err);
@@ -87,8 +88,9 @@ const UserScreen = ({
           username: user.email,
         },
       });
-      user.username = user.email;
-      setUser({ ...user });
+      let temp = {...user};
+      temp.username = user.email;
+      setUser({ ...temp });
       showModal(false);
     } catch (err) {
       const errorMsg = handleError(err);

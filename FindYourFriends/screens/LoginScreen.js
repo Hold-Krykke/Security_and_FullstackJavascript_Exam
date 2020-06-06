@@ -77,26 +77,22 @@ const LoginScreen = ({ navigation, setSignedIn, backendURL, setFirstLogin, user,
             if (result.type == "success") {
                 // The .slice(0, -1) is to remove a false # thats at then end, for some reason.
                 const token = result.url.split("token=")[1].slice(0, -1);
-                //console.log("GOOGLE LOGIN TOKEN\n", JSON.stringify({ token }, null, 4));
                 await SecureStore.setItemAsync(TOKEN_KEY, token);
                 const decoded = jwt_decode(token);
-                user.email = decoded.useremail;
-                user.username = decoded.username;
-                setUser({ ...user });
-                // console.log("user", user);
+                let temp = {...user};
+                temp.email = decoded.useremail;
+                temp.username = decoded.username;
+                setUser({ ...temp });
                 setSignedIn(true);
                 navigation.navigate("UserScreen");
             } else if (result.type == "cancel") {
                 // If the user closed the web browser, the Promise resolves with { type: 'cancel' }.
                 // If the user does not permit the application to authenticate with the given url, the Promise resolved with { type: 'cancel' }.
-                console.log("User Cancelled.");
             } else if (result.type == "dismiss") {
                 // If the browser is closed using dismissBrowser, the Promise resolves with { type: 'dismiss' }.
-                console.log("User dismissed the browser.");
             }
         } catch (error) {
-            console.log(error);
-            Alert(error); // This needs to be finetuned, to send something more specific. We do not wish to hand everything to the User.
+            Alert("Failed to log in"); // This needs to be finetuned, to send something more specific. We do not wish to hand everything to the User.
         }
     };
 
@@ -114,22 +110,16 @@ const LoginScreen = ({ navigation, setSignedIn, backendURL, setFirstLogin, user,
         );
         if (
             res.token
-            // && (typeof res.token === String || res.token instanceof String)
         ) {
             const decoded = jwt_decode(res.token);
-            user.email = decoded.useremail;
-            user.username = decoded.username;
-            // console.log("User", user);
+            let temp = {...user};
+            temp.email = decoded.useremail;
+            temp.username = decoded.username;
             await SecureStore.setItemAsync(TOKEN_KEY, res.token);
-            setUser({ ...user });
-            // console.log(JSON.stringify({ res }, null, 4));
+            setUser({ ...temp });
             setSignedIn(true);
             navigation.navigate("UserScreen");
         } else {
-            console.log(
-                "Something went wrong while logging in:\n",
-                JSON.stringify({ res }, null, 4)
-            );
             Alert("Wrong username or password!", "Login Error!");
         }
     };
