@@ -8,6 +8,7 @@ import {
 	Button,
 	Modal,
 	Dimensions,
+	Alert
 } from 'react-native';
 import Card from './Card';
 import Input from './Input';
@@ -45,7 +46,9 @@ const MapScreenSettings = ({navigation, distance, setDistance}) => {
 					visible={modalVisible}
 					onRequestClose={() => {
 						//as per the documentation, this is needed to be buildable on Android. /shrug
-						Alert.alert('Settings Modal has been closed.');
+						// Alert.alert('Settings Modal has been closed.');
+						console.log("Settings Modal has been closed.");
+						setModalVisible(false);
 					}}>
 					<View style={styles.modal} onPress={() => Keyboard.dismiss()}>
 						<Card style={styles.cardStyle}>
