@@ -12,6 +12,7 @@ import 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import UserScreen from "./screens/UserScreen";
+import * as SecureStore from "expo-secure-store";
 
 export default function App() {
   const [signedIn, setSignedIn] = useState(false);
