@@ -8,7 +8,6 @@ import {
 	Button,
 	Modal,
 	Dimensions,
-	Alert
 } from 'react-native';
 import Card from './Card';
 import Input from './Input';
