@@ -34,7 +34,7 @@ app.use(passport.initialize());
 
 //The regular logger needs to be before the router
 
-const tokenExpirationInSeconds = process.env.TOKEN_EXPIRATION || ""
+const tokenExpirationInSeconds = Number(process.env.TOKEN_EXPIRATION)
 
 app.post("/auth/jwt", (req, res) => {
   /* ---------------------------------- */
