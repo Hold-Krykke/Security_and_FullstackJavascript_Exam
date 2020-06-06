@@ -18,7 +18,7 @@ export default function App() {
   const [signedIn, setSignedIn] = useState(false);
   const [firstLogin, setFirstLogin] = useState(false);
   const [user, setUser] = useState({ email: "", username: "", location: {lat: 0, lon: 0}});
-  const [distance, setDistance] = useState(1000)
+  const [distance, setDistance] = useState(100000)
   const [username, setUsername] = useState("");
 
   /**
