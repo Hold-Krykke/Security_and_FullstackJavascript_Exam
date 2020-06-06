@@ -4,13 +4,13 @@ import { ApolloClient } from "apollo-client";
 import { InMemoryCache } from "apollo-cache-inmemory";
 import { createHttpLink } from "apollo-link-http";
 import { onError } from "apollo-link-error";
-import { SERVER_URL } from "../constants/settings";
+import { SERVER_URL, TOKEN_KEY } from "../constants/settings";
 import { Observable } from "apollo-link";
 import jwt_decode from "jwt-decode";
 
 // Places auth token on every outgoing request. 
 const authLink = setContext(async (request, previousContext) => {
-  const token = await SecureStore.getItemAsync("token");
+  const token = await SecureStore.getItemAsync(TOKEN_KEY);
   // return the headers to the context so httpLink can read them
   return {
     headers: {
@@ -22,7 +22,7 @@ const authLink = setContext(async (request, previousContext) => {
 
 const getNewToken = async () => {
   try {
-    const expiredToken = await SecureStore.getItemAsync("token");
+    const expiredToken = await SecureStore.getItemAsync(TOKEN_KEY);
     const decoded = jwt_decode(expiredToken);
     if (!decoded.isOAuth) throw Error("You need to log in again");
     const request = {
@@ -37,7 +37,7 @@ const getNewToken = async () => {
       .then((response) => response.json())
       .then((data) => data.token);
 
-    await SecureStore.setItemAsync("token", token);
+    await SecureStore.setItemAsync(TOKEN_KEY, token);
 
     return token;
   } catch (err) {

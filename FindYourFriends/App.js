@@ -7,7 +7,7 @@ import CreateUserScreen from "./screens/CreateUserScreen";
 import ChatScreen from "./screens/ChatScreen";
 import { ApolloProvider } from "@apollo/react-hooks";
 import client from "./utils/ApolloClientProvider";
-import { SERVER_URL } from "./constants/settings";
+import { SERVER_URL, TOKEN_KEY } from "./constants/settings";
 import 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -18,6 +18,14 @@ export default function App() {
   const [firstLogin, setFirstLogin] = useState(false);
   const [user, setUser] = useState({ email: "", username: "" });
   const [username, setUsername] = useState("");
+
+  const logout = async () => {
+    Promise.all([client.clearStore(), SecureStore.deleteItemAsync(TOKEN_KEY),
+    ]).then(() => {
+      console.log("User has logged out");
+      setSignedIn(false);
+    });
+  };
 
   const Stack = createStackNavigator();
 
@@ -37,16 +45,16 @@ export default function App() {
               />}
             </Stack.Screen>
             <Stack.Screen name="UserScreen">
-                {(props) => (<UserScreen {...props}
-                    setSignedIn={setSignedIn}
-                    user={user}
-                    setUser={setUser}
-                    username={username}
-                    setUsername={setUsername}
-                    visible={firstLogin}
-                    showModal={setFirstLogin}
-                  />
-                )}
+              {(props) => (<UserScreen {...props}
+                setSignedIn={setSignedIn}
+                user={user}
+                setUser={setUser}
+                username={username}
+                setUsername={setUsername}
+                visible={firstLogin}
+                showModal={setFirstLogin}
+              />
+              )}
             </Stack.Screen>
             <Stack.Screen name="CreateUserScreen">{props => <CreateUserScreen {...props} />}</Stack.Screen>
             <Stack.Screen name="MapScreen">{props => <MapScreen {...props} />}</Stack.Screen>
