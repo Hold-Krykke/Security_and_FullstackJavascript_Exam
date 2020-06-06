@@ -68,7 +68,7 @@ export default function App() {
               )}
             </Stack.Screen>
             <Stack.Screen name="CreateUserScreen">{props => <CreateUserScreen {...props} />}</Stack.Screen>
-            <Stack.Screen name="MapScreen">{props => <MapScreen props={props} user={user} setUser={setUser} distance={distance} setDistance={setDistance} />}</Stack.Screen>
+            <Stack.Screen name="MapScreen">{props => <MapScreen {...props} user={user} setUser={setUser} distance={distance} setDistance={setDistance} />}</Stack.Screen>
           </Stack.Navigator>
         </NavigationContainer>
       </View>

@@ -40,7 +40,7 @@ const MARKER_COLORS = [
 	'indigo',
 ];
 
-const MapScreen = ({user, setUser, distance, setDistance, props}) => {
+const MapScreen = ({user, setUser, distance, setDistance, navigation}) => {
 	let mapRef = useRef(null);
 	const DEBUG = false; //use to display settings on screen
 	const [changeRegion, setChangeRegion] = useState(false);
@@ -138,7 +138,7 @@ const MapScreen = ({user, setUser, distance, setDistance, props}) => {
 
 	return (
 		<>
-			<MapScreenSettings {...props} distance={distance} setDistance={setDistance} />
+			<MapScreenSettings navigation={navigation} distance={distance} setDistance={setDistance} />
 			{DEBUG && user && <Text>{JSON.stringify({...user, distance: distance}, null, 4)}</Text>}
 			<View style={styles.button}>
 			<Button title="Fetch nearby users" onPress={() => getNearbyUsers()}></Button>

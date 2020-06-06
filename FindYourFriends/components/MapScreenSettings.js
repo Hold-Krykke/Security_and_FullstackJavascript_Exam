@@ -13,7 +13,7 @@ import Card from './Card';
 import Input from './Input';
 import colors from '../constants/colors';
 
-const MapScreenSettings = ({props, distance, setDistance}) => {
+const MapScreenSettings = ({navigation, distance, setDistance}) => {
 	const [modalVisible, setModalVisible] = useState(false);
 	const [distanceInput, setDistanceInput] = useState(distance | 1000);
 	const [inputMsg, setInputMsg] = useState('');
@@ -87,7 +87,7 @@ const MapScreenSettings = ({props, distance, setDistance}) => {
 							<Button
 								color={colors.secondary}
 								title="GO BACK"
-								onPress={() => props.navigation.goBack()}
+								onPress={() => navigation.goBack()}
 							/>
 						</View>
 					</View>
