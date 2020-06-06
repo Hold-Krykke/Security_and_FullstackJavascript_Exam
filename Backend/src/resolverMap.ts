@@ -28,7 +28,7 @@ const jwt = require("jsonwebtoken");
 
 const schema: string = process.env.DATABASE_SCHEMA || "";
 
-const tokenExpirationInSeconds = 3600;
+const tokenExpirationInSeconds = Number(process.env.TOKEN_EXPIRATION)
 
 const userFacade: UserFacade = new UserFacade(schema);
 const positionFacade: PositionFacade = new PositionFacade();

@@ -5,11 +5,6 @@ const handleError = ({ graphQLErrors, networkError }) => {
   let errorMessage;
   if (graphQLErrors) {
     graphQLErrors.map((err, index) => {
-      console.log(
-        "ERROR IN HANDLE-ERROR",
-        `\nERROR NUMBER ${index}\n`,
-        JSON.stringify({ err }, null, 4)
-      );
       const { message, locations, path } = err;
       const code = err.extensions.code;
       const errorMap = (code) => {
@@ -44,7 +39,13 @@ const handleError = ({ graphQLErrors, networkError }) => {
       errorMessage = errorMap(code);
     });
   }
-  if (networkError) console.log(`[Network error]: ${networkError}`);
+  if (networkError) {
+    console.log(`[Network error]: ${networkError}`);
+    errorMessage = {
+      title: "Network Error",
+      message: networkError.message,
+    };
+  }
   return errorMessage;
 };
 

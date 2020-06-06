@@ -1,11 +1,13 @@
 var path = require("path");
 require("dotenv").config({ path: path.join(process.cwd(), ".env") });
+import "chai"
 import { expect } from "chai";
 import { ApiError } from "../src/customErrors/apiError";
 import bcrypt from "bcryptjs";
 import UserDataAccessorObject from "../src/dataAccessorObjects/userDAO";
 import IUser from "../src/interfaces/IUser";
 import UserFacade from "../src/facades/userFacade";
+import * as mocha from "mocha"
 
 const schema: string = process.env.DATABASE_SCHEMA_TEST || "";
 let UDAO: UserDataAccessorObject;
