@@ -14,35 +14,21 @@ import Input from './Input';
 import colors from '../constants/colors';
 
 const MapScreenSettings = ({props, distance, setDistance}) => {
-	//console.log('MapScreenSettings printing distance --> ', distance);
 	const [modalVisible, setModalVisible] = useState(false);
 	const [distanceInput, setDistanceInput] = useState(distance | 1000);
 	const [inputMsg, setInputMsg] = useState('');
 
 	const inputHandler = (val) => {
-		//val = parseFloat(val.replace('/,/', '.'));
 		setDistanceInput(val);
-		// console.log('##################innerValue###############', val);
-		// if (val) {
-		// 	setInputMsg('');
-		// 	//setDistanceInput(val);
-		// } else {
-		// 	setInputMsg('Input must be a decimal number');
-		// }
 	};
 
 	const pressHandler = () => {
-		//distanceInput assumed safe
-		let val = distanceInput.toString().replace('/,/', '.') //Sometimes reads as number. Convert to string, replace commas
-		val = parseFloat(val); 
-		
-		//val = parseFloat(val); //converts pretty much any flawed string to our demands. "abc105.5abc" would be parsed 105.5
-		//if (distanceInput.includes(',')) distanceInput = distanceInput.replace(',', '.'); //remove if check
-		//let distanceValue = distanceInput.replace(',', '.');
+		let val = distanceInput.toString().replace('/,/', '.'); //Sometimes reads as number. Convert to string, replace commas
+		val = parseFloat(val); //converts pretty much any flawed string to our demands. "abc105.5abc" would be parsed 105.5
 		if (val) setDistance(val);
 		else {
 			setInputMsg('Input must be a decimal number');
-			setTimeout(() => setInputMsg(''), 2000)
+			setTimeout(() => setInputMsg(''), 2000);
 		}
 		setModalVisible(false);
 	};
@@ -114,10 +100,8 @@ const MapScreenSettings = ({props, distance, setDistance}) => {
 const styles = StyleSheet.create({
 	cardStyle: {
 		justifyContent: 'center',
-
 		alignItems: 'center',
 		padding: 0,
-		//marginTop: '20%',
 		width: Dimensions.get('window').width * 0.7,
 		height: Dimensions.get('window').height * 0.4,
 		backgroundColor: '#fff',
@@ -126,12 +110,10 @@ const styles = StyleSheet.create({
 	screen: {
 		flex: 0,
 		padding: 10,
-		//alignItems: 'center',
 		justifyContent: 'center',
 	},
 	mapButtons: {
 		flex: 0,
-		//padding: 10,
 		alignItems: 'stretch',
 		justifyContent: 'flex-start',
 		flexDirection: 'row',
@@ -148,7 +130,6 @@ const styles = StyleSheet.create({
 		color: colors.secondary,
 		fontSize: 14,
 		fontWeight: 'bold',
-		//marginBottom: 20,
 	},
 	tipText: {
 		color: colors.primary,
@@ -157,10 +138,7 @@ const styles = StyleSheet.create({
 		fontStyle: 'italic',
 	},
 	innerModal: {
-		//width: 300,
-		//maxWidth: '80%',
 		justifyContent: 'center',
-
 		alignItems: 'center',
 		padding: 0,
 		marginTop: 10,
@@ -172,13 +150,7 @@ const styles = StyleSheet.create({
 	settingsContainer: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		//justifyContent:'center',
 		justifyContent: 'space-around',
-		//alignItems: 'center'
-	},
-	touchableEnabled: {},
-	touchableText: {
-		letterSpacing: 0.5,
 	},
 	modal: {
 		flex: 1,
@@ -188,7 +160,6 @@ const styles = StyleSheet.create({
 		backgroundColor: 'rgba(80,80,80,0.1)',
 	},
 	button: {
-		//backgroundColor: 'white',
 		width: 110,
 		marginVertical: 10,
 	},

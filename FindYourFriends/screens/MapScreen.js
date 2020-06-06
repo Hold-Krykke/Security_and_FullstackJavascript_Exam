@@ -40,74 +40,14 @@ const MARKER_COLORS = [
 	'indigo',
 ];
 
-// const UserInfo = () => {
-
-// }
-
 const MapScreen = ({user, setUser, distance, setDistance, props}) => {
-	//console.log('user', user);
 	let mapRef = useRef(null);
-	const DEBUG = true; //use to display settings on screen | debug TODO remove
-	//const [distance, setDistance] = useState(1000);
+	const DEBUG = false; //use to display settings on screen
 	const [changeRegion, setChangeRegion] = useState(false);
 	const [region, setRegion] = useState(null);
 	const [users, setUsers] = useState([]);
-	//pass userInfo as props instead of bogus "settings" object
-
-	// const [
-	// 	updatePosition,
-	// 	{loadingPosition, errorPosition, dataPosition, calledPosition},
-	// ] = useMutation(facade.UPDATE_POSITION);
 
 	const [nearbyUsers, {loading, error, data, called}] = useMutation(facade.NEARBY_USERS);
-
-	const NearbyUsersState = async () => {
-		try {
-			await nearbyUsers({
-				variables: {
-					username: user.username,
-					coordinates: {
-						lon: user.location.lon,
-						lat: user.location.lat,
-					},
-					distance: 100000, //todo remove static distance
-				},
-			});
-			//console.log('getNearbyUsers', dataUsers);
-			//console.log('getNearbyUsers', result);
-			//setUsers(result.dataUsers.getNearbyUsers); //experiemental, can't test because no login. may be "data" or "dataUsers"
-		} catch (err) {
-			console.log('getNearbyUsers error:', err);
-			//todo proper error handling
-		}
-
-		if (error) {
-			//todo handle error
-		}
-		if (data) {
-			console.log(data);
-			//if (users != data.getNearbyUsers)
-		// 	if (data.getNearbyUsers) {
-		// 		return data.getNearbyUsers.map((user) => {
-		// 			return (
-		// 				<MapView.Marker
-		// 					title={user.username}
-		// 					pinColor={MARKER_COLORS[Math.floor(Math.random() * MARKER_COLORS.length)]} //random color from possible ones
-		// 					key={user.username}
-		// 					coordinate={{
-		// 						longitude: user.lon,
-		// 						latitude: user.lat,
-		// 					}}
-		// 				/>
-		// 			);
-		// 		});
-		// 	}
-		// }
-		if (data.getNearbyUsers) {
-			setUsers(data.getNearbyUsers)
-		}
-	}
-	};
 
 	const getNearbyUsers = async () => {
 		try {
@@ -118,54 +58,30 @@ const MapScreen = ({user, setUser, distance, setDistance, props}) => {
 						lon: user.location.lon,
 						lat: user.location.lat,
 					},
-					distance: 100000, //todo remove static distance
+					distance,
 				},
 			});
-			//console.log('getNearbyUsers', dataUsers);
-			//console.log('getNearbyUsers', result);
-			//setUsers(result.dataUsers.getNearbyUsers); //experiemental, can't test because no login. may be "data" or "dataUsers"
 		} catch (err) {
 			console.log('getNearbyUsers error:', err);
 			//todo proper error handling
 		}
 	};
-	// if (error) {
-	// 	//todo handle error
-	// }
-	if (data) {
-		console.log(data);
-		//if (users != data.getNearbyUsers)
-		if (data.getNearbyUsers) setUsers(data.nearbyUsers); //infinite re-render
-		//setUsers(data.getNearbyUsers);
-	}
-	 
-	
 
-	// const updateMyPosition = async () => {
-	// 	//experiemental, can't test because no login
-	// 	try {
-	// 		const result = await updatePosition({
-	// 			variables: {
-	// 				username: user.username,
-	// 				coordinates: {
-	// 					lon: user.location.lon,
-	// 					lat: user.location.lat,
-	// 				},
-	// 			},
-	// 		});
-	// 		console.log('updateMyPosition', result);
-	// 		//Do anything?
-	// 	} catch (err) {
-	// 		console.log('updateMyPosition error:', err);
-	// 		//todo proper error handling
-	// 	}
-	// };
+	if (error) {
+		console.log('NearbyUsersError:', error);
+		//todo proper error handling
+	}
+
+	useEffect(() => {
+		if (data && data.getNearbyUsers) {
+			setUsers(...[data.getNearbyUsers]);
+		}
+	}, [data]);
 
 	const animateRegionMapView = (animationTime = 1000) => {
 		if (mapRef.current) mapRef.current.animateToRegion(region, animationTime);
 	};
 
-	
 	useEffect(() => {
 		//Always change MapView region based on new location
 		if (user.location.lat && user.location.lon) {
@@ -178,11 +94,6 @@ const MapScreen = ({user, setUser, distance, setDistance, props}) => {
 			//On first run, trigger next useEffect
 			setChangeRegion(true);
 		}
-
-		//getNearbyUsers(); //todo activate when testing can be done. currently tells "need to be logged in".
-		//^This might be too often. Should maybe be chained with updateMyPosition
-		//updateMyPosition() //this is apparently already done on getNearbyUsers..so delete.
-		//return null
 	}, [user.location]);
 
 	useEffect(() => {
@@ -201,7 +112,6 @@ const MapScreen = ({user, setUser, distance, setDistance, props}) => {
 			(async () => {
 				let {status} = await Location.requestPermissionsAsync();
 				if (status !== 'granted') {
-					//setErrorMsg('Permission to access location was denied');
 					//TODO Handle error with new system
 					//go to settings would be cool: https://docs.expo.io/versions/latest/sdk/intent-launcher/
 					return;
@@ -230,7 +140,9 @@ const MapScreen = ({user, setUser, distance, setDistance, props}) => {
 		<>
 			<MapScreenSettings {...props} distance={distance} setDistance={setDistance} />
 			{DEBUG && user && <Text>{JSON.stringify({...user, distance: distance}, null, 4)}</Text>}
+			<View style={styles.button}>
 			<Button title="Fetch nearby users" onPress={() => getNearbyUsers()}></Button>
+			</View>
 			<TouchableWithoutFeedback
 				touchSoundDisabled={true}
 				onPress={() => {
@@ -245,7 +157,6 @@ const MapScreen = ({user, setUser, distance, setDistance, props}) => {
 								showsUserLocation
 								loadingEnabled={true}
 								onLongPress={() => animateRegionMapView()}>
-								
 								{users &&
 									users.map((user) => {
 										return (
@@ -262,7 +173,6 @@ const MapScreen = ({user, setUser, distance, setDistance, props}) => {
 									})}
 							</MapView>
 						)}
-						{/* <NearbyUsersState/> */}
 					</View>
 				</View>
 			</TouchableWithoutFeedback>
@@ -273,7 +183,6 @@ const MapScreen = ({user, setUser, distance, setDistance, props}) => {
 const styles = StyleSheet.create({
 	screen: {
 		flex: 1,
-		//padding: 10,
 		alignItems: 'center',
 		justifyContent: 'flex-start',
 	},
@@ -297,6 +206,13 @@ const styles = StyleSheet.create({
 	mapStyle: {
 		width: WIDTH,
 		height: '100%',
+	},
+	button: {
+		justifyContent:'center',
+		alignItems: 'center',
+		width: 220,
+		marginVertical: 10,
+		
 	},
 });
 
