@@ -1,12 +1,19 @@
 import React, {useState, useEffect, useRef} from 'react';
-import {Dimensions, StyleSheet, View, Text, TouchableWithoutFeedback, Keyboard} from 'react-native';
+import {
+	Dimensions,
+	StyleSheet,
+	View,
+	Text,
+	TouchableWithoutFeedback,
+	Keyboard,
+	Button,
+} from 'react-native';
 import * as Location from 'expo-location';
 import MapView from 'react-native-maps';
 import colors from '../constants/colors';
 import facade from '../facade';
 import MapScreenSettings from '../components/MapScreenSettings';
 import {useMutation} from '@apollo/react-hooks';
-
 
 const {width: WIDTH, height: HEIGHT} = Dimensions.get('window');
 const ASPECT_RATIO = WIDTH / HEIGHT;
@@ -33,89 +40,150 @@ const MARKER_COLORS = [
 	'indigo',
 ];
 
-const MapScreen = (props) => {
+// const UserInfo = () => {
+
+// }
+
+const MapScreen = ({user, setUser, distance, setDistance, props}) => {
+	//console.log('user', user);
 	let mapRef = useRef(null);
 	const DEBUG = true; //use to display settings on screen | debug TODO remove
-	const [settings, setSettings] = useState({
-		username: 'Johnny',
-		distance: 1000,
-		longitude: null,
-		latitude: null,
-	});
+	//const [distance, setDistance] = useState(1000);
 	const [changeRegion, setChangeRegion] = useState(false);
 	const [region, setRegion] = useState(null);
 	const [users, setUsers] = useState([]);
 	//pass userInfo as props instead of bogus "settings" object
 
-	const [
-		updatePosition,
-		{loadingPosition, errorPosition, dataPosition, calledPosition},
-	] = useMutation(facade.UPDATE_POSITION);
+	// const [
+	// 	updatePosition,
+	// 	{loadingPosition, errorPosition, dataPosition, calledPosition},
+	// ] = useMutation(facade.UPDATE_POSITION);
 
-	const [nearbyUsers, {loadingUsers, errorUsers, dataUsers, calledUsers}] = useMutation(
-		facade.NEARBY_USERS
-	);
+	const [nearbyUsers, {loading, error, data, called}] = useMutation(facade.NEARBY_USERS);
+
+	const NearbyUsersState = async () => {
+		try {
+			await nearbyUsers({
+				variables: {
+					username: user.username,
+					coordinates: {
+						lon: user.location.lon,
+						lat: user.location.lat,
+					},
+					distance: 100000, //todo remove static distance
+				},
+			});
+			//console.log('getNearbyUsers', dataUsers);
+			//console.log('getNearbyUsers', result);
+			//setUsers(result.dataUsers.getNearbyUsers); //experiemental, can't test because no login. may be "data" or "dataUsers"
+		} catch (err) {
+			console.log('getNearbyUsers error:', err);
+			//todo proper error handling
+		}
+
+		if (error) {
+			//todo handle error
+		}
+		if (data) {
+			console.log(data);
+			//if (users != data.getNearbyUsers)
+		// 	if (data.getNearbyUsers) {
+		// 		return data.getNearbyUsers.map((user) => {
+		// 			return (
+		// 				<MapView.Marker
+		// 					title={user.username}
+		// 					pinColor={MARKER_COLORS[Math.floor(Math.random() * MARKER_COLORS.length)]} //random color from possible ones
+		// 					key={user.username}
+		// 					coordinate={{
+		// 						longitude: user.lon,
+		// 						latitude: user.lat,
+		// 					}}
+		// 				/>
+		// 			);
+		// 		});
+		// 	}
+		// }
+		if (data.getNearbyUsers) {
+			setUsers(data.getNearbyUsers)
+		}
+	}
+	};
 
 	const getNearbyUsers = async () => {
 		try {
-			const result = await nearbyUsers({
+			await nearbyUsers({
 				variables: {
-					username: settings.username,
+					username: user.username,
 					coordinates: {
-						lon: settings.longitude,
-						lat: settings.latitude,
+						lon: user.location.lon,
+						lat: user.location.lat,
 					},
-					distance: settings.distance,
+					distance: 100000, //todo remove static distance
 				},
 			});
-			console.log('getNearbyUsers', result);
-			setUsers(result.data.getNearbyUsers); //experiemental, can't test because no login. may be "data" or "dataUsers"
+			//console.log('getNearbyUsers', dataUsers);
+			//console.log('getNearbyUsers', result);
+			//setUsers(result.dataUsers.getNearbyUsers); //experiemental, can't test because no login. may be "data" or "dataUsers"
 		} catch (err) {
 			console.log('getNearbyUsers error:', err);
 			//todo proper error handling
 		}
 	};
+	// if (error) {
+	// 	//todo handle error
+	// }
+	if (data) {
+		console.log(data);
+		//if (users != data.getNearbyUsers)
+		if (data.getNearbyUsers) setUsers(data.nearbyUsers); //infinite re-render
+		//setUsers(data.getNearbyUsers);
+	}
+	 
+	
 
-	const updateMyPosition = async () => {
-		//experiemental, can't test because no login
-		try {
-			const result = await updatePosition({
-				variables: {
-					username: settings.username,
-					coordinates: {
-						lon: 12.57,
-						lat: 55.66,
-					},
-				},
-			});
-			console.log('updateMyPosition', result);
-			//Do anything?
-		} catch (err) {
-			console.log('updateMyPosition error:', err);
-			//todo proper error handling
-		}
-	};
+	// const updateMyPosition = async () => {
+	// 	//experiemental, can't test because no login
+	// 	try {
+	// 		const result = await updatePosition({
+	// 			variables: {
+	// 				username: user.username,
+	// 				coordinates: {
+	// 					lon: user.location.lon,
+	// 					lat: user.location.lat,
+	// 				},
+	// 			},
+	// 		});
+	// 		console.log('updateMyPosition', result);
+	// 		//Do anything?
+	// 	} catch (err) {
+	// 		console.log('updateMyPosition error:', err);
+	// 		//todo proper error handling
+	// 	}
+	// };
 
 	const animateRegionMapView = (animationTime = 1000) => {
-		mapRef.current.animateToRegion(region, animationTime);
+		if (mapRef.current) mapRef.current.animateToRegion(region, animationTime);
 	};
 
+	
 	useEffect(() => {
 		//Always change MapView region based on new location
-		if (settings.latitude && settings.longitude) {
+		if (user.location.lat && user.location.lon) {
 			setRegion({
-				latitude: settings.latitude,
-				longitude: settings.longitude,
+				latitude: user.location.lat,
+				longitude: user.location.lon,
 				latitudeDelta: LATITUDE_DELTA,
 				longitudeDelta: LONGITUDE_DELTA,
 			});
 			//On first run, trigger next useEffect
 			setChangeRegion(true);
 		}
-		//getNearbyUsers() //todo activate when testing can be done. currently tells "need to be logged in".
+
+		//getNearbyUsers(); //todo activate when testing can be done. currently tells "need to be logged in".
 		//^This might be too often. Should maybe be chained with updateMyPosition
-		//updateMyPosition()
-	}, [settings]);
+		//updateMyPosition() //this is apparently already done on getNearbyUsers..so delete.
+		//return null
+	}, [user.location]);
 
 	useEffect(() => {
 		//set MapView camera region close to user ONLY on startup
@@ -140,10 +208,12 @@ const MapScreen = (props) => {
 				}
 
 				let location = await Location.getCurrentPositionAsync({});
-				setSettings({
-					...settings,
-					longitude: location.coords.longitude,
-					latitude: location.coords.latitude,
+				setUser({
+					...user,
+					location: {
+						lon: location.coords.longitude,
+						lat: location.coords.latitude,
+					},
 				});
 
 				if (DEBUG) {
@@ -158,9 +228,9 @@ const MapScreen = (props) => {
 
 	return (
 		<>
-			<MapScreenSettings settings={settings} setSettings={setSettings} />
-			{DEBUG && settings && <Text>{JSON.stringify(settings, null, 4)}</Text>}
-
+			<MapScreenSettings {...props} distance={distance} setDistance={setDistance} />
+			{DEBUG && user && <Text>{JSON.stringify({...user, distance: distance}, null, 4)}</Text>}
+			<Button title="Fetch nearby users" onPress={() => getNearbyUsers()}></Button>
 			<TouchableWithoutFeedback
 				touchSoundDisabled={true}
 				onPress={() => {
@@ -175,20 +245,24 @@ const MapScreen = (props) => {
 								showsUserLocation
 								loadingEnabled={true}
 								onLongPress={() => animateRegionMapView()}>
-								{users && //experiemental, can't test because no login
+								
+								{users &&
 									users.map((user) => {
-										<MapView.Marker
-											title={user.username}
-											pinColor={MARKER_COLORS[Math.floor(Math.random() * array.length)]} //random color from possible ones
-											key={user.username}
-											coordinate={{
-												longitude: user.lon,
-												latitude: user.lat,
-											}}
-										/>;
+										return (
+											<MapView.Marker
+												title={user.username}
+												pinColor={MARKER_COLORS[Math.floor(Math.random() * MARKER_COLORS.length)]} //random color from possible ones
+												key={user.username}
+												coordinate={{
+													longitude: user.lon,
+													latitude: user.lat,
+												}}
+											/>
+										);
 									})}
 							</MapView>
 						)}
+						{/* <NearbyUsersState/> */}
 					</View>
 				</View>
 			</TouchableWithoutFeedback>

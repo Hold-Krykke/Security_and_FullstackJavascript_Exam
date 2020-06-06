@@ -13,22 +13,38 @@ import Card from './Card';
 import Input from './Input';
 import colors from '../constants/colors';
 
-const MapScreenSettings = ({settings, setSettings}) => {
-	console.log("MapScreenSettigns printing settings", settings);
+const MapScreenSettings = ({props, distance, setDistance}) => {
+	//console.log('MapScreenSettings printing distance --> ', distance);
 	const [modalVisible, setModalVisible] = useState(false);
-	const [distanceInput, setDistanceInput] = useState(settings.distance | 1000);
+	const [distanceInput, setDistanceInput] = useState(distance | 1000);
 	const [inputMsg, setInputMsg] = useState('');
 
-	const inputHandler = (distance) => {
-		setInputMsg('');
-		distance = distance.replace(',', '.');
-		setDistanceInput(distance);
-		distance = parseFloat(distance); //converts pretty much any flawed string to our demands. "abc105.5abc" would be parsed 105.5
-		if (distance) {
-			setSettings({...settings, distance});
-		} else {
+	const inputHandler = (val) => {
+		//val = parseFloat(val.replace('/,/', '.'));
+		setDistanceInput(val);
+		// console.log('##################innerValue###############', val);
+		// if (val) {
+		// 	setInputMsg('');
+		// 	//setDistanceInput(val);
+		// } else {
+		// 	setInputMsg('Input must be a decimal number');
+		// }
+	};
+
+	const pressHandler = () => {
+		//distanceInput assumed safe
+		let val = distanceInput.toString().replace('/,/', '.') //Sometimes reads as number. Convert to string, replace commas
+		val = parseFloat(val); 
+		
+		//val = parseFloat(val); //converts pretty much any flawed string to our demands. "abc105.5abc" would be parsed 105.5
+		//if (distanceInput.includes(',')) distanceInput = distanceInput.replace(',', '.'); //remove if check
+		//let distanceValue = distanceInput.replace(',', '.');
+		if (val) setDistance(val);
+		else {
 			setInputMsg('Input must be a decimal number');
+			setTimeout(() => setInputMsg(''), 2000)
 		}
+		setModalVisible(false);
 	};
 	return (
 		<TouchableWithoutFeedback
@@ -50,8 +66,8 @@ const MapScreenSettings = ({settings, setSettings}) => {
 							<Text style={styles.text}>Search radius</Text>
 							<View style={styles.settingsContainer}>
 								<Input
-									value={distanceInput.toString()}
-									onChangeText={inputHandler}
+									defaultValue={distanceInput.toString()}
+									onChangeText={(input) => inputHandler(input)}
 									keyboardType="numeric"
 									autoFocus={true}
 								/>
@@ -59,7 +75,7 @@ const MapScreenSettings = ({settings, setSettings}) => {
 							</View>
 							<View style={styles.button}>
 								<Button
-									onPress={() => setModalVisible(false)}
+									onPress={() => pressHandler()}
 									color={colors.secondary}
 									title="Return"
 									disabled={!!inputMsg}
@@ -82,11 +98,11 @@ const MapScreenSettings = ({settings, setSettings}) => {
 							/>
 						</View>
 						<View style={styles.button}>
-						<Button
-							color={colors.secondary}
-							title="GO BACK"
-							onPress={() => props.navigation.goBack()}
-						/>
+							<Button
+								color={colors.secondary}
+								title="GO BACK"
+								onPress={() => props.navigation.goBack()}
+							/>
 						</View>
 					</View>
 				</View>
