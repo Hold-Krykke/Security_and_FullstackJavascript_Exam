@@ -9,8 +9,8 @@
 * [Security Eksamens Rapport](https://github.com/Hold-Krykke/Security_and_FullstackJavascript_Exam/blob/master/RAPPORT.md)
 
 ## JavaScript Produkt
-* [React Native App](#)
-* [Backend](#)
+* [React Native App](https://expo.io/@mrhardcode/FindYourFriends)
+* [Backend](https://exam.bjarup.com/graphql)
 
 
 ### Overordnet projekt ide:
