@@ -7,6 +7,7 @@ import {
 	TouchableWithoutFeedback,
 	Keyboard,
 	Button,
+	ActivityIndicator
 } from 'react-native';
 import * as Location from 'expo-location';
 import MapView from 'react-native-maps';
@@ -152,6 +153,7 @@ const MapScreen = ({user, setUser, distance, setDistance, navigation}) => {
 				}}>
 				<View style={styles.screen}>
 					<View style={styles.container}>
+						{!region && <ActivityIndicator/>}
 						{region && (
 							<MapView
 								ref={mapRef}

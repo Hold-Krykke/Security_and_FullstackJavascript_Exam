@@ -15,15 +15,11 @@ import Card from "../components/Card";
 import Input from "../components/Input";
 import colors from "../constants/colors";
 import handleError from "../utils/ErrorHandler";
-import { Linking } from "expo";
-import * as WebBrowser from "expo-web-browser";
-import jwt_decode from "jwt-decode"; // https://www.npmjs.com/package/jwt-decode
 import * as SecureStore from "expo-secure-store";
 import Alert from "../utils/MakeAlert";
 import facade from "../facade";
 import { useMutation } from "@apollo/react-hooks";
-
-const secureStoreKey = "token";
+import { TOKEN_KEY } from "../constants/settings";
 
 const UserScreen = ({
   visible,
@@ -32,7 +28,6 @@ const UserScreen = ({
   username,
   setUsername,
   showModal,
-  setSignedIn,
   navigation,
   logout,
 }) => {
@@ -44,10 +39,7 @@ const UserScreen = ({
     async function saveNewToken() {
       if (data) {
         if (data.registerOAuthUser != "") {
-          await SecureStore.setItemAsync(
-            secureStoreKey,
-            data.registerOAuthUser
-          );
+          await SecureStore.setItemAsync(TOKEN_KEY, data.registerOAuthUser);
         } else {
           Alert("Could not save new username", "Error");
         }
@@ -71,7 +63,7 @@ const UserScreen = ({
           username: username,
         },
       });
-      let temp = {...user};
+      let temp = { ...user };
       temp.username = username;
       setUser({ ...temp });
       showModal(false);
@@ -88,7 +80,7 @@ const UserScreen = ({
           username: user.email,
         },
       });
-      let temp = {...user};
+      let temp = { ...user };
       temp.username = user.email;
       setUser({ ...temp });
       showModal(false);
@@ -151,10 +143,6 @@ const UserScreen = ({
                 </View>
               </Modal>
               <View style={styles.container}>
-                {/* 
-        Upon Logout, be sure to set both the SignedIn state
-        but also remove the Token from the SecureStore. 
-      */}
                 <Button
                   title="Log out"
                   style={styles.button}
