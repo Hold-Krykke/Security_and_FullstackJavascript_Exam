@@ -75,29 +75,6 @@ describe("Verify the UserFacade", () => {
     expect(success).to.be.equal(true);
   });
 
-  it("Should get user Johnny", async () => {
-    const user: IUser = await facade.getUserByUsername("Johnny");
-    expect(user.email).to.be.equal("johnny@ringo.com");
-    expect(user.isOAuth).to.be.equal(0);
-    expect(user.password).to.not.be.equal(null);
-  });
-
-  it("Negative, Should fail to get user IDontExist", async () => {
-    try {
-      const user: IUser = await facade.getUserByUsername("IDontExist");
-    } catch (err) {
-      expect(err instanceof ApiError).to.be.equal(true);
-      expect(err.message).to.be.equal(
-        "User with username: IDontExist was not found"
-      );
-    }
-  });
-
-  it("Should delete user Johnny", async () => {
-    const success: string = await facade.deleteUser("Johnny");
-    expect(success).to.be.equal("User Johnny was removed");
-  });
-
   it("Should check user Jenny", async () => {
     const success: boolean = await facade.checkUser(
       "jenny@thekill.com",
@@ -122,20 +99,6 @@ describe("Verify the UserFacade", () => {
       expect(err.message).to.be.equal(
         "User with email: i@dont.exist was not found"
       );
-    }
-  });
-
-  it("Should check if user Jenny is OAuth type user", async () => {
-    const status: boolean = await facade.isOAuthUser("Jenny");
-    expect(status).to.be.equal(false);
-  });
-
-  it("Negative, Should fail to check if user IDontExist is OAuth type user", async () => {
-    try {
-      const status: boolean = await facade.isOAuthUser("IDontExist");
-    } catch (err) {
-      expect(err instanceof ApiError).to.be.equal(true);
-      expect(err.message).to.be.equal("User IDontExist not found");
     }
   });
 
