@@ -68,17 +68,6 @@ const initPassport = () => {
             }
         }));
 
-    passport.use(new JWTStrategy({
-        jwtFromRequest: (req: any) => req.cookies.jwt,
-        secretOrKey: process.env.SECRET,
-    },
-        (jwtPayload: any, done: Function) => {
-            if (Date.now() > jwtPayload.expires) {
-                return done('jwt expired');
-            }
-            return done(null, jwtPayload);
-        }
-    ));
 
     passport.serializeUser((user, done) => {
         done(null, user);
