@@ -23,6 +23,8 @@
     ],
     "ios": {
       "supportsTablet": true
-    }
+    },
+    "description": "This is an exam project",
+    "githubUrl": "https://github.com/Hold-Krykke/Security_and_FullstackJavascript_Exam"
   }
 }

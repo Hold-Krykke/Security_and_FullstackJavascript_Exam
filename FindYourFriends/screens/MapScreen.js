@@ -108,16 +108,17 @@ const MapScreen = ({user, setUser, distance, setDistance, navigation}) => {
 	}, [changeRegion]);
 
 	useEffect(() => {
-		//Every second ask for location permission and update location state.
-		const interval = setInterval(() => {
-			(async () => {
-				let {status} = await Location.requestPermissionsAsync();
+		(async () => {
+			let {status} = await Location.requestPermissionsAsync();
 				if (status !== 'granted') {
 					//TODO Handle error with new system
 					//go to settings would be cool: https://docs.expo.io/versions/latest/sdk/intent-launcher/
 					return;
-				}
-
+			}
+		})();
+		//Every second update location state.
+		const interval = setInterval(() => {
+			(async () => {
 				let location = await Location.getCurrentPositionAsync({});
 				setUser({
 					...user,
