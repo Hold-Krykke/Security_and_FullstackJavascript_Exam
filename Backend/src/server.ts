@@ -35,6 +35,7 @@ app.use(bodyParser.json());
 app.use(passport.initialize());
 
 //The regular logger needs to be before the router
+app.use(requestLogger);
 
 const tokenExpirationInSeconds = Number(process.env.TOKEN_EXPIRATION)
 
