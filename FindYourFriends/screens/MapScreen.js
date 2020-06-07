@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
 	Dimensions,
 	StyleSheet,
@@ -14,11 +14,11 @@ import MapView from 'react-native-maps';
 import colors from '../constants/colors';
 import facade from '../facade';
 import MapScreenSettings from '../components/MapScreenSettings';
-import {useMutation} from '@apollo/react-hooks';
+import { useMutation } from '@apollo/react-hooks';
 import Alert from "../utils/MakeAlert";
 import handleError from "../utils/ErrorHandler";
 
-const {width: WIDTH, height: HEIGHT} = Dimensions.get('window');
+const { width: WIDTH, height: HEIGHT } = Dimensions.get('window');
 const ASPECT_RATIO = WIDTH / HEIGHT;
 const LATITUDE_DELTA = 0.06;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
@@ -43,14 +43,14 @@ const MARKER_COLORS = [
 	'indigo',
 ];
 
-const MapScreen = ({user, setUser, distance, setDistance, navigation}) => {
+const MapScreen = ({ user, setUser, distance, setDistance, navigation }) => {
 	let mapRef = useRef(null);
 	const DEBUG = false; //use to display settings on screen
 	const [changeRegion, setChangeRegion] = useState(false);
 	const [region, setRegion] = useState(null);
 	const [users, setUsers] = useState([]);
 
-	const [nearbyUsers, {loading, error, data, called}] = useMutation(facade.NEARBY_USERS);
+	const [nearbyUsers, { loading, error, data, called }] = useMutation(facade.NEARBY_USERS);
 
 	const getNearbyUsers = async () => {
 		try {
@@ -71,7 +71,7 @@ const MapScreen = ({user, setUser, distance, setDistance, navigation}) => {
 
 	if (error) {
 		const errorMsg = handleError(error);
-      	Alert(errorMsg.message, errorMsg.title);
+		Alert(errorMsg.message, errorMsg.title);
 	}
 
 	useEffect(() => {
@@ -110,11 +110,11 @@ const MapScreen = ({user, setUser, distance, setDistance, navigation}) => {
 
 	useEffect(() => {
 		(async () => {
-			let {status} = await Location.requestPermissionsAsync();
-				if (status !== 'granted') {
-					//TODO Handle error with new system
-					//go to settings would be cool: https://docs.expo.io/versions/latest/sdk/intent-launcher/
-					return;
+			let { status } = await Location.requestPermissionsAsync();
+			if (status !== 'granted') {
+				//TODO Handle error with new system
+				//go to settings would be cool: https://docs.expo.io/versions/latest/sdk/intent-launcher/
+				return;
 			}
 		})();
 		//Every second update location state.
@@ -142,18 +142,18 @@ const MapScreen = ({user, setUser, distance, setDistance, navigation}) => {
 	return (
 		<>
 			<MapScreenSettings navigation={navigation} distance={distance} setDistance={setDistance} />
-			{DEBUG && user && <Text>{JSON.stringify({...user, distance: distance}, null, 4)}</Text>}
-			<View style={styles.button}>
-			<Button title="Fetch nearby users" onPress={() => getNearbyUsers()}></Button>
-			</View>
+			{DEBUG && user && <Text>{JSON.stringify({ ...user, distance: distance }, null, 4)}</Text>}
 			<TouchableWithoutFeedback
 				touchSoundDisabled={true}
 				onPress={() => {
 					Keyboard.dismiss();
 				}}>
 				<View style={styles.screen}>
+					<View style={styles.button}>
+						<Button color="#32a895" title="FIND FRIENDS" onPress={() => getNearbyUsers()}></Button>
+					</View>
 					<View style={styles.container}>
-						{!region && <ActivityIndicator/>}
+						{!region && <ActivityIndicator />}
 						{region && (
 							<MapView
 								ref={mapRef}
@@ -212,11 +212,10 @@ const styles = StyleSheet.create({
 		height: '100%',
 	},
 	button: {
-		justifyContent:'center',
+		justifyContent: 'center',
 		alignItems: 'center',
 		width: 220,
 		marginVertical: 10,
-		
 	},
 });
 

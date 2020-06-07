@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
 	StyleSheet,
 	View,
@@ -13,7 +13,7 @@ import Card from './Card';
 import Input from './Input';
 import colors from '../constants/colors';
 
-const MapScreenSettings = ({navigation, distance, setDistance}) => {
+const MapScreenSettings = ({ navigation, distance, setDistance }) => {
 	const [modalVisible, setModalVisible] = useState(false);
 	const [distanceInput, setDistanceInput] = useState(distance | 100000);
 	const [inputMsg, setInputMsg] = useState('');
@@ -25,12 +25,14 @@ const MapScreenSettings = ({navigation, distance, setDistance}) => {
 	const pressHandler = () => {
 		let val = distanceInput.toString().replace('/,/', '.'); //Sometimes reads as number. Convert to string, replace commas
 		val = parseFloat(val); //converts pretty much any flawed string to our demands. "abc105.5abc" would be parsed 105.5
-		if (val) setDistance(val);
-		else {
+		if (val) {
+			setModalVisible(false);
+			setDistance(val);
+		} else {
 			setInputMsg('Input must be a decimal number');
 			setTimeout(() => setInputMsg(''), 2000);
 		}
-		setModalVisible(false);
+
 	};
 	return (
 		<TouchableWithoutFeedback
@@ -58,6 +60,7 @@ const MapScreenSettings = ({navigation, distance, setDistance}) => {
 									onChangeText={(input) => inputHandler(input)}
 									keyboardType="numeric"
 									autoFocus={true}
+									style={{ width: "30%" }}
 								/>
 								<Text style={styles.text}> m</Text>
 							</View>
@@ -69,7 +72,7 @@ const MapScreenSettings = ({navigation, distance, setDistance}) => {
 									disabled={!!inputMsg}
 								/>
 							</View>
-							{inputMsg ? <Text style={{...styles.text, color: 'red'}}>{inputMsg}</Text> : null}
+							{inputMsg ? <Text style={{ ...styles.text, color: 'red' }}>{inputMsg}</Text> : null}
 							<Text style={styles.tipText}>Tip: Press the map to return to your location </Text>
 						</Card>
 					</View>
@@ -163,7 +166,7 @@ const styles = StyleSheet.create({
 	},
 	button: {
 		width: 110,
-		marginVertical: 10,
+		marginTop: 10,
 	},
 });
 
