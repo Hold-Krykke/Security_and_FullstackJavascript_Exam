@@ -3,6 +3,10 @@ type Query {
   Check JWT validity
   """
   checkToken(input: String): Boolean
+  """
+  Get a single user with the given username
+  """
+  getUser(username: String!): User
 }
 
 type User {
@@ -61,6 +65,10 @@ type Mutation {
   Update or create own position and returns result of the update
   """
   updatePosition(username: String!, coordinates: LocationInput!): OwnPosition
+  """
+  Deletes an existing user with the given username
+  """
+  deleteUser(username: String!): String
 }
 # You can comment like this here.
 # https://github.com/apollographql/graphql-tag#importing-graphql-files

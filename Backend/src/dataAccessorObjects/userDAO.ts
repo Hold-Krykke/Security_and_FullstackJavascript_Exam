@@ -344,5 +344,95 @@ export default class UserDataAccessorObject {
     })
   }
 
+    /**
+   * Used to get a user from database based on given username.
+   * Returns promise with null as value if no user was found
+   * @param username username of user
+   */
+  getUserByUsername(username: string): Promise<IUser> | Promise<any> {
+    return new Promise((resolve, reject) => {
+      this._pool.getConnection((err, connection) => {
+        if (err) {
+          console.log("Failed to get connection from pool");
+          reject(err);
+          return;
+        }
+        else {
+          try {
+            connection.query('SELECT * FROM users WHERE username = ?', [username], function (error, result) {
+              if (error) {
+                console.log("An error occurred when trying to fetch user");
+                reject(error);
+                return;
+              }
+              const data = result[0];
+              if (typeof (data) == "undefined") {
+                resolve(null);
+                // return statement necessary to end method
+                return;
+              }
+              //I couldn't find a better way to destructure this data
+              const { username, password, email, isOAuth, refreshToken } = data;
+              const user: IUser = {
+                username,
+                password,
+                email,
+                isOAuth,
+                refreshToken
+              }
+              resolve(user);
+            });
+          } catch (error) {
+            console.log("Failed to get user by username");
+            reject(error);
+          } finally {
+            //console.log("Releasing connection back to the pool");
+            connection.release();
+          }
+        }
+      });
+    })
+  }
+
+  /**
+   * Used to remove specific user from database.
+   * Will return promise with success message if user was deleted
+   * @param username username of user
+   */
+  deleteUser(username: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this._pool.getConnection((err, connection) => {
+        if (err) {
+          console.log("Failed to get connection from pool");
+          reject(err);
+          return;
+        }
+        else {
+          try {
+            connection.query('DELETE FROM `users` WHERE (`username` = ?);',
+              [username], function (error, result) {
+                if (error) {
+                  console.log("An error occurred when trying to delete user");
+                  reject(error);
+                  return;
+                }
+                if (result.affectedRows == 0) {
+                  // Should promise be resolved instead (a bit less aggressive strategy)?
+                  reject({ "message": `User ${username} does not exist` });
+                  return;
+                }
+                resolve({ "message": `User ${username} succesfully deleted` });
+              })
+          } catch (err) {
+            console.log("Failed to delete user");
+            reject(err);
+          } finally {
+            connection.release();
+          }
+        }
+      });
+    })
+  }
+
 }
 

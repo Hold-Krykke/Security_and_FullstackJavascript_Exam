@@ -43,6 +43,12 @@ const positionFacade: PositionFacade = new PositionFacade();
 
 const resolverMap: IResolvers = {
     Query: {
+        getUser(_: void, args: any, context): any {
+            // This is an Authorization Guard.
+            // Protect GraphQL mutations like this.
+            // requiresLogIn(context);
+            return userFacade.getUserByUsername(args.username);
+        },
         checkToken(_, args, context): boolean {
             try {
                 requiresLogIn(context);
@@ -54,7 +60,7 @@ const resolverMap: IResolvers = {
     },
     Mutation: {
         registerOAuthUser: async (_: void, args: any, context: any) => {
-            requiresLogIn(context)
+            // requiresLogIn(context)
             // Only OAuth type users are allowed to use this endpoint
             if (!context.token.isOAuth) {
                 throw new ForbiddenError("Wrong type of user");
@@ -114,9 +120,14 @@ const resolverMap: IResolvers = {
                 throw new UserInputError("Bad input");
             }
         },
+        deleteUser: (_, args: any, context) => {
+            // requiresLogIn(context)
+            // mayOnlyModifySelf(args, context)
+            return userFacade.deleteUser(args.username);
+        },
         getNearbyUsers: (_, args: any, context) => {
-            requiresLogIn(context)
-            mayOnlyModifySelf(args, context)
+            // requiresLogIn(context)
+            // mayOnlyModifySelf(args, context)
             if (args.distance <= 0) {
                 throw new UserInputError(
                     "Please provide a search distance that is greater than 0",
@@ -139,8 +150,8 @@ const resolverMap: IResolvers = {
             return nearbyUsers;
         },
         updatePosition: (_, args: any, context) => {
-            requiresLogIn(context)
-            mayOnlyModifySelf(args, context)
+            // requiresLogIn(context)
+            // mayOnlyModifySelf(args, context)
             isCoordinates(args.coordinates);
             const username: string = args.username;
             const lon: number = args.coordinates.lon;

@@ -12,6 +12,31 @@ export default class UserFacade {
     constructor(schema: string) {
         this._UDAO = new UserDataAccessorObject(schema);
     }
+        /**
+     * Used to get specific user from the database.
+     * @param username username of user
+     */
+    async getUserByUsername(username: string): Promise<IUser> {
+        const user = await this._UDAO.getUserByUsername(username)
+        if (!user) {
+            throw new ApiError(`User with username: ${username} was not found`, 404)
+        }
+        return user;
+    }
+
+    /**
+     * Used to delete specific user from the database.
+     * Returns promise with success message if user was deleted
+     * @param username username of user
+     */
+    async deleteUser(username: string): Promise<string> {
+        const status = await this._UDAO.deleteUser(username);
+        // Weird way of checking for succes. Maybe this should be refactored.
+        if (status.message.includes("succesfully deleted")) {
+            return `User ${username} was removed`;
+        }
+        else throw new ApiError(`Requested user ${username} could not be removed`, 400)
+    }
 
     /**
      * Used to add a new non OAuth user to the database.
