@@ -16,7 +16,7 @@ import { TOKEN_KEY } from "../constants/settings"
 const LoginScreen = ({ navigation, setSignedIn, backendURL, setFirstLogin, user, setUser, logout }) => {
     const [userEmail, setUserEmail] = useState("");
     const [password, setPassword] = useState("");
-    const { data, error } = useQuery(facade.CHECK_JWT);
+    const { data, error } = useQuery(facade.CHECK_JWT, {fetchPolicy="network-only"});
 
     useEffect(() => {
         async function check() {
