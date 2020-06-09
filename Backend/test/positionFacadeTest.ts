@@ -4,6 +4,7 @@ import PositionFacade from "../src/facades/positionFacade";
 import { expect } from "chai";
 import { ApiError } from '../src/customErrors/apiError';
 import { positionCreator } from "../src/util/geoUtils"
+import * as mocha from "mocha"
 
 let testPositionCollection: mongo.Collection;
 let facade: PositionFacade;
