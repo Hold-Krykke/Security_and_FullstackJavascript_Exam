@@ -6,8 +6,7 @@
 * **Cph-ab363 - [Asger Bjarup](https://github.com/HrBjarup)**
 * **Cph-cs340 - [Camilla Staunstrup](https://github.com/Castau)**
 
----
-Da vores projekt er en kombination af valgfagene Security og Fullstack Javascript er vores kode ikke deployet endnu. Vi vil derfor også fortsætte med at arbejde på de få funktionaliter der mangler frem til eksamen i Fullstack Javascript. Disse funktionaliter er ikke relevante i forhold til Security. Droplets og servere er sat op og klar til at programmet deployes, se mere om det i rapporten.  
+--- 
 * [Backend kode](https://github.com/Hold-Krykke/Security_and_FullstackJavascript_Exam/tree/master/Backend)
 * [Frontend App kode](https://github.com/Hold-Krykke/Security_and_FullstackJavascript_Exam/tree/master/FindYourFriends)
 ---
